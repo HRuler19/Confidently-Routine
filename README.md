@@ -4,17 +4,24 @@ A client-side routine management system implemented in vanilla JavaScript (ES6).
 
 ## Architectural Overview
 
-┌─────────────────┐
-│ UI Layer │ → DOM rendering, event delegation
-├─────────────────┤
-│ Application │ → Feature modules, business logic
-├─────────────────┤
-│ Event Bus │ → Cross-module communication
-├─────────────────┤
-│ Data Layer │ → Storage abstraction, JSON schema
-├─────────────────┤
-│ Visualization │ → Chart rendering, metrics display
-└─────────────────┘
+<pre>
+┌─────────────────────────────────────┐
+│              UI Layer                │
+│     DOM rendering & events           │
+├─────────────────────────────────────┤
+│          Application Layer           │
+│  Auth · Routines · Dashboard · Notes │
+├─────────────────────────────────────┤
+│              Event Bus                │
+│    Module communication bridge       │
+├─────────────────────────────────────┤
+│             Data Layer                │
+│    LocalStorage · JSON · IndexedDB   │
+├─────────────────────────────────────┤
+│         Visualization Layer          │
+│        Chart.js · Canvas API         │
+└─────────────────────────────────────┘
+</pre>
 
 
 ### Layer Responsibilities
@@ -81,7 +88,7 @@ Handles application preferences:
 
 All persisted data follows a versioned schema:
 
-json
+```json
 {
   "schemaVersion": "1.0",
   "user": {
@@ -92,6 +99,7 @@ json
   "notes": [],
   "settings": {}
 }
+```
 
 The schema includes versioning to support future migrations. All storage operations validate against expected structure before committing writes.
 
@@ -105,6 +113,7 @@ The schema includes versioning to support future migrations. All storage operati
 
 ## Project Structure
 
+<pre>
 Confidently-Routine
 │
 ├── index.html
@@ -136,6 +145,7 @@ Confidently-Routine
 │
 └── data/                     # backups
     └── routines_2026-02-27.json
+<pre>
 
 ## Technical Specifications
 
