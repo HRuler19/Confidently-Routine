@@ -16,6 +16,7 @@ A client-side routine management system implemented in vanilla JavaScript (ES6).
 │ Visualization │ → Chart rendering, metrics display
 └─────────────────┘
 
+
 ### Layer Responsibilities
 
 **UI Layer**  
@@ -39,8 +40,6 @@ State is distributed across feature modules rather than centralized in a single 
 - Provides controlled setters for mutations
 - Emits events after state changes
 
-This pattern prevents unintended cross-module dependencies while maintaining predictable update flows.
-
 ### Data Flow Sequence
 
 1. User interaction triggers DOM event
@@ -53,44 +52,36 @@ This pattern prevents unintended cross-module dependencies while maintaining pre
 ## Module Specifications
 
 ### Authentication Module
-
 Manages user session and profile data without server dependencies. Implements avatar handling through data URLs and maintains profile state across sessions.
 
 ### Routine Engine
-
 Core scheduling logic with:
-
 - Category-based organization
 - Eisenhower matrix classification
 - Completion tracking algorithms
 - Filter operations (by category, priority, status)
 
 ### Analytics Engine
-
 Computes performance metrics from raw routine data:
-
 - Completion rate calculations
 - Trend analysis over configurable periods
 - Category performance breakdowns
 - Priority distribution statistics
 
 ### Notes System
-
 Structured storage for user-generated content. Implements basic CRUD operations with timestamp tracking and category tagging.
 
 ### Settings Manager
-
 Handles application preferences:
-
 - Theme selection (light/dark)
 - Language preferences (i18n infrastructure)
 - Data export/import operations
 
 ## Data Schema
 
-All persisted data conforms to a versioned schema structure:
+All persisted data follows a versioned schema:
 
-```json
+json
 {
   "schemaVersion": "1.0",
   "user": {
