@@ -221,4 +221,3 @@ GitHub • Report • Contact
 © 2026 Confidently-Routine. All rights reserved.
 
 </div>
-```
