@@ -113,7 +113,7 @@ The schema includes versioning to support future migrations. All storage operati
 
 ## Project Structure
 
-<pre>
+```
 Confidently-Routine
 │
 ├── index.html
