@@ -145,7 +145,6 @@ Confidently-Routine
 │
 └── data/                     # backups
     └── routines_2026-02-27.json
-<pre>
 ```
   
 ## Technical Specifications
@@ -210,7 +209,16 @@ Framework-less rendering demonstrates understanding of browser APIs and performa
 - **Calendar integration interfaces**
 
 ---
-**Version:** 1.0.0
-**Last Updated:** 2026
-**License:** MIT
+
+<div align="center">
+
+ Confidently-Routine
+
+GitHub • Report • Contact
+
+⭐ Star this project if you like it!
+
+© 2026 Confidently-Routine. All rights reserved.
+
+</div>
 ```
