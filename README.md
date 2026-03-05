@@ -153,7 +153,7 @@ Confidently-Routine
 └── data/                     # backups
     └── routines_2026-02-27.json
 ```
-  
+
 ## Technical Specifications
 
 Core:
@@ -167,21 +167,20 @@ Visualization
 - **Chart.js**
 - **Canvas API**
 
-
 Storage
-- **LocalStorage** with JSON serialization (max 5-10MB)**
-- **Compression** for large datasets**
-- **Automatic backup** before schema migrations**
-- **Export/import** functionality (JSON/CSV)**
 
+- **LocalStorage** with JSON serialization (max 5-10MB)\*\*
+- **Compression** for large datasets\*\*
+- **Automatic backup** before schema migrations\*\*
+- **Export/import** functionality (JSON/CSV)\*\*
 
 ## Error Handling Strategy
 
-- **Try-catch blocks** in all storage operations**
-- **Fallback UI states** for rendering failures**
-- **Validation layer** before state mutations**
-- **User notifications** for critical errors**
-- **Automatic recovery** mechanisms**
+- **Try-catch blocks** in all storage operations\*\*
+- **Fallback UI states** for rendering failures\*\*
+- **Validation layer** before state mutations\*\*
+- **User notifications** for critical errors\*\*
+- **Automatic recovery** mechanisms\*\*
 
 ## Development Practices
 
@@ -190,7 +189,6 @@ Storage
 - **Composition over inheritance**
 - **Pure rendering functions**
 - **Explicit dependency injection**
-
 
 ## Engineering Decisions
 
@@ -206,7 +204,6 @@ Centralized stores often create unnecessary coupling. Module-local state with cl
 Manual DOM Management
 Framework-less rendering demonstrates understanding of browser APIs and performance optimization at the native level.
 
-
 ## Future Considerations:
 
 - **IndexedDB implementation for larger datasets**
@@ -216,11 +213,10 @@ Framework-less rendering demonstrates understanding of browser APIs and performa
 - **Calendar integration interfaces**
 
 ---
-<<<<<<< HEAD
 
 <div align="center">
 
- Confidently-Routine
+Confidently-Routine
 
 GitHub • Report • Contact
 
@@ -228,11 +224,4 @@ GitHub • Report • Contact
 
 © 2026 Confidently-Routine. All rights reserved.
 
-</div>
-=======
-**Version:** 1.0.0
-**Last Updated:** 2026
-**License:** MIT
-```
-`
->>>>>>> 80cdc8c (feat(layout): style and position header & sidebar in the main layout)
+# </div>
