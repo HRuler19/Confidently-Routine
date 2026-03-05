@@ -1,0 +1,70 @@
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 60 px;
+  left: 0;
+  max-width: 325px;
+  width: 20%;
+  height: 100%;
+  background: #ffffff;
+  padding: 20px 30px;
+  border-right: 1px solid #e5e7eb;
+  box-sizing: border-box;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Menu Items Container */
+#sidebar .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+/* Icons */
+#sidebar .menu-item i {
+  color: #0e5e0a;
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* Text labels */
+#sidebar .menu-item div {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* Hover effect */
+#sidebar .menu-item:hover {
+  background: #f3f3f3;
+}
+
+/* Active / menu */
+#sidebar .menu-item.active {
+  background: #0e5e0a;
+  color: #ffffff;
+}
+
+#sidebar .menu-item.active i,
+#sidebar .menu-item.active div {
+  color: #ffffff;
+}
+
+/* Responsive: Sidebar  */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 60px;
+    padding: 20px 8px;
+  }
+  #sidebar .menu-item div {
+    display: none;
+  }
+}

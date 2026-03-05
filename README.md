@@ -1,4 +1,4 @@
-# Confidently-Routine
+`# Confidently-Routine
 
 A client-side routine management system implemented in vanilla JavaScript (ES6). The architecture prioritizes modular separation, deterministic state transitions, and framework-agnostic scalability.
 
@@ -22,7 +22,6 @@ A client-side routine management system implemented in vanilla JavaScript (ES6).
 │        Chart.js · Canvas API         │
 └─────────────────────────────────────┘
 </pre>
-
 
 ### Layer Responsibilities
 
@@ -59,27 +58,35 @@ State is distributed across feature modules rather than centralized in a single 
 ## Module Specifications
 
 ### Authentication Module
+
 Manages user session and profile data without server dependencies. Implements avatar handling through data URLs and maintains profile state across sessions.
 
 ### Routine Engine
+
 Core scheduling logic with:
+
 - Category-based organization
 - Eisenhower matrix classification
 - Completion tracking algorithms
 - Filter operations (by category, priority, status)
 
 ### Analytics Engine
+
 Computes performance metrics from raw routine data:
+
 - Completion rate calculations
 - Trend analysis over configurable periods
 - Category performance breakdowns
 - Priority distribution statistics
 
 ### Notes System
+
 Structured storage for user-generated content. Implements basic CRUD operations with timestamp tracking and category tagging.
 
 ### Settings Manager
+
 Handles application preferences:
+
 - Theme selection (light/dark)
 - Language preferences (i18n infrastructure)
 - Data export/import operations
@@ -105,11 +112,11 @@ The schema includes versioning to support future migrations. All storage operati
 
 ## Performance Strategy
 
-- **Targeted rendering** – Only modified components re-render**
-- **Event delegation** – Minimal event listener registration**
-- **Chart reuse** – Single Chart.js instance with data updates**
-- **Lazy loading** – Non-visible sections defer rendering**
-- **Debounced operations** – Storage writes and calculations**
+- **Targeted rendering** – Only modified components re-render\*\*
+- **Event delegation** – Minimal event listener registration\*\*
+- **Chart reuse** – Single Chart.js instance with data updates\*\*
+- **Lazy loading** – Non-visible sections defer rendering\*\*
+- **Debounced operations** – Storage writes and calculations\*\*
 
 ## Project Structure
 
@@ -209,6 +216,7 @@ Framework-less rendering demonstrates understanding of browser APIs and performa
 - **Calendar integration interfaces**
 
 ---
+<<<<<<< HEAD
 
 <div align="center">
 
@@ -221,3 +229,10 @@ GitHub • Report • Contact
 © 2026 Confidently-Routine. All rights reserved.
 
 </div>
+=======
+**Version:** 1.0.0
+**Last Updated:** 2026
+**License:** MIT
+```
+`
+>>>>>>> 80cdc8c (feat(layout): style and position header & sidebar in the main layout)
