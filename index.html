@@ -9,18 +9,16 @@
     <link rel="stylesheet" href="/assets/css/layouts/header.css" />
     <link rel="stylesheet" href="/assets/css/layouts/sidebar.css" />
     <link rel="stylesheet" href="/assets/css/pages/login.css" />
+    <link rel="stylesheet" href="/assets/css/components/modal.css" />
+    <link rel="stylesheet" href="/assets/css/components/mobile-nav.css" />
 
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-      integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
       rel="stylesheet"
@@ -28,9 +26,9 @@
   </head>
 
   <body>
-    <div>
+    <div id="app">
       <!-- Header -->
-      <div class="header">
+      <div class="header" id="mainHeader">
         <div class="headerLeft">
           <div>
             <img src="/assets/images/Logo Confidently Routine.svg" alt="" />
@@ -39,9 +37,13 @@
         </div>
 
         <div class="headerRight">
-          <div>Cholukov Hangeldi</div>
+          <button class="hamburger-menu" id="hamburgerBtn">
+            <i class="fa-solid fa-bars"></i>
+          </button>
 
-          <div class="avatar">
+          <div id="welcomeMessage">Cholukov Hangeldi</div>
+
+          <div class="avatar" id="headerAvatar">
             <img src="/assets/images/Boy image 1.svg" alt="" />
           </div>
         </div>
@@ -76,10 +78,241 @@
             <div class="settings">Settings</div>
           </div>
         </a>
+
+        <a href="#" id="logoutBtn">
+          <div class="menu-item">
+            <div><i class="fa-solid fa-sign-out-alt"></i></div>
+            <div class="logout">Logout</div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Mobile Bottom Navigation -->
+      <div class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="#" data-page="dashboard" class="mobile-nav-item">
+          <i class="fa-regular fa-house"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" data-page="routines" class="mobile-nav-item">
+          <i class="fa-regular fa-calendar"></i>
+          <span>Routine</span>
+        </a>
+        <a href="#" data-page="notes" class="mobile-nav-item">
+          <i class="fa-regular fa-pen-to-square"></i>
+          <span>Notes</span>
+        </a>
+        <a href="#" data-page="settings" class="mobile-nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
       </div>
 
       <!-- Page Content -->
       <main id="content"></main>
+
+      <!-- LOGOUT MODAL -->
+      <div class="modal" id="logoutModal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="modal-icon-wrapper">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </div>
+          </div>
+          <div class="modal-body">
+            <h2>Ready to leave?</h2>
+            <p>Are you sure you want to log out of your account?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" id="cancelLogout">
+              Cancel
+            </button>
+            <button class="modal-btn modal-btn-confirm" id="confirmLogout">
+              Yes, log out
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGIN Page -->
+      <section class="login-section" id="loginSection">
+        <div class="login-container">
+          <div class="login-wrapper">
+            <!-- Header Section -->
+            <header class="login-header">
+              <div class="login-header__content">
+                <div class="login-logo">
+                  <img
+                    src="assets/images/Logo Confidently Routine.svg"
+                    alt="Confidently Routine"
+                    class="login-logo__image"
+                  />
+                </div>
+                <h1 class="login-title">Confidently Routine</h1>
+                <p class="login-description">Enter your login credentials</p>
+              </div>
+              <div
+                class="login-avatar"
+                role="button"
+                tabindex="0"
+                aria-label="Select main avatar"
+                id="mainAvatarSelector"
+              >
+                <img
+                  src="assets/images/Boy image 1.svg"
+                  alt="Main avatar"
+                  class="login-avatar__image"
+                  id="mainAvatarImg"
+                />
+              </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="login-main">
+              <!-- Avatar Selection -->
+              <div
+                class="avatar-list"
+                role="group"
+                aria-label="Available avatars"
+              >
+                <div
+                  class="avatar avatar--1"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Select avatar 1"
+                  data-avatar="1"
+                >
+                  <img
+                    src="assets/images/Boy image 1.svg"
+                    alt="Avatar option 1"
+                  />
+                </div>
+                <div
+                  class="avatar avatar--2"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Select avatar 2"
+                  data-avatar="2"
+                >
+                  <img
+                    src="assets/images/Girl image 1.svg"
+                    alt="Avatar option 2"
+                  />
+                </div>
+                <div
+                  class="avatar avatar--3"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Select avatar 3"
+                  data-avatar="3"
+                >
+                  <img
+                    src="assets/images/Boy image 2.svg"
+                    alt="Avatar option 3"
+                  />
+                </div>
+                <div
+                  class="avatar avatar--4"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Select avatar 4"
+                  data-avatar="4"
+                >
+                  <img
+                    src="assets/images/Girl image 2.svg"
+                    alt="Avatar option 4"
+                  />
+                </div>
+                <div
+                  class="avatar avatar--add"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Add new avatar"
+                  id="addAvatarBtn"
+                >
+                  <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                </div>
+              </div>
+
+              <!-- Hidden file input -->
+              <input
+                type="file"
+                id="avatarUpload"
+                accept="image/*"
+                style="display: none"
+              />
+
+              <!-- Login Form -->
+              <form class="login-form" id="loginForm" novalidate>
+                <div class="form-fields">
+                  <!-- Username Field -->
+                  <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-wrapper">
+                      <i
+                        class="fa-solid fa-user input-icon"
+                        aria-hidden="true"
+                      ></i>
+                      <input
+                        type="text"
+                        id="username"
+                        class="input-field input-field--username"
+                        placeholder="Enter your Username"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Password Field -->
+                  <div class="form-group form-group--password">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-password-wrapper">
+                      <span class="input-password-icon" aria-hidden="true">
+                        <i class="fa-solid fa-lock"></i>
+                      </span>
+                      <input
+                        type="password"
+                        id="password"
+                        class="input-field input-field--password"
+                        placeholder="Enter your Password"
+                        required
+                      />
+                      <button
+                        type="button"
+                        class="password-toggle"
+                        aria-label="Toggle password visibility"
+                      >
+                        <i
+                          class="fa-regular fa-eye-slash"
+                          aria-hidden="true"
+                        ></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Remember Me Checkbox -->
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    id="remember-me"
+                    class="checkbox-input"
+                  />
+                  <label for="remember-me" class="checkbox-label">
+                    Remember me
+                  </label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="submit-wrapper">
+                  <button type="submit" class="button button--submit">
+                    Submit
+                  </button>
+                </div>
+              </form>
+            </main>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script src="/assets/js/app.js"></script>
