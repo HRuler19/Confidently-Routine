@@ -1,17 +1,20 @@
 /* Header */
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 60px;
   padding: 0 30px;
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   font-size: 20px;
-  font-family: "DM Sans", sans-serif;
   color: #0e5e0a;
+  z-index: 1000;
+  box-sizing: border-box;
 }
 
 /* Left Side */

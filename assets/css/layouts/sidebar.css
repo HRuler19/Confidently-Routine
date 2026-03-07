@@ -1,15 +1,23 @@
 /* Sidebar */
 #sidebar {
   position: fixed;
-  top: 60 px;
+  top: 60px;
   left: 0;
-  max-width: 325px;
-  width: 20%;
-  height: 100%;
+  bottom: 0;
+  width: 250px;
   background: #ffffff;
-  padding: 20px 30px;
-  border-right: 1px solid #e5e7eb;
+  padding: 20px 0;
+  border-right: 1px solid #f5f5f5;
   box-sizing: border-box;
+  font-family: "DM Sans", sans-serif;
+  overflow-y: auto;
+  z-index: 999;
+}
+
+/* Sidebar links */
+#sidebar a {
+  text-decoration: none;
+  display: block;
   font-family: "DM Sans", sans-serif;
 }
 
@@ -18,10 +26,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 10px;
+  padding: 12px 20px;
+  margin: 0 10px;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   cursor: pointer;
+  font-family: "DM Sans", sans-serif;
   transition:
     background 0.2s,
     color 0.2s;
@@ -36,10 +46,11 @@
 }
 
 /* Text labels */
-#sidebar .menu-item div {
+#sidebar .menu-item div:last-child {
   font-size: 16px;
   font-weight: 500;
   color: #111827;
+  font-family: "DM Sans", sans-serif;
 }
 
 /* Hover effect */
@@ -49,22 +60,40 @@
 
 /* Active / menu */
 #sidebar .menu-item.active {
-  background: #0e5e0a;
-  color: #ffffff;
+  background: #f3f3f3;
 }
 
 #sidebar .menu-item.active i,
-#sidebar .menu-item.active div {
-  color: #ffffff;
+#sidebar .menu-item.active div:last-child {
+  color: #0e5e0a;
 }
 
-/* Responsive: Sidebar  */
+/* Active menu text */
+#sidebar .menu-item.active div:last-child {
+  font-family: "DM Sans", sans-serif;
+  color: #0e5e0a;
+}
+
+/* Responsive: Sidebar */
 @media (max-width: 768px) {
   #sidebar {
-    width: 60px;
-    padding: 20px 8px;
+    width: 70px;
+    padding: 20px 0;
   }
-  #sidebar .menu-item div {
+
+  #sidebar .menu-item {
+    padding: 12px 0;
+    justify-content: center;
+    margin: 0 5px;
+    font-family: "DM Sans", sans-serif;
+  }
+
+  #sidebar .menu-item div:last-child {
     display: none;
+    font-family: "DM Sans", sans-serif;
+  }
+
+  #sidebar .menu-item i {
+    font-size: 22px;
   }
 }

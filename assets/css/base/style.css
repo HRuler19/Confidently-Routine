@@ -1,0 +1,49 @@
+/* GLOBAL Styles */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "DM Sans", sans-serif;
+  overflow-x: hidden;
+}
+
+/* MAIN CONTENT */
+#content {
+  position: relative;
+  margin-left: 250px;
+  margin-top: 60px;
+  padding: 30px;
+  min-height: calc(100vh - 60px);
+  background: #ffffff;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Responsive content */
+@media (max-width: 768px) {
+  #content {
+    margin-left: 70px;
+  }
+}
+
+/* Page sections */
+section {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+section h1 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #0e5e0a;
+  font-size: 24px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 10px;
+}
+
+section p {
+  color: #4b5563;
+  line-height: 1.6;
+}

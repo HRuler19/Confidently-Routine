@@ -150,7 +150,14 @@ Confidently-Routine
 │   └── libs/
 │       └── chart.js
 │
-└── data/                     # backups
+├── views/
+│   ├── dashboard.html
+│   ├── routines.html
+│   ├── notes.html
+│   ├── login.html
+│   └── settings.html
+│
+└── data/
     └── routines_2026-02-27.json
 ```
 

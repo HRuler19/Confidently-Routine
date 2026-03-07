@@ -4,9 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confidently-Routine</title>
+
+    <link rel="stylesheet" href="/assets/css/base/style.css" />
     <link rel="stylesheet" href="/assets/css/layouts/header.css" />
     <link rel="stylesheet" href="/assets/css/layouts/sidebar.css" />
     <link rel="stylesheet" href="/assets/css/pages/login.css" />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
@@ -14,348 +17,71 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap"
       rel="stylesheet"
     />
   </head>
+
   <body>
-    <!-- LOGIN Page -->
-    <div class="login-container">
-      <div class="login-wrapper">
-        <!-- Header Section -->
-        <header class="login-header">
-          <div class="login-header__content">
-            <div class="login-logo">
-              <img
-                src="assets/images/Logo Confidently Routine.svg"
-                alt="Confidently Routine"
-                class="login-logo__image"
-              />
-            </div>
-            <h1 class="login-title">Confidently Routine</h1>
-            <p class="login-description">Enter your login credentials</p>
-          </div>
-          <div
-            class="login-avatar"
-            role="button"
-            tabindex="0"
-            aria-label="Select main avatar"
-          >
-            <img
-              src="assets/images/Boy image 1.svg"
-              alt="Main avatar"
-              class="login-avatar__image"
-            />
-          </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="login-main">
-          <!-- Avatar Selection -->
-          <div class="avatar-list" role="group" aria-label="Available avatars">
-            <div
-              class="avatar avatar--1"
-              role="button"
-              tabindex="0"
-              aria-label="Select avatar 1"
-              data-avatar="1"
-            >
-              <img src="assets/images/Boy image 1.svg" alt="Avatar option 1" />
-            </div>
-            <div
-              class="avatar avatar--2"
-              role="button"
-              tabindex="0"
-              aria-label="Select avatar 2"
-              data-avatar="2"
-            >
-              <img src="assets/images/Girl image 1.svg" alt="Avatar option 2" />
-            </div>
-            <div
-              class="avatar avatar--3"
-              role="button"
-              tabindex="0"
-              aria-label="Select avatar 3"
-              data-avatar="3"
-            >
-              <img src="assets/images/Boy image 2.svg" alt="Avatar option 3" />
-            </div>
-            <div
-              class="avatar avatar--4"
-              role="button"
-              tabindex="0"
-              aria-label="Select avatar 4"
-              data-avatar="4"
-            >
-              <img src="assets/images/Girl image 2.svg" alt="Avatar option 4" />
-            </div>
-            <div
-              class="avatar avatar--add"
-              role="button"
-              tabindex="0"
-              aria-label="Add new avatar"
-            >
-              <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            </div>
-          </div>
-
-          <!-- Login Form -->
-          <form class="login-form" id="loginForm" novalidate>
-            <div class="form-fields">
-              <!-- Username Field -->
-              <div class="form-group">
-                <label for="username" class="form-label">Username</label>
-                <div class="input-wrapper">
-                  <i class="fa-solid fa-user input-icon" aria-hidden="true"></i>
-                  <input
-                    type="text"
-                    id="username"
-                    class="input-field input-field--username"
-                    placeholder="Enter your Username"
-                    required
-                  />
-                </div>
-              </div>
-
-              <!-- Password Field -->
-              <div class="form-group form-group--password">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-password-wrapper">
-                  <span class="input-password-icon" aria-hidden="true">
-                    <i class="fa-solid fa-lock"></i>
-                  </span>
-                  <input
-                    type="password"
-                    id="password"
-                    class="input-field input-field--password"
-                    placeholder="Enter your Password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    class="password-toggle"
-                    aria-label="Toggle password visibility"
-                  >
-                    <i class="fa-regular fa-eye-slash" aria-hidden="true"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Remember Me Checkbox -->
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="remember-me" class="checkbox-input" />
-              <label for="remember-me" class="checkbox-label">
-                Remember me
-              </label>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="submit-wrapper">
-              <button type="submit" class="button button--submit">
-                Submit
-              </button>
-            </div>
-          </form>
-        </main>
-      </div>
-    </div>
-
-    <script>
-      (function () {
-        "use strict";
-
-        // DOM Elements
-        const passwordToggle = document.querySelector(".password-toggle i");
-        const passwordInput = document.getElementById("password");
-        const loginForm = document.getElementById("loginForm");
-        const avatars = document.querySelectorAll(".avatar");
-        const mainAvatar = document.querySelector(".login-avatar__image");
-
-        // Password visibility toggle
-        if (passwordToggle && passwordInput) {
-          passwordToggle.addEventListener("click", function () {
-            const type =
-              passwordInput.type === "password" ? "text" : "password";
-            passwordInput.type = type;
-
-            this.classList.toggle("fa-eye");
-            this.classList.toggle("fa-eye-slash");
-          });
-        }
-
-        // Form validation and submission
-        if (loginForm) {
-          loginForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            const username = document.getElementById("username");
-            const password = document.getElementById("password");
-            const rememberMe = document.getElementById("remember-me");
-
-            // Validation
-            if (!username.value.trim()) {
-              showError(username, "Please enter username");
-              return;
-            }
-
-            if (!password.value.trim()) {
-              showError(password, "Please enter password");
-              return;
-            }
-
-            if (password.value.length < 6) {
-              showError(password, "Password must be at least 6 characters");
-              return;
-            }
-
-            // Clear any existing errors
-            clearErrors();
-
-            // TODO: Add login logic here
-            console.log("Form submitted successfully", {
-              username: username.value,
-              password: password.value,
-              rememberMe: rememberMe.checked,
-            });
-          });
-        }
-
-        // Helper function to show error
-        function showError(inputElement, message) {
-          clearErrors();
-
-          const formGroup = inputElement.closest(
-            ".form-group, .form-group--password",
-          );
-          const errorDiv = document.createElement("div");
-          errorDiv.className = "error-message";
-          errorDiv.textContent = message;
-          errorDiv.style.color = "#dc3545";
-          errorDiv.style.fontSize = "10px";
-          errorDiv.style.marginTop = "4px";
-          errorDiv.style.fontFamily = "DM Sans, sans-serif";
-
-          formGroup.appendChild(errorDiv);
-          inputElement.style.borderColor = "#dc3545";
-        }
-
-        // Helper function to clear errors
-        function clearErrors() {
-          document
-            .querySelectorAll(".error-message")
-            .forEach((el) => el.remove());
-          document.querySelectorAll(".input-field").forEach((el) => {
-            el.style.borderColor = "#d1d5db";
-          });
-        }
-
-        // Avatar selection handler
-        if (avatars.length && mainAvatar) {
-          avatars.forEach(function (avatar) {
-            avatar.addEventListener("click", function () {
-              // Remove selected class from all avatars
-              avatars.forEach(function (av) {
-                av.classList.remove("avatar--selected");
-                av.style.borderColor = "#3c8116";
-              });
-
-              // Add selected class to clicked avatar
-              this.classList.add("avatar--selected");
-              this.style.borderColor = "#0e5e0a";
-
-              // Update main avatar if it's not the add button
-              const selectedImg = this.querySelector("img");
-              if (selectedImg) {
-                mainAvatar.src = selectedImg.src;
-              }
-            });
-          });
-        }
-
-        // Keyboard support for interactive elements
-        document
-          .querySelectorAll('[role="button"]')
-          .forEach(function (element) {
-            element.addEventListener("keypress", function (event) {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                this.click();
-              }
-            });
-          });
-
-        // Real-time validation
-        const usernameInput = document.getElementById("username");
-        if (usernameInput) {
-          usernameInput.addEventListener("blur", function () {
-            if (!this.value.trim()) {
-              showError(this, "Username is required");
-            } else {
-              clearErrors();
-            }
-          });
-        }
-
-        const passwordInputField = document.getElementById("password");
-        if (passwordInputField) {
-          passwordInputField.addEventListener("blur", function () {
-            if (!this.value.trim()) {
-              showError(this, "Password is required");
-            } else if (this.value.length < 6) {
-              showError(this, "Password must be at least 6 characters");
-            } else {
-              clearErrors();
-            }
-          });
-        }
-      })();
-    </script>
-
-    <!-- Commented code remains exactly the same -->
-    <!-- 
     <div>
-      <div>
-        Header
-        <div class="header">
-          <div class="headerLeft">
-            <div>
-              <img src="/assets/images/Logo Confidently Routine.svg" alt="" />
-            </div>
-            <div>Confidently Routine</div>
+      <!-- Header -->
+      <div class="header">
+        <div class="headerLeft">
+          <div>
+            <img src="/assets/images/Logo Confidently Routine.svg" alt="" />
           </div>
-          <div class="headerRight">
-            <div>Cholukov Hangeldi</div>
-            <div class="avatar">
-              <img src="/assets/images/Boy image 1.svg" alt="" />
-            </div>
-          </div>
+          <div>Confidently Routine</div>
         </div>
 
-        Sidebar
-        <div id="sidebar">
+        <div class="headerRight">
+          <div>Cholukov Hangeldi</div>
+
+          <div class="avatar">
+            <img src="/assets/images/Boy image 1.svg" alt="" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <a href="#" data-page="dashboard">
           <div class="menu-item">
             <div><i class="fa-regular fa-house"></i></div>
             <div class="dashboard">Dashboard</div>
           </div>
+        </a>
+
+        <a href="#" data-page="routines">
           <div class="menu-item">
             <div><i class="fa-regular fa-calendar"></i></div>
             <div class="myRoutine">My routine</div>
           </div>
+        </a>
+
+        <a href="#" data-page="notes">
           <div class="menu-item">
             <div><i class="fa-regular fa-pen-to-square"></i></div>
             <div class="notes">Notes</div>
           </div>
+        </a>
+
+        <a href="#" data-page="settings">
           <div class="menu-item">
             <div><i class="fa-solid fa-gear"></i></div>
             <div class="settings">Settings</div>
           </div>
-        </div>
+        </a>
       </div>
-    </div> 
-    -->
+
+      <!-- Page Content -->
+      <main id="content"></main>
+    </div>
+
+    <script src="/assets/js/app.js"></script>
   </body>
 </html>
