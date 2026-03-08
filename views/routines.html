@@ -41,3 +41,62 @@
     </div>
   </div>
 </section>
+
+<div class="filter-stats-row">
+  <div class="filter-section">
+    <span class="filter-label">Filters:</span>
+    <div class="filter-selects-group">
+      <!-- Task Status Custom Select -->
+      <div class="custom-select filter-custom-select" id="taskStatusSelect">
+        <div class="select-trigger"><span>All Tasks</span></div>
+        <div class="select-options">
+          <div class="option" data-value="all">All Tasks</div>
+          <div class="option" data-value="active">Active</div>
+          <div class="option" data-value="completed">Completed</div>
+        </div>
+      </div>
+
+      <!-- Category Filter Custom Select -->
+      <div class="custom-select filter-custom-select" id="categoryFilterSelect">
+        <div class="select-trigger"><span>All Categories</span></div>
+        <div class="select-options">
+          <div class="option" data-value="all">All Categories</div>
+          <div class="option" data-value="personal">Personal</div>
+          <div class="option" data-value="work">Work</div>
+          <div class="option" data-value="shopping">Shopping</div>
+          <div class="option" data-value="other">Other</div>
+        </div>
+      </div>
+
+      <!-- Priority Filter Custom Select -->
+      <div class="custom-select filter-custom-select" id="priorityFilterSelect">
+        <div class="select-trigger"><span>All Priorities</span></div>
+        <div class="select-options">
+          <div class="option" data-value="all">All Priorities</div>
+          <div class="option" data-value="low">Low</div>
+          <div class="option" data-value="medium">Medium</div>
+          <div class="option" data-value="high">High</div>
+          <div class="option" data-value="hard">Hard</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-group">
+    <div class="stat-badge">
+      <span class="stat-number total"></span>
+      <span>4</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-badge">
+      <span class="stat-number completed"></span>
+      <span>1</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-badge">
+      <span class="stat-number active"></span>
+      <span>3</span>
+      <span class="stat-label">Active</span>
+    </div>
+  </div>
+</div>
