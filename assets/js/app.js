@@ -1,418 +1,364 @@
-(function() {
-    "use strict";
+(function () {
+"use strict";
 
-    // DOM Elements
-    const content = document.getElementById("content");
-    const loginSection = document.getElementById("loginSection");
-    const mainHeader = document.getElementById("mainHeader");
-    const sidebar = document.getElementById("sidebar");
-    const welcomeMessage = document.getElementById("welcomeMessage");
-    const headerAvatar = document.getElementById("headerAvatar");
-    const mainAvatarImg = document.getElementById("mainAvatarImg");
-    const loginForm = document.getElementById("loginForm");
-    const passwordToggle = document.querySelector(".password-toggle i");
-    const passwordInput = document.getElementById("password");
-    const avatars = document.querySelectorAll(".avatar:not(.avatar--add)");
-    const addAvatarBtn = document.getElementById("addAvatarBtn");
-    const avatarUpload = document.getElementById("avatarUpload");
-    const usernameInput = document.getElementById("username");
-    const rememberMe = document.getElementById("remember-me");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const mobileNavItems = document.querySelectorAll(".mobile-nav-item");
-    
+// DOM Elements
+const content = document.getElementById("content");
+const loginSection = document.getElementById("loginSection");
+const mainHeader = document.getElementById("mainHeader");
+const sidebar = document.getElementById("sidebar");
+const welcomeMessage = document.getElementById("welcomeMessage");
+const headerAvatar = document.getElementById("headerAvatar");
+const mainAvatarImg = document.getElementById("mainAvatarImg");
+const loginForm = document.getElementById("loginForm");
+const passwordToggle = document.querySelector(".password-toggle i");
+const passwordInput = document.getElementById("password");
+const avatars = document.querySelectorAll(".avatar:not(.avatar--add)");
+const addAvatarBtn = document.getElementById("addAvatarBtn");
+const avatarUpload = document.getElementById("avatarUpload");
+const usernameInput = document.getElementById("username");
+const rememberMe = document.getElementById("remember-me");
+const logoutBtn = document.getElementById("logoutBtn");
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const mobileNavItems = document.querySelectorAll(".mobile-nav-item");
+
     // Modal elements
-    const logoutModal = document.getElementById("logoutModal");
-    const cancelLogout = document.getElementById("cancelLogout");
-    const confirmLogout = document.getElementById("confirmLogout");
+const logoutModal = document.getElementById("logoutModal");
+const cancelLogout = document.getElementById("cancelLogout");
+const confirmLogout = document.getElementById("confirmLogout");
 
-    // LocalStorage keys
-    const STORAGE_KEYS = {
-        USER: "confidently_user",
-        REMEMBER_ME: "confidently_remember"
-    };
+  // LocalStorage keys
+const STORAGE_KEYS = {
+USER: "confidently_user",
+REMEMBER_ME: "confidently_remember"
+};
 
-    let selectedAvatar = "assets/images/Boy image 1.svg";
+let selectedAvatar = "assets/images/Boy image 1.svg";
 
-    document.addEventListener("DOMContentLoaded", function() {
-        loginSection.style.display = "flex";
-        mainHeader.style.display = "none";
-        sidebar.style.display = "none";
-        
-        checkSavedUser();
-        loadPage("dashboard");
-        setupMobileNavigation();
-    });
+document.addEventListener("DOMContentLoaded", function () {
+loginSection.style.display = "flex";
+mainHeader.style.display = "none";
+sidebar.style.display = "none";
 
-    // Mobile navigation setup 
-    function setupMobileNavigation() {
-        if (hamburgerBtn) {
-            hamburgerBtn.addEventListener("click", function(e) {
-                e.stopPropagation(); 
-                sidebar.classList.toggle("mobile-open");
-                console.log("Hamburger clicked", sidebar.classList); 
-            });
-        }
+checkSavedUser();
+loadPage("dashboard");
+setupMobileNavigation();
+setupGlobalEvents();
+});
 
-        // Click outside close
-        document.addEventListener("click", function(event) {
-            if (window.innerWidth <= 768) {
-                if (sidebar.classList.contains("mobile-open")) {
-                    if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target)) {
-                        sidebar.classList.remove("mobile-open");
-                    }
-                }
-            }
-        });
+function initCustomSelects() {
+const selects = document.querySelectorAll(".custom-select");
 
-        // Touch event 
-        document.addEventListener("touchstart", function(event) {
-            if (window.innerWidth <= 768) {
-                if (sidebar.classList.contains("mobile-open")) {
-                    if (!sidebar.contains(event.target) && !hamburgerBtn.contains(event.target)) {
-                        sidebar.classList.remove("mobile-open");
-                    }
-                }
-            }
-        });
+selects.forEach((select) => {
+if (select.dataset.initialized) return;
 
-        mobileNavItems.forEach(item => {
-            item.addEventListener("click", function(e) {
-                e.preventDefault();
-                const pageName = this.dataset.page;
-                if (pageName) {
-                    loadPage(pageName);
-                    
-                    mobileNavItems.forEach(nav => nav.classList.remove("active"));
-                    this.classList.add("active");
-                    
-                    updateSidebarActive(pageName);
-                }
-            });
-        });
-    }
+const trigger = select.querySelector(".select-trigger");
+const options = select.querySelectorAll(".option");
 
-    function updateSidebarActive(pageName) {
-        const sidebarLinks = document.querySelectorAll("#sidebar a:not(#logoutBtn)");
-        sidebarLinks.forEach(link => {
-            const menuItem = link.querySelector('.menu-item');
-            if (menuItem) {
-                menuItem.classList.remove('active');
-                if (link.dataset.page === pageName) {
-                    menuItem.classList.add('active');
-                }
-            }
-        });
-    }
+if (trigger) {
+trigger.addEventListener("click", (e) => {
+e.stopPropagation();
 
-    function checkSavedUser() {
-        const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
-        const rememberMeValue = localStorage.getItem(STORAGE_KEYS.REMEMBER_ME) === "true";
+document.querySelectorAll(".custom-select").forEach((s) => {
+if (s !== select) s.classList.remove("open");
+});
 
-        if (savedUser && rememberMeValue) {
-            try {
-                const userData = JSON.parse(savedUser);
-                loginUser(userData);
-            } catch (e) {
-                console.error("Error parsing saved user", e);
-            }
-        }
-    }
+select.classList.toggle("open");
+});
+}
 
-    function loginUser(userData) {
-        loginSection.style.display = "none";
-        mainHeader.style.display = "flex";
-        
-        // Sidebar view
-        if (window.innerWidth > 768) {
-            sidebar.style.display = "flex";
-            sidebar.classList.remove("mobile-open");
-        } else {
-            sidebar.style.display = "flex"; 
-            sidebar.classList.remove("mobile-open");
-        }
+options.forEach((option) => {
+option.addEventListener("click", (e) => {
+e.stopPropagation();
 
-        if (welcomeMessage) {
-            welcomeMessage.textContent = userData.username;
-        }
+const span = trigger.querySelector("span");
+if (span) span.innerText = option.innerText;
 
-        if (headerAvatar) {
-            const avatarImg = headerAvatar.querySelector("img");
-            if (avatarImg) {
-                avatarImg.src = userData.avatar;
-            }
-        }
-    }
+select.classList.remove("open");
+select.dataset.value = option.dataset.value;
+});
+});
 
-    function showLogoutModal() {
-        logoutModal.classList.add("show");
-    }
+select.dataset.initialized = "true";
+});
+}
 
-    function hideLogoutModal() {
-        logoutModal.classList.remove("show");
-    }
+function setupGlobalEvents() {
+window.addEventListener("click", () => {
+document
+.querySelectorAll(".custom-select")
+.forEach((s) => s.classList.remove("open"));
+});
+}
 
-    function performLogout() {
-        if (!rememberMe.checked) {
-            localStorage.removeItem(STORAGE_KEYS.USER);
-            localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
-        }
+async function loadPage(pageName) {
+try {
+const response = await fetch(`views/${pageName}.html`);
 
-        loginSection.style.display = "flex";
-        mainHeader.style.display = "none";
-        sidebar.style.display = "none";
-        sidebar.classList.remove("mobile-open");
+if (!response.ok) {
+throw new Error(`HTTP error! status: ${response.status}`);
+}
 
-        if (loginForm) {
-            loginForm.reset();
-        }
+const html = await response.text();
+content.innerHTML = html;
 
-        avatars.forEach(av => {
-            av.classList.remove("avatar--selected");
-        });
+initCustomSelects();
+updateSidebarActive(pageName);
 
-        if (mainAvatarImg) {
-            mainAvatarImg.src = "assets/images/Boy image 1.svg";
-        }
-        selectedAvatar = "assets/images/Boy image 1.svg";
-        
-        hideLogoutModal();
-    }
+mobileNavItems.forEach((item) => {
+item.classList.remove("active");
 
-    // Password toggle
-    if (passwordToggle && passwordInput) {
-        passwordToggle.addEventListener("click", function() {
-            const type = passwordInput.type === "password" ? "text" : "password";
-            passwordInput.type = type;
-            this.classList.toggle("fa-eye");
-            this.classList.toggle("fa-eye-slash");
-        });
-    }
+if (item.dataset.page === pageName) {
+item.classList.add("active");
+}
+});
 
-    // Form submit
-    if (loginForm) {
-        loginForm.addEventListener("submit", function(event) {
-            event.preventDefault();
+if (window.innerWidth <= 768) {
+sidebar.classList.remove("mobile-open");
+}
+} catch (error) {
+content.innerHTML = `<div style="padding:20px;color:red;">Page not found: ${pageName}</div>`;
+}
+}
 
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-            const rememberMeChecked = rememberMe.checked;
+function setupMobileNavigation() {
+if (hamburgerBtn) {
+hamburgerBtn.addEventListener("click", function (e) {
+e.stopPropagation();
+sidebar.classList.toggle("mobile-open");
+});
+}
 
-            if (!username) {
-                showError(usernameInput, "Please enter username");
-                return;
-            }
+document.addEventListener("click", function (event) {
+if (window.innerWidth <= 768 && sidebar.classList.contains("mobile-open")) {
+if (
+!sidebar.contains(event.target) &&
+!hamburgerBtn.contains(event.target)
+) {
+sidebar.classList.remove("mobile-open");
+}
+}
+});
 
-            if (!password) {
-                showError(passwordInput, "Please enter password");
-                return;
-            }
+mobileNavItems.forEach((item) => {
+item.addEventListener("click", function (e) {
+e.preventDefault();
 
-            if (password.length < 6) {
-                showError(passwordInput, "Password must be at least 6 characters");
-                return;
-            }
+const pageName = this.dataset.page;
 
-            clearErrors();
+if (pageName) loadPage(pageName);
+});
+});
 
-            const userData = {
-                username: username,
-                avatar: selectedAvatar,
-                lastLogin: new Date().toISOString()
-            };
+const sidebarLinks = document.querySelectorAll("#sidebar a:not(#logoutBtn)");
 
-            if (rememberMeChecked) {
-                localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
-                localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "true");
-            } else {
-                localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "false");
-            }
+sidebarLinks.forEach(function (link) {
+link.addEventListener("click", function (event) {
+event.preventDefault();
 
-            loginUser(userData);
-        });
-    }
+const pageName = this.dataset.page;
 
-    // Error functions
-    function showError(inputElement, message) {
-        clearErrors();
+if (pageName) loadPage(pageName);
+});
+});
+}
 
-        const formGroup = inputElement.closest(".form-group, .form-group--password");
-        const errorDiv = document.createElement("div");
-        errorDiv.className = "error-message";
-        errorDiv.textContent = message;
-        errorDiv.style.color = "#dc3545";
-        errorDiv.style.fontSize = "10px";
-        errorDiv.style.marginTop = "4px";
-        errorDiv.style.fontFamily = "DM Sans, sans-serif";
+function updateSidebarActive(pageName) {
+const sidebarLinks = document.querySelectorAll("#sidebar a:not(#logoutBtn)");
 
-        formGroup.appendChild(errorDiv);
-        inputElement.style.borderColor = "#dc3545";
-    }
+sidebarLinks.forEach((link) => {
+const menuItem = link.querySelector(".menu-item");
 
-    function clearErrors() {
-        document.querySelectorAll(".error-message").forEach((el) => el.remove());
-        document.querySelectorAll(".input-field").forEach((el) => {
-            el.style.borderColor = "#d1d5db";
-        });
-    }
+if (menuItem) {
+menuItem.classList.remove("active");
 
-    // Avatar selection 
-    if (avatars.length && mainAvatarImg) {
-        avatars.forEach(function(avatar) {
-            avatar.addEventListener("click", function() {
-                avatars.forEach(function(av) {
-                    av.classList.remove("avatar--selected");
-                });
+if (link.dataset.page === pageName) {
+menuItem.classList.add("active");
+}
+}
+});
+}
 
-                this.classList.add("avatar--selected");
+function checkSavedUser() {
+const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
+const rememberMeValue =
+localStorage.getItem(STORAGE_KEYS.REMEMBER_ME) === "true";
 
-                const selectedImg = this.querySelector("img");
-                if (selectedImg) {
-                    selectedAvatar = selectedImg.src;
-                    mainAvatarImg.src = selectedImg.src;
-                }
-            });
-        });
-    }
+if (savedUser && rememberMeValue) {
+try {
+const userData = JSON.parse(savedUser);
+loginUser(userData);
+} catch {}
+}
+}
 
-    // Custom avatar upload 
-    if (addAvatarBtn && avatarUpload) {
-        addAvatarBtn.addEventListener("click", function() {
-            avatarUpload.click();
-        });
+function loginUser(userData) {
+loginSection.style.display = "none";
+mainHeader.style.display = "flex";
+sidebar.style.display = "flex";
 
-        avatarUpload.addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageData = e.target.result;
-                    
-                    selectedAvatar = imageData;
-                    mainAvatarImg.src = imageData;
-                    
-                    avatars.forEach(av => {
-                        av.classList.remove("avatar--selected");
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+if (welcomeMessage) {
+welcomeMessage.textContent = userData.username;
+}
 
-    // Real-time validation
-    if (usernameInput) {
-        usernameInput.addEventListener("blur", function() {
-            if (!this.value.trim()) {
-                showError(this, "Username is required");
-            } else {
-                clearErrors();
-            }
-        });
-    }
+if (headerAvatar) {
+const avatarImg = headerAvatar.querySelector("img");
 
-    if (passwordInput) {
-        passwordInput.addEventListener("blur", function() {
-            if (!this.value.trim()) {
-                showError(this, "Password is required");
-            } else if (this.value.length < 6) {
-                showError(this, "Password must be at least 6 characters");
-            } else {
-                clearErrors();
-            }
-        });
-    }
+if (avatarImg) {
+avatarImg.src = userData.avatar;
+}
+}
+}
 
-    // Keyboard support
-    document.querySelectorAll('[role="button"]').forEach(function(element) {
-        element.addEventListener("keypress", function(event) {
-            if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                this.click();
-            }
-        });
-    });
+function performLogout() {
+if (!rememberMe.checked) {
+localStorage.removeItem(STORAGE_KEYS.USER);
+localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+}
 
-    // Logout button click
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", function(event) {
-            event.preventDefault();
-            showLogoutModal();
-        });
-    }
+loginSection.style.display = "flex";
+mainHeader.style.display = "none";
+sidebar.style.display = "none";
+sidebar.classList.remove("mobile-open");
 
-    // Modal buttons
-    if (cancelLogout) {
-        cancelLogout.addEventListener("click", hideLogoutModal);
-    }
+if (loginForm) loginForm.reset();
 
-    if (confirmLogout) {
-        confirmLogout.addEventListener("click", performLogout);
-    }
+avatars.forEach((av) => av.classList.remove("avatar--selected"));
 
-    // Close modal on outside click
-    window.addEventListener("click", function(event) {
-        if (event.target === logoutModal) {
-            hideLogoutModal();
-        }
-    });
+if (mainAvatarImg) {
+mainAvatarImg.src = "assets/images/Boy image 1.svg";
+}
 
-    // Page loading function
-    async function loadPage(pageName) {
-        try {
-            const response = await fetch(`views/${pageName}.html`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const html = await response.text();
-            content.innerHTML = html;
-            
-            updateSidebarActive(pageName);
-            
-            mobileNavItems.forEach(item => {
-                item.classList.remove("active");
-                if (item.dataset.page === pageName) {
-                    item.classList.add("active");
-                }
-            });
-        } catch (error) {
-            console.error("Page error:", error);
-            content.innerHTML = `<p>Page error</p>`;
-        }
-    }
+selectedAvatar = "assets/images/Boy image 1.svg";
 
-    // Sidebar navigation
-    const sidebarLinks = document.querySelectorAll("#sidebar a:not(#logoutBtn)");
-    sidebarLinks.forEach(function(link) {
-        link.addEventListener("click", function(event) {
-            event.preventDefault();
-            
-            const pageName = this.dataset.page;
-            
-            if (pageName) {
-                loadPage(pageName);
-                
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove("mobile-open");
-                }
-            }
-        });
-    });
+hideLogoutModal();
+}
 
-    // Window resize handler
-    window.addEventListener("resize", function() {
-        if (window.innerWidth > 768) {
-            // Desktop
-            if (loginSection.style.display === "none") {
-                sidebar.style.display = "flex";
-            }
-            sidebar.classList.remove("mobile-open");
-        } else {
-            // Mobile
-            if (loginSection.style.display === "none") {
-                sidebar.style.display = "flex"; 
-                sidebar.classList.remove("mobile-open");
-            }
-        }
-    });
+if (passwordToggle && passwordInput) {
+passwordToggle.addEventListener("click", function () {
+const type = passwordInput.type === "password" ? "text" : "password";
+
+passwordInput.type = type;
+
+this.classList.toggle("fa-eye");
+this.classList.toggle("fa-eye-slash");
+});
+}
+
+if (loginForm) {
+loginForm.addEventListener("submit", function (event) {
+event.preventDefault();
+
+const username = usernameInput.value.trim();
+const password = passwordInput.value.trim();
+
+if (!username) return showError(usernameInput, "Please enter username");
+
+if (!password) return showError(passwordInput, "Please enter password");
+
+if (password.length < 6)
+return showError(passwordInput, "Password must be at least 6 characters");
+
+clearErrors();
+
+const userData = {
+username,
+avatar: selectedAvatar,
+lastLogin: new Date().toISOString()
+};
+
+if (rememberMe.checked) {
+localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "true");
+} else {
+localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "false");
+}
+
+loginUser(userData);
+});
+}
+
+if (logoutBtn)
+logoutBtn.addEventListener("click", (e) => {
+e.preventDefault();
+showLogoutModal();
+});
+
+if (cancelLogout) cancelLogout.addEventListener("click", hideLogoutModal);
+
+if (confirmLogout) confirmLogout.addEventListener("click", performLogout);
+
+function showLogoutModal() {
+logoutModal.classList.add("show");
+}
+
+function hideLogoutModal() {
+logoutModal.classList.remove("show");
+}
+
+avatars.forEach((avatar) => {
+avatar.addEventListener("click", function () {
+avatars.forEach((av) => av.classList.remove("avatar--selected"));
+
+this.classList.add("avatar--selected");
+
+const selectedImg = this.querySelector("img");
+
+if (selectedImg) {
+selectedAvatar = selectedImg.src;
+mainAvatarImg.src = selectedImg.src;
+}
+});
+});
+
+if (addAvatarBtn && avatarUpload) {
+addAvatarBtn.addEventListener("click", () => avatarUpload.click());
+
+avatarUpload.addEventListener("change", function (event) {
+const file = event.target.files[0];
+
+if (file) {
+const reader = new FileReader();
+
+reader.onload = (e) => {
+selectedAvatar = e.target.result;
+mainAvatarImg.src = e.target.result;
+
+avatars.forEach((av) =>
+av.classList.remove("avatar--selected")
+);
+};
+
+reader.readAsDataURL(file);
+}
+});
+}
+
+function showError(inputElement, message) {
+clearErrors();
+
+const formGroup = inputElement.closest(
+".form-group, .form-group--password"
+);
+
+const errorDiv = document.createElement("div");
+
+errorDiv.className = "error-message";
+errorDiv.textContent = message;
+
+errorDiv.style.cssText =
+"color:#dc3545;font-size:10px;margin-top:4px;font-family:'DM Sans',sans-serif;";
+
+formGroup.appendChild(errorDiv);
+
+inputElement.style.borderColor = "#dc3545";
+}
+
+function clearErrors() {
+document.querySelectorAll(".error-message").forEach((el) => el.remove());
+
+document
+.querySelectorAll(".input-field")
+.forEach((el) => (el.style.borderColor = "#d1d5db"));
+}
+
 })();

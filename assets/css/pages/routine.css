@@ -1,0 +1,175 @@
+/* Routines */
+.routines {
+  width: 100%;
+  margin: 0 auto;
+  padding: 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0px;
+  width: 100%;
+}
+
+/* INPUT & BUTTON */
+.routines input[type="text"] {
+  flex: 1;
+  height: 40px;
+  min-height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 15px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.routines button {
+  width: 152px;
+  height: 40px;
+  background-color: #0e5e0a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+
+.routines hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 30px 0;
+}
+
+.filters-row {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+.filter-group > span {
+  display: block;
+  font-size: 12px;
+  color: #4b5563;
+  margin-bottom: 5px;
+}
+
+/* CUSTOM SELECT */
+.custom-select {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.select-trigger {
+  height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.select-trigger:after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B4B4B4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  transition: transform 0.3s;
+}
+
+.custom-select.open .select-trigger:after {
+  transform: rotate(180deg);
+}
+.custom-select.open .select-trigger {
+  border-color: #0e5e0a;
+}
+
+.select-options {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  display: none;
+  overflow: hidden;
+}
+
+.custom-select.open .select-options {
+  display: block;
+}
+
+.option {
+  height: 40px;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.option:hover {
+  background-color: #f3f3f3;
+}
+
+/* Calendar */
+.date-wrapper {
+  position: relative;
+}
+.routines input[type="date"] {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 15px;
+  font-family: "DM Sans", sans-serif;
+  outline: none;
+  cursor: pointer;
+  color: #4b5563;
+}
+
+/* Modern Calendar icon and picker */
+.routines input[type="date"]::-webkit-calendar-picker-indicator {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230e5e0a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>");
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .input-row {
+    flex-direction: column;
+  }
+  .routines button {
+    width: 100%;
+  }
+  .filters-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+}

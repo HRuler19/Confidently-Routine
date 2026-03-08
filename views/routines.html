@@ -1,5 +1,43 @@
 <section class="routines">
-  <h1>My Routine</h1>
+  <div class="input-row">
+    <input type="text" placeholder="Add new task" />
+    <button><i class="fa-solid fa-plus"></i>Add Task</button>
+  </div>
 
-  <p>Your daily routines will appear here.</p>
+  <hr />
+
+  <div class="filters-row">
+    <div class="filter-group">
+      <span>Category</span>
+      <div class="custom-select" id="categorySelect">
+        <div class="select-trigger"><span>Personal</span></div>
+        <div class="select-options">
+          <div class="option" data-value="personal">Personal</div>
+          <div class="option" data-value="work">Work</div>
+          <div class="option" data-value="shopping">Shopping</div>
+          <div class="option" data-value="other">Other</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <span>Priority</span>
+      <div class="custom-select" id="prioritySelect">
+        <div class="select-trigger"><span>Medium</span></div>
+        <div class="select-options">
+          <div class="option" data-value="low">Low</div>
+          <div class="option" data-value="medium">Medium</div>
+          <div class="option" data-value="high">High</div>
+          <div class="option" data-value="hard">Hard</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <span>Due Date</span>
+      <div class="date-wrapper">
+        <input type="date" id="taskDate" value="2026-03-08" />
+      </div>
+    </div>
+  </div>
 </section>
