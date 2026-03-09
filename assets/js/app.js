@@ -87,6 +87,13 @@
 
           select.classList.remove("open");
           select.dataset.value = newOption.dataset.value;
+
+          if (select.id.includes("Filter") || select.id.includes("Status")) {
+            const filterEvent = new CustomEvent("filterChange", {
+              detail: { filter: select.id, value: newOption.dataset.value },
+            });
+            select.dispatchEvent(filterEvent);
+          }
         });
       });
 
@@ -127,6 +134,12 @@
       if (window.innerWidth <= 768) {
         sidebar.classList.remove("mobile-open");
       }
+
+      window.dispatchEvent(
+        new CustomEvent("pageLoaded", {
+          detail: { page: pageName },
+        }),
+      );
     } catch (error) {
       content.innerHTML = `<div style="padding:20px;color:red;">Page not found: ${pageName}</div>`;
     }
@@ -157,9 +170,7 @@
     mobileNavItems.forEach((item) => {
       item.addEventListener("click", function (e) {
         e.preventDefault();
-
         const pageName = this.dataset.page;
-
         if (pageName) loadPage(pageName);
       });
     });
@@ -171,9 +182,7 @@
     sidebarLinks.forEach(function (link) {
       link.addEventListener("click", function (event) {
         event.preventDefault();
-
         const pageName = this.dataset.page;
-
         if (pageName) loadPage(pageName);
       });
     });
@@ -226,6 +235,8 @@
         avatarImg.src = userData.avatar;
       }
     }
+
+    loadPage("dashboard");
   }
 
   function performLogout() {
@@ -252,17 +263,17 @@
     hideLogoutModal();
   }
 
+  // Password toggle
   if (passwordToggle && passwordInput) {
     passwordToggle.addEventListener("click", function () {
       const type = passwordInput.type === "password" ? "text" : "password";
-
       passwordInput.type = type;
-
       this.classList.toggle("fa-eye");
       this.classList.toggle("fa-eye-slash");
     });
   }
 
+  // Login form submit
   if (loginForm) {
     loginForm.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -271,9 +282,7 @@
       const password = passwordInput.value.trim();
 
       if (!username) return showError(usernameInput, "Please enter username");
-
       if (!password) return showError(passwordInput, "Please enter password");
-
       if (password.length < 6)
         return showError(
           passwordInput,
@@ -299,6 +308,7 @@
     });
   }
 
+  // Logout events
   if (logoutBtn)
     logoutBtn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -306,7 +316,6 @@
     });
 
   if (cancelLogout) cancelLogout.addEventListener("click", hideLogoutModal);
-
   if (confirmLogout) confirmLogout.addEventListener("click", performLogout);
 
   function showLogoutModal() {
@@ -317,14 +326,13 @@
     logoutModal.classList.remove("show");
   }
 
+  // Avatar selection
   avatars.forEach((avatar) => {
     avatar.addEventListener("click", function () {
       avatars.forEach((av) => av.classList.remove("avatar--selected"));
-
       this.classList.add("avatar--selected");
 
       const selectedImg = this.querySelector("img");
-
       if (selectedImg) {
         selectedAvatar = selectedImg.src;
         mainAvatarImg.src = selectedImg.src;
@@ -332,6 +340,7 @@
     });
   });
 
+  // Add avatar
   if (addAvatarBtn && avatarUpload) {
     addAvatarBtn.addEventListener("click", () => avatarUpload.click());
 
@@ -344,7 +353,6 @@
         reader.onload = (e) => {
           selectedAvatar = e.target.result;
           mainAvatarImg.src = e.target.result;
-
           avatars.forEach((av) => av.classList.remove("avatar--selected"));
         };
 
@@ -353,6 +361,7 @@
     });
   }
 
+  // Error handling functions
   function showError(inputElement, message) {
     clearErrors();
 
@@ -361,21 +370,17 @@
     );
 
     const errorDiv = document.createElement("div");
-
     errorDiv.className = "error-message";
     errorDiv.textContent = message;
-
     errorDiv.style.cssText =
       "color:#dc3545;font-size:10px;margin-top:4px;font-family:'DM Sans',sans-serif;";
 
     formGroup.appendChild(errorDiv);
-
     inputElement.style.borderColor = "#dc3545";
   }
 
   function clearErrors() {
     document.querySelectorAll(".error-message").forEach((el) => el.remove());
-
     document
       .querySelectorAll(".input-field")
       .forEach((el) => (el.style.borderColor = "#d1d5db"));
