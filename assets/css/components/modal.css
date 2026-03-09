@@ -72,7 +72,17 @@
   font-size: 14px;
   color: #6b7280;
   line-height: 1.5;
-  margin: 0;
+  margin: 0 0 8px 0;
+}
+
+.modal-task-title {
+  font-weight: 600;
+  color: #111827 !important;
+  background-color: #f9fafb;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-left: 3px solid #dc2626;
+  margin-top: 8px !important;
 }
 
 .modal-footer {

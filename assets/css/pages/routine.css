@@ -44,6 +44,12 @@
   transition: 0.2s;
 }
 
+.routines button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .routines hr {
   border: none;
   border-top: 1px solid #e5e7eb;

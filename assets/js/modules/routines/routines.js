@@ -41,6 +41,8 @@
     },
   ];
 
+  let taskToDelete = null;
+
   // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     initRoutines();
@@ -59,6 +61,72 @@
 
     attachEvents();
     updateStats();
+    initAddTaskButton();
+    initModalEvents();
+  }
+
+  function initAddTaskButton() {
+    const input = document.getElementById("taskInput");
+    const addBtn = document.getElementById("addTaskBtn");
+
+    if (input && addBtn) {
+      input.addEventListener("input", function () {
+        addBtn.disabled = this.value.trim() === "";
+      });
+
+      addBtn.disabled = input.value.trim() === "";
+    }
+  }
+
+  function initModalEvents() {
+    const modal = document.getElementById("deleteTaskModal");
+    const cancelBtn = document.getElementById("cancelDelete");
+    const deleteBtn = document.getElementById("confirmDelete");
+
+    cancelBtn.addEventListener("click", closeModal);
+    deleteBtn.addEventListener("click", confirmDelete);
+
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && modal.classList.contains("show")) {
+        closeModal();
+      }
+    });
+  }
+
+  function openModal(taskId, taskTitle) {
+    taskToDelete = taskId;
+    const modal = document.getElementById("deleteTaskModal");
+    const taskTitleElement = modal.querySelector(".modal-task-title");
+    taskTitleElement.textContent = `"${taskTitle}"`;
+    modal.classList.add("show");
+  }
+
+  function closeModal() {
+    const modal = document.getElementById("deleteTaskModal");
+    modal.classList.remove("show");
+    taskToDelete = null;
+  }
+
+  function confirmDelete() {
+    if (taskToDelete) {
+      tasks = tasks.filter((t) => t.id != taskToDelete);
+
+      const taskItem = document.querySelector(
+        `.task-item[data-id="${taskToDelete}"]`,
+      );
+      if (taskItem) {
+        taskItem.remove();
+      }
+
+      updateStats();
+      closeModal();
+    }
   }
 
   function attachEvents() {
@@ -84,7 +152,7 @@
     });
 
     // Add task button
-    const addTaskBtn = document.querySelector(".routines button");
+    const addTaskBtn = document.getElementById("addTaskBtn");
     if (addTaskBtn) {
       addTaskBtn.removeEventListener("click", handleAddTask);
       addTaskBtn.addEventListener("click", handleAddTask);
@@ -109,6 +177,56 @@
         select.removeEventListener("filterChange", filterTasks);
         select.addEventListener("filterChange", filterTasks);
       }
+    });
+
+    // Custom select triggers
+    initCustomSelects();
+  }
+
+  function initCustomSelects() {
+    const customSelects = document.querySelectorAll(".custom-select");
+
+    customSelects.forEach((select) => {
+      const trigger = select.querySelector(".select-trigger");
+      const options = select.querySelectorAll(".option");
+
+      if (trigger) {
+        trigger.addEventListener("click", (e) => {
+          e.stopPropagation();
+
+          document.querySelectorAll(".custom-select").forEach((s) => {
+            if (s !== select) s.classList.remove("open");
+          });
+
+          select.classList.toggle("open");
+        });
+      }
+
+      options.forEach((option) => {
+        option.addEventListener("click", (e) => {
+          e.stopPropagation();
+
+          const value = option.dataset.value;
+          const text = option.textContent;
+          const triggerSpan = select.querySelector(".select-trigger span");
+
+          if (triggerSpan) {
+            triggerSpan.textContent = text;
+          }
+
+          select.dataset.value = value;
+          select.classList.remove("open");
+
+          const event = new CustomEvent("filterChange", { detail: { value } });
+          select.dispatchEvent(event);
+        });
+      });
+    });
+
+    document.addEventListener("click", () => {
+      document.querySelectorAll(".custom-select").forEach((s) => {
+        s.classList.remove("open");
+      });
     });
   }
 
@@ -441,20 +559,20 @@
 
   function handleDelete(e) {
     e.stopPropagation();
+    e.preventDefault();
 
-    if (confirm("Are you sure you want to delete this task?")) {
-      const taskItem = e.currentTarget.closest(".task-item");
-      if (taskItem) {
-        const taskId = taskItem.dataset.id;
-        tasks = tasks.filter((t) => t.id != taskId);
-        taskItem.remove();
-        updateStats();
+    const taskItem = e.currentTarget.closest(".task-item");
+    if (taskItem) {
+      const taskId = taskItem.dataset.id;
+      const task = tasks.find((t) => t.id == taskId);
+      if (task) {
+        openModal(taskId, task.title);
       }
     }
   }
 
   function handleAddTask() {
-    const input = document.querySelector('.routines input[type="text"]');
+    const input = document.getElementById("taskInput");
     const title = input.value.trim();
 
     if (!title) {
@@ -480,6 +598,7 @@
     addTaskToDOM(newTask);
 
     input.value = "";
+    document.getElementById("addTaskBtn").disabled = true;
     updateStats();
   }
 
