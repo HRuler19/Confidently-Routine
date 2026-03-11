@@ -1,49 +1,15 @@
 (function () {
   "use strict";
 
-  // State
-  let tasks = [
-    {
-      id: 1,
-      title: "Learn React Advanced Patterns",
-      category: "Personal",
-      priority: "medium",
-      dueDate: "2026-03-03",
-      displayDate: "03/03/2026",
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Build todo app with advanced features",
-      category: "Work",
-      priority: "medium",
-      dueDate: "2026-03-01",
-      displayDate: "7 days ago",
-      completed: false,
-    },
-    {
-      id: 3,
-      title: "Buy groceries for the week",
-      category: "Shopping",
-      priority: "low",
-      dueDate: "2026-02-24",
-      displayDate: "12 days ago",
-      completed: false,
-    },
-    {
-      id: 4,
-      title: "English learning",
-      category: "Other",
-      priority: "hard",
-      dueDate: "2026-02-18",
-      displayDate: "18 days ago",
-      completed: true,
-    },
-  ];
+  // Flatpickr instance
+  let datePicker = null;
+
+  // State - Load from TaskStore instead of hardcoded tasks
+  let tasks = [];
 
   let taskToDelete = null;
+  let editDatePickers = [];
 
-  // Initialize
   document.addEventListener("DOMContentLoaded", function () {
     initRoutines();
   });
@@ -57,24 +23,231 @@
   function initRoutines() {
     if (!document.querySelector(".tasks-container")) return;
 
-    console.log("Routines initialized");
+    // Load tasks from localStorage
+    tasks = TaskStore.getTasks() || [];
 
+    console.log("Routines initialized with", tasks.length, "tasks");
+
+    initDatePicker();
+    renderTasksToDOM();
     attachEvents();
+    attachFilterChangeListener();
     updateStats();
     initAddTaskButton();
     initModalEvents();
+    initFilterSelects();
+    // Apply filters on initialization
+    filterTasks();
+  }
+
+  /**
+   * Render all tasks to DOM
+   */
+  function renderTasksToDOM() {
+    const container = document.querySelector(".tasks-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    tasks.forEach((task) => {
+      addTaskToDOM(task);
+    });
+  }
+
+  function initDatePicker() {
+    const dateInput = document.getElementById("taskDate");
+    if (!dateInput) return;
+
+    if (datePicker) {
+      datePicker.destroy();
+    }
+
+    dateInput.type = "text";
+
+    datePicker = flatpickr(dateInput, {
+      dateFormat: "Y-m-d",
+      defaultDate: dateInput.value || new Date().toISOString().split("T")[0],
+      minDate: "today",
+      disableMobile: true,
+      animate: true,
+      static: true,
+      monthSelectorType: "static",
+      locale: {
+        firstDayOfWeek: 1,
+        weekdays: {
+          shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          longhand: [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ],
+        },
+        months: {
+          shorthand: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ],
+          longhand: [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ],
+        },
+      },
+      onOpen: function (selectedDates, dateStr, instance) {
+        if (instance.calendarContainer) {
+          instance.calendarContainer.classList.add("open-animation");
+        }
+      },
+      onChange: function (selectedDates, dateStr) {
+        dateInput.value = dateStr;
+      },
+      onReady: function (selectedDates, dateStr, instance) {
+        if (instance.calendarContainer) {
+          instance.calendarContainer.classList.add("ios-wheel-picker");
+        }
+      },
+    });
+
+    dateInput.addEventListener("click", function () {
+      if (datePicker) {
+        datePicker.open();
+      }
+    });
+  }
+
+  function initEditDatePicker(inputElement, defaultDate) {
+    if (!inputElement) return null;
+
+    inputElement.type = "text";
+
+    const picker = flatpickr(inputElement, {
+      dateFormat: "Y-m-d",
+      defaultDate: defaultDate || new Date().toISOString().split("T")[0],
+      minDate: "today",
+      disableMobile: true,
+      animate: true,
+      static: true,
+      monthSelectorType: "static",
+      locale: {
+        firstDayOfWeek: 1,
+        weekdays: {
+          shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+          longhand: [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ],
+        },
+        months: {
+          shorthand: [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ],
+          longhand: [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ],
+        },
+      },
+      onOpen: function (selectedDates, dateStr, instance) {
+        if (instance.calendarContainer) {
+          instance.calendarContainer.classList.add("open-animation");
+        }
+      },
+      onReady: function (selectedDates, dateStr, instance) {
+        if (instance.calendarContainer) {
+          instance.calendarContainer.classList.add("ios-wheel-picker");
+        }
+      },
+    });
+
+    inputElement.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (picker && typeof picker.open === "function") {
+        picker.open();
+      }
+    });
+
+    return picker;
   }
 
   function initAddTaskButton() {
     const input = document.getElementById("taskInput");
     const addBtn = document.getElementById("addTaskBtn");
+    const categorySelect = document.getElementById("categorySelect");
+    const prioritySelect = document.getElementById("prioritySelect");
+
+    // Initialize category and priority select values
+    if (categorySelect && !categorySelect.dataset.value) {
+      categorySelect.dataset.value = "personal";
+    }
+    if (prioritySelect && !prioritySelect.dataset.value) {
+      prioritySelect.dataset.value = "medium";
+    }
 
     if (input && addBtn) {
-      input.addEventListener("input", function () {
-        addBtn.disabled = this.value.trim() === "";
-      });
+      input.removeEventListener("input", handleInput);
+      addBtn.removeEventListener("click", handleAddTask);
+
+      input.addEventListener("input", handleInput);
+      addBtn.addEventListener("click", handleAddTask);
 
       addBtn.disabled = input.value.trim() === "";
+    }
+  }
+
+  function handleInput() {
+    const input = document.getElementById("taskInput");
+    const addBtn = document.getElementById("addTaskBtn");
+    if (input && addBtn) {
+      addBtn.disabled = this.value.trim() === "";
     }
   }
 
@@ -83,27 +256,43 @@
     const cancelBtn = document.getElementById("cancelDelete");
     const deleteBtn = document.getElementById("confirmDelete");
 
-    cancelBtn.addEventListener("click", closeModal);
-    deleteBtn.addEventListener("click", confirmDelete);
+    if (cancelBtn) {
+      cancelBtn.removeEventListener("click", closeModal);
+      cancelBtn.addEventListener("click", closeModal);
+    }
 
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
+    if (deleteBtn) {
+      deleteBtn.removeEventListener("click", confirmDelete);
+      deleteBtn.addEventListener("click", confirmDelete);
+    }
 
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && modal.classList.contains("show")) {
-        closeModal();
-      }
-    });
+    if (modal) {
+      modal.removeEventListener("click", handleModalClick);
+      modal.addEventListener("click", handleModalClick);
+    }
+
+    document.removeEventListener("keydown", handleEscapeKey);
+    document.addEventListener("keydown", handleEscapeKey);
+  }
+
+  function handleModalClick(e) {
+    if (e.target === document.getElementById("deleteTaskModal")) {
+      closeModal();
+    }
+  }
+
+  function handleEscapeKey(e) {
+    const modal = document.getElementById("deleteTaskModal");
+    if (e.key === "Escape" && modal && modal.classList.contains("show")) {
+      closeModal();
+    }
   }
 
   function openModal(taskId, taskTitle) {
     taskToDelete = taskId;
     const modal = document.getElementById("deleteTaskModal");
     const taskTitleElement = modal.querySelector(".modal-task-title");
-    taskTitleElement.textContent = `"${taskTitle}"`;
+    if (taskTitleElement) taskTitleElement.textContent = `"${taskTitle}"`;
     modal.classList.add("show");
   }
 
@@ -115,7 +304,11 @@
 
   function confirmDelete() {
     if (taskToDelete) {
+      // Delete from array
       tasks = tasks.filter((t) => t.id != taskToDelete);
+
+      // Delete from localStorage
+      TaskStore.deleteTask(taskToDelete);
 
       const taskItem = document.querySelector(
         `.task-item[data-id="${taskToDelete}"]`,
@@ -125,114 +318,172 @@
       }
 
       updateStats();
+      filterTasks();
       closeModal();
     }
   }
 
   function attachEvents() {
-    // Edit buttons
-    const editButtons = document.querySelectorAll(".edit-btn");
-    editButtons.forEach((btn) => {
-      btn.removeEventListener("click", handleEditClick);
-      btn.addEventListener("click", handleEditClick);
-    });
+    document.removeEventListener("click", handleDocumentClick);
+    document.removeEventListener("change", handleDocumentChange);
+    document.removeEventListener("keydown", handleDocumentKeyDown);
 
-    // Delete buttons
-    const deleteButtons = document.querySelectorAll(".delete-btn");
-    deleteButtons.forEach((btn) => {
-      btn.removeEventListener("click", handleDelete);
-      btn.addEventListener("click", handleDelete);
-    });
+    document.addEventListener("click", handleDocumentClick);
+    document.addEventListener("change", handleDocumentChange);
+    document.addEventListener("keydown", handleDocumentKeyDown);
+  }
 
-    // Checkboxes
-    const checkboxes = document.querySelectorAll(".task-checkbox");
-    checkboxes.forEach((checkbox) => {
-      checkbox.removeEventListener("change", handleCheckboxChange);
-      checkbox.addEventListener("change", handleCheckboxChange);
-    });
-
-    // Add task button
-    const addTaskBtn = document.getElementById("addTaskBtn");
-    if (addTaskBtn) {
-      addTaskBtn.removeEventListener("click", handleAddTask);
-      addTaskBtn.addEventListener("click", handleAddTask);
-    }
-
-    // Save with enter
-    document.addEventListener("keydown", handleEnterKey);
-
-    // Click outside cancel
-    document.addEventListener("click", handleOutsideClick);
-
-    // Filter selects
-    const filterSelects = [
+  /**
+   * Listen for filter change events dispatched by app.js
+   */
+  function attachFilterChangeListener() {
+    // Listen for custom filterChange events on filter selects
+    const filterSelectIds = [
       "taskStatusSelect",
       "categoryFilterSelect",
       "priorityFilterSelect",
     ];
 
-    filterSelects.forEach((id) => {
+    filterSelectIds.forEach((id) => {
       const select = document.getElementById(id);
       if (select) {
-        select.removeEventListener("filterChange", filterTasks);
-        select.addEventListener("filterChange", filterTasks);
+        select.removeEventListener("filterChange", handleFilterChange);
+        select.addEventListener("filterChange", handleFilterChange);
       }
     });
+  }
+
+  /**
+   * Handle filter change events
+   */
+  function handleFilterChange(e) {
+    console.log("Filter changed:", e.detail);
+    filterTasks();
+  }
+
+  function handleDocumentClick(e) {
+    // Edit buttons
+    if (e.target.closest(".edit-btn")) {
+      e.preventDefault();
+      e.stopPropagation();
+      const taskItem = e.target.closest(".task-item");
+      if (taskItem && !taskItem.classList.contains("editing")) {
+        handleEditClick(e);
+      }
+      return;
+    }
+
+    // Delete buttons
+    if (e.target.closest(".delete-btn")) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleDelete(e);
+      return;
+    }
 
     // Custom select triggers
-    initCustomSelects();
-  }
+    if (e.target.closest(".select-trigger")) {
+      const select = e.target.closest(".custom-select");
+      if (select) {
+        e.stopPropagation();
 
-  function initCustomSelects() {
-    const customSelects = document.querySelectorAll(".custom-select");
-
-    customSelects.forEach((select) => {
-      const trigger = select.querySelector(".select-trigger");
-      const options = select.querySelectorAll(".option");
-
-      if (trigger) {
-        trigger.addEventListener("click", (e) => {
-          e.stopPropagation();
-
-          document.querySelectorAll(".custom-select").forEach((s) => {
-            if (s !== select) s.classList.remove("open");
-          });
-
-          select.classList.toggle("open");
+        document.querySelectorAll(".custom-select").forEach((s) => {
+          if (s !== select) s.classList.remove("open");
         });
+
+        select.classList.toggle("open");
+      }
+      return;
+    }
+
+    // Custom select options
+    if (e.target.closest(".option")) {
+      const option = e.target.closest(".option");
+      const select = option.closest(".custom-select");
+      const value = option.dataset.value;
+      const text = option.textContent;
+      const triggerSpan = select.querySelector(".select-trigger span");
+
+      if (triggerSpan) {
+        triggerSpan.textContent = text;
       }
 
-      options.forEach((option) => {
-        option.addEventListener("click", (e) => {
-          e.stopPropagation();
+      select.dataset.value = value;
+      select.classList.remove("open");
 
-          const value = option.dataset.value;
-          const text = option.textContent;
-          const triggerSpan = select.querySelector(".select-trigger span");
+      // Only filter if this is a filter select, not an add-task select
+      if (select.classList.contains("filter-custom-select")) {
+        filterTasks();
+      }
 
-          if (triggerSpan) {
-            triggerSpan.textContent = text;
-          }
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
 
-          select.dataset.value = value;
-          select.classList.remove("open");
-
-          const event = new CustomEvent("filterChange", { detail: { value } });
-          select.dispatchEvent(event);
-        });
-      });
-    });
-
-    document.addEventListener("click", () => {
-      document.querySelectorAll(".custom-select").forEach((s) => {
+    // Click outside - close all custom selects
+    if (!e.target.closest(".custom-select")) {
+      document.querySelectorAll(".custom-select.open").forEach((s) => {
         s.classList.remove("open");
       });
+    }
+
+    // Handle edit mode cancel on outside click
+    const editingItem = document.querySelector(".task-item.editing");
+    if (editingItem && !editingItem.contains(e.target)) {
+      cancelEdit(editingItem);
+    }
+  }
+
+  function handleDocumentChange(e) {
+    // Checkboxes
+    if (e.target.classList.contains("task-checkbox")) {
+      handleCheckboxChange(e);
+    }
+  }
+
+  function handleDocumentKeyDown(e) {
+    // Enter key in edit mode
+    if (e.key === "Enter") {
+      const editingItem = document.querySelector(".task-item.editing");
+      if (editingItem) {
+        const saveBtn = editingItem.querySelector(".edit-save-btn");
+        if (saveBtn && e.target.closest(".edit-title")) {
+          e.preventDefault();
+          saveBtn.click();
+        }
+      }
+    }
+
+    // Escape key in edit mode
+    if (e.key === "Escape") {
+      const editingItem = document.querySelector(".task-item.editing");
+      if (editingItem) {
+        e.preventDefault();
+        cancelEdit(editingItem);
+      }
+    }
+  }
+
+  // YENİ: Filter selectlarına özel event listener
+  function initFilterSelects() {
+    const filterSelects = [
+      { id: "taskStatusSelect", defaultValue: "all" },
+      { id: "categoryFilterSelect", defaultValue: "all" },
+      { id: "priorityFilterSelect", defaultValue: "all" },
+    ];
+
+    filterSelects.forEach(({ id, defaultValue }) => {
+      const select = document.getElementById(id);
+      if (select) {
+        // Set initial dataset.value
+        select.dataset.value = defaultValue;
+      }
     });
   }
 
-  // CHECKBOX CHANGE HANDLER
   function handleCheckboxChange(e) {
-    const checkbox = e.currentTarget;
+    const checkbox = e.target;
     const taskItem = checkbox.closest(".task-item");
     const taskId = taskItem.dataset.id;
     const task = tasks.find((t) => t.id == taskId);
@@ -248,15 +499,17 @@
         taskItem.dataset.completed = "false";
       }
 
+      // Save to localStorage
+      TaskStore.updateTask(task.id, { completed: task.completed });
+
       updateStats();
+      // Filter'ları tekrar uygula (checkbox değişince)
+      filterTasks();
     }
   }
 
   function handleEditClick(e) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const taskItem = e.currentTarget.closest(".task-item");
+    const taskItem = e.target.closest(".task-item");
     if (!taskItem) return;
 
     if (taskItem.classList.contains("editing")) return;
@@ -278,7 +531,6 @@
     const originalHTML = taskRow.outerHTML;
     taskItem.dataset.originalHTML = originalHTML;
 
-    // Category options
     const categoryOptions = [
       { value: "Personal", label: "Personal" },
       { value: "Work", label: "Work" },
@@ -286,7 +538,6 @@
       { value: "Other", label: "Other" },
     ];
 
-    // Priority options
     const priorityOptions = [
       { value: "low", label: "Low" },
       { value: "medium", label: "Medium" },
@@ -294,14 +545,12 @@
       { value: "hard", label: "Hard" },
     ];
 
-    // Category options HTML
     let categoryOptionsHtml = "";
     categoryOptions.forEach((opt) => {
       const selected = opt.value === task.category ? "selected" : "";
       categoryOptionsHtml += `<div class="option" data-value="${opt.value}" ${selected ? 'data-selected="true"' : ""}>${opt.label}</div>`;
     });
 
-    // Priority options HTML
     let priorityOptionsHtml = "";
     priorityOptions.forEach((opt) => {
       const selected = opt.value === task.priority ? "selected" : "";
@@ -339,7 +588,7 @@
         
         <div class="edit-field due-date-field">
           <label>Due Date</label>
-          <input type="date" class="edit-date" value="${task.dueDate}">
+          <input type="text" class="edit-date" value="${task.dueDate}" placeholder="Select date">
         </div>
         
         <div class="edit-actions">
@@ -351,96 +600,54 @@
 
     taskItem.innerHTML = editHTML;
 
-    initEditModeSelectors(taskItem);
+    const editDateInput = taskItem.querySelector(".edit-date");
+    if (editDateInput) {
+      if (editDatePickers.length > 0) {
+        editDatePickers.forEach((picker) => {
+          if (picker && typeof picker.destroy === "function") {
+            try {
+              picker.destroy();
+            } catch (e) {
+              console.log("Picker destroy error:", e);
+            }
+          }
+        });
+        editDatePickers = [];
+      }
+
+      try {
+        const editPicker = initEditDatePicker(editDateInput, task.dueDate);
+        if (editPicker) {
+          editDatePickers.push(editPicker);
+        }
+      } catch (e) {
+        console.log("Edit picker creation error:", e);
+      }
+    }
 
     const saveBtn = taskItem.querySelector(".edit-save-btn");
     const cancelBtn = taskItem.querySelector(".edit-cancel-btn");
 
-    saveBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      saveEdit(taskItem, task);
-    });
-
-    cancelBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      cancelEdit(taskItem);
-    });
-
-    const titleInput = taskItem.querySelector(".edit-title");
-    titleInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+    if (saveBtn) {
+      saveBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
         e.preventDefault();
         saveEdit(taskItem, task);
-      }
-      if (e.key === "Escape") {
+      });
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
         e.preventDefault();
         cancelEdit(taskItem);
-      }
-    });
-
-    titleInput.focus();
-  }
-
-  function initEditModeSelectors(taskItem) {
-    const selects = taskItem.querySelectorAll(".custom-select");
-
-    selects.forEach((select) => {
-      if (select.dataset.initialized) return;
-
-      const trigger = select.querySelector(".select-trigger");
-      const options = select.querySelectorAll(".option");
-
-      if (trigger) {
-        const newTrigger = trigger.cloneNode(true);
-        trigger.parentNode.replaceChild(newTrigger, trigger);
-
-        newTrigger.addEventListener("click", (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          taskItem.querySelectorAll(".custom-select").forEach((s) => {
-            if (s !== select) s.classList.remove("open");
-          });
-
-          select.classList.toggle("open");
-        });
-      }
-
-      options.forEach((option) => {
-        const newOption = option.cloneNode(true);
-        option.parentNode.replaceChild(newOption, option);
-
-        newOption.addEventListener("click", (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          const triggerSpan = select.querySelector(".select-trigger span");
-          if (triggerSpan) {
-            triggerSpan.innerText = newOption.innerText;
-          }
-
-          select.classList.remove("open");
-          select.dataset.value = newOption.dataset.value;
-        });
       });
+    }
 
-      select.dataset.initialized = "true";
-    });
-
-    setTimeout(() => {
-      const handleClickOutside = (e) => {
-        if (!taskItem.contains(e.target)) {
-          taskItem
-            .querySelectorAll(".custom-select")
-            .forEach((s) => s.classList.remove("open"));
-        }
-      };
-      document.addEventListener("click", handleClickOutside);
-
-      setTimeout(() => {
-        document.removeEventListener("click", handleClickOutside);
-      }, 100);
-    }, 0);
+    const titleInput = taskItem.querySelector(".edit-title");
+    if (titleInput) {
+      titleInput.focus();
+    }
   }
 
   function saveEdit(taskItem, task) {
@@ -488,7 +695,12 @@
       task.displayDate = newDate.split("-").reverse().join("/");
     }
 
+    // Save to localStorage
+    TaskStore.updateTask(task.id, task);
+
     exitEditMode(taskItem, task);
+
+    filterTasks();
   }
 
   function cancelEdit(taskItem) {
@@ -498,7 +710,20 @@
 
     taskItem.classList.remove("editing");
 
-    attachEvents();
+    if (editDatePickers.length > 0) {
+      editDatePickers.forEach((picker) => {
+        if (picker && typeof picker.destroy === "function") {
+          try {
+            picker.destroy();
+          } catch (e) {
+            console.log("Picker destroy error:", e);
+          }
+        }
+      });
+      editDatePickers = [];
+    }
+
+    filterTasks();
   }
 
   function exitEditMode(taskItem, task) {
@@ -541,7 +766,19 @@
       taskItem.classList.add("completed");
     }
 
-    attachEvents();
+    if (editDatePickers.length > 0) {
+      editDatePickers.forEach((picker) => {
+        if (picker && typeof picker.destroy === "function") {
+          try {
+            picker.destroy();
+          } catch (e) {
+            console.log("Picker destroy error:", e);
+          }
+        }
+      });
+      editDatePickers = [];
+    }
+
     updateStats();
   }
 
@@ -554,14 +791,22 @@
       }
     });
 
-    attachEvents();
+    if (editDatePickers.length > 0) {
+      editDatePickers.forEach((picker) => {
+        if (picker && typeof picker.destroy === "function") {
+          try {
+            picker.destroy();
+          } catch (e) {
+            console.log("Picker destroy error:", e);
+          }
+        }
+      });
+      editDatePickers = [];
+    }
   }
 
   function handleDelete(e) {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const taskItem = e.currentTarget.closest(".task-item");
+    const taskItem = e.target.closest(".task-item");
     if (taskItem) {
       const taskId = taskItem.dataset.id;
       const task = tasks.find((t) => t.id == taskId);
@@ -580,26 +825,75 @@
       return;
     }
 
+    // Get selected category and priority from custom selects
+    const categorySelect = document.getElementById("categorySelect");
+    const prioritySelect = document.getElementById("prioritySelect");
+
+    const selectedCategory = categorySelect?.dataset.value || "personal";
+    const selectedPriority = prioritySelect?.dataset.value || "medium";
+
+    // Capitalize category for display (personal → Personal)
+    const categoryDisplay =
+      selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1);
+
+    const dateInput = document.getElementById("taskDate");
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString().split("T")[0];
 
+    const selectedDate =
+      dateInput && dateInput.value ? dateInput.value : todayStr;
+
     const newTask = {
       id: Date.now(),
       title: title,
-      category: "Personal",
-      priority: "medium",
-      dueDate: todayStr,
-      displayDate: "Today",
+      category: categoryDisplay,
+      priority: selectedPriority,
+      dueDate: selectedDate,
+      displayDate: formatDisplayDate(selectedDate),
       completed: false,
     };
 
+    // Add to tasks array and localStorage
     tasks.push(newTask);
+    TaskStore.addTask(newTask);
+
     addTaskToDOM(newTask);
 
     input.value = "";
     document.getElementById("addTaskBtn").disabled = true;
+
+    if (dateInput && datePicker) {
+      dateInput.value = todayStr;
+      datePicker.setDate(todayStr);
+    }
+
     updateStats();
+    filterTasks();
+  }
+
+  function formatDisplayDate(dateStr) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(dateStr);
+    dueDate.setHours(0, 0, 0, 0);
+
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return "Today";
+    } else if (diffDays === 1) {
+      return "Tomorrow";
+    } else if (diffDays === -1) {
+      return "Yesterday";
+    } else if (diffDays < -1) {
+      return `${Math.abs(diffDays)} days ago`;
+    } else if (diffDays > 1) {
+      return `in ${diffDays} days`;
+    } else {
+      return dateStr.split("-").reverse().join("/");
+    }
   }
 
   function addTaskToDOM(task) {
@@ -639,59 +933,109 @@
     `;
 
     container.insertAdjacentHTML("beforeend", taskHtml);
-    attachEvents();
   }
 
-  function filterTasks(e) {
+  function filterTasks() {
     const statusSelect = document.getElementById("taskStatusSelect");
     const categorySelect = document.getElementById("categoryFilterSelect");
     const prioritySelect = document.getElementById("priorityFilterSelect");
 
-    const statusFilter = statusSelect
-      ? statusSelect.dataset.value || "all"
-      : "all";
-    const categoryFilter = categorySelect
-      ? categorySelect.dataset.value || "all"
-      : "all";
-    const priorityFilter = prioritySelect
-      ? prioritySelect.dataset.value || "all"
-      : "all";
+    // Get filter values from dataset.value
+    const statusFilter = statusSelect?.dataset.value || "all";
+    const categoryFilter = categorySelect?.dataset.value || "all";
+    const priorityFilter = prioritySelect?.dataset.value || "all";
+
+    console.log("Filtering with:", {
+      statusFilter,
+      categoryFilter,
+      priorityFilter,
+      totalTasks: tasks.length,
+    });
 
     const taskItems = document.querySelectorAll(".task-item");
 
     taskItems.forEach((item) => {
       const taskId = item.dataset.id;
       const task = tasks.find((t) => t.id == taskId);
-      if (!task) return;
+      if (!task) {
+        item.style.display = "none";
+        return;
+      }
 
       let show = true;
 
+      // Status filter - compare lowercase for consistency
       if (statusFilter !== "all") {
-        if (statusFilter === "completed" && !task.completed) show = false;
-        if (statusFilter === "active" && task.completed) show = false;
+        const taskStatus = task.completed ? "completed" : "active";
+        if (statusFilter !== taskStatus) {
+          show = false;
+        }
       }
 
+      // Category filter - case-insensitive comparison
       if (show && categoryFilter !== "all") {
-        if (task.category.toLowerCase() !== categoryFilter) show = false;
+        if (task.category.toLowerCase() !== categoryFilter.toLowerCase()) {
+          show = false;
+        }
       }
 
+      // Priority filter - exact match
       if (show && priorityFilter !== "all") {
-        if (task.priority !== priorityFilter) show = false;
+        if (task.priority !== priorityFilter) {
+          show = false;
+        }
       }
 
       item.style.display = show ? "block" : "none";
     });
+
+    updateVisibleStats();
   }
 
-  function updateStats() {
+  /**
+   * Update stats based on visible items
+   */
+  function updateVisibleStats() {
     const taskItems = document.querySelectorAll(".task-item");
-    const totalTasks = taskItems.length;
+    let totalVisible = 0;
+    let completedVisible = 0;
+    let activeVisible = 0;
 
-    let completedTasks = 0;
     taskItems.forEach((item) => {
-      const taskId = item.dataset.id;
-      const task = tasks.find((t) => t.id == taskId);
-      if (task && task.completed) completedTasks++;
+      if (item.style.display !== "none") {
+        totalVisible++;
+        const taskId = item.dataset.id;
+        const task = tasks.find((t) => t.id == taskId);
+        if (task && task.completed) {
+          completedVisible++;
+        } else {
+          activeVisible++;
+        }
+      }
+    });
+
+    // Update displayed stats
+    const statBadges = document.querySelectorAll(".stat-badge");
+    if (statBadges.length >= 3) {
+      const totalSpan = statBadges[0].querySelector("span:nth-child(2)");
+      const completedSpan = statBadges[1].querySelector("span:nth-child(2)");
+      const activeSpan = statBadges[2].querySelector("span:nth-child(2)");
+
+      if (totalSpan) totalSpan.textContent = totalVisible;
+      if (completedSpan) completedSpan.textContent = completedVisible;
+      if (activeSpan) activeSpan.textContent = activeVisible;
+    }
+  }
+
+  /**
+   * Update all stats (total, completed, active) based on all tasks
+   */
+  function updateStats() {
+    const totalTasks = tasks.length;
+    let completedTasks = 0;
+
+    tasks.forEach((task) => {
+      if (task.completed) completedTasks++;
     });
 
     const activeTasks = totalTasks - completedTasks;
@@ -706,26 +1050,6 @@
       if (totalSpan) totalSpan.textContent = totalTasks;
       if (completedSpan) completedSpan.textContent = completedTasks;
       if (activeSpan) activeSpan.textContent = activeTasks;
-    }
-  }
-
-  function handleEnterKey(e) {
-    if (e.key === "Enter") {
-      const editingItem = document.querySelector(".task-item.editing");
-      if (editingItem) {
-        const saveBtn = editingItem.querySelector(".edit-save-btn");
-        if (saveBtn) {
-          e.preventDefault();
-          saveBtn.click();
-        }
-      }
-    }
-  }
-
-  function handleOutsideClick(e) {
-    const editingItem = document.querySelector(".task-item.editing");
-    if (editingItem && !editingItem.contains(e.target)) {
-      cancelEdit(editingItem);
     }
   }
 })();
