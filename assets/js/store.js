@@ -221,3 +221,138 @@ const TaskStore = (function () {
     STORAGE_KEY,
   };
 })();
+
+// Note Management Store
+const NoteStore = (function () {
+  "use strict";
+
+  const STORAGE_KEY = "confidently_notes";
+
+  // Default notes - Empty array (user will add notes dynamically)
+  const DEFAULT_NOTES = [];
+
+  /**
+   * Initialize notes from localStorage with default values if empty
+   */
+  function initializeNotes() {
+    const existing = localStorage.getItem(STORAGE_KEY);
+    if (!existing) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NOTES));
+      return DEFAULT_NOTES;
+    }
+    return JSON.parse(existing);
+  }
+
+  /**
+   * Get all notes from localStorage
+   */
+  function getNotes() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : DEFAULT_NOTES;
+    } catch (e) {
+      console.error("Error getting notes:", e);
+      return DEFAULT_NOTES;
+    }
+  }
+
+  /**
+   * Add new note to localStorage
+   */
+  function addNote(note) {
+    try {
+      const notes = getNotes();
+      notes.unshift(note);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      return true;
+    } catch (e) {
+      console.error("Error adding note:", e);
+      return false;
+    }
+  }
+
+  /**
+   * Update note in localStorage
+   */
+  function updateNote(noteId, updates) {
+    try {
+      const notes = getNotes();
+      const note = notes.find((n) => n.id == noteId);
+      if (note) {
+        Object.assign(note, updates);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Error updating note:", e);
+      return false;
+    }
+  }
+
+  /**
+   * Delete note from localStorage
+   */
+  function deleteNote(noteId) {
+    try {
+      const notes = getNotes();
+      const filtered = notes.filter((n) => n.id != noteId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      return true;
+    } catch (e) {
+      console.error("Error deleting note:", e);
+      return false;
+    }
+  }
+
+  /**
+   * Update multiple notes (array)
+   */
+  function updateNotes(notesArray) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notesArray));
+      return true;
+    } catch (e) {
+      console.error("Error updating notes:", e);
+      return false;
+    }
+  }
+
+  /**
+   * Clear all notes
+   */
+  function clearNotes() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      return true;
+    } catch (e) {
+      console.error("Error clearing notes:", e);
+      return false;
+    }
+  }
+
+  /**
+   * Reset to default notes
+   */
+  function resetToDefaults() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NOTES));
+      return true;
+    } catch (e) {
+      console.error("Error resetting notes:", e);
+      return false;
+    }
+  }
+
+  return {
+    initializeNotes,
+    getNotes,
+    addNote,
+    updateNote,
+    deleteNote,
+    updateNotes,
+    clearNotes,
+    resetToDefaults,
+    STORAGE_KEY,
+  };
+})();

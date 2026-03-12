@@ -75,7 +75,8 @@
   margin: 0 0 8px 0;
 }
 
-.modal-task-title {
+.modal-task-title,
+.modal-note-title {
   font-weight: 600;
   color: #111827 !important;
   background-color: #f9fafb;
