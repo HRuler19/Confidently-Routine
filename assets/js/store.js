@@ -93,37 +93,16 @@ const TaskStore = (function () {
 
   const STORAGE_KEY = "confidently_tasks";
 
-  // Default tasks - Empty array (user will add tasks dynamically)
-  const DEFAULT_TASKS = [];
-
-  /**
-   * Initialize tasks from localStorage with default values if empty
-   */
-  function initializeTasks() {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    if (!existing) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TASKS));
-      return DEFAULT_TASKS;
-    }
-    return JSON.parse(existing);
-  }
-
-  /**
-   * Get all tasks from localStorage
-   */
   function getTasks() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : DEFAULT_TASKS;
+      return stored ? JSON.parse(stored) : [];
     } catch (e) {
       console.error("Error getting tasks:", e);
-      return DEFAULT_TASKS;
+      return [];
     }
   }
 
-  /**
-   * Add new task to localStorage
-   */
   function addTask(task) {
     try {
       const tasks = getTasks();
@@ -136,15 +115,12 @@ const TaskStore = (function () {
     }
   }
 
-  /**
-   * Update task in localStorage
-   */
   function updateTask(taskId, updates) {
     try {
       const tasks = getTasks();
-      const task = tasks.find((t) => t.id == taskId);
-      if (task) {
-        Object.assign(task, updates);
+      const index = tasks.findIndex((t) => t.id == taskId);
+      if (index !== -1) {
+        tasks[index] = { ...tasks[index], ...updates };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
         return true;
       }
@@ -155,9 +131,6 @@ const TaskStore = (function () {
     }
   }
 
-  /**
-   * Delete task from localStorage
-   */
   function deleteTask(taskId) {
     try {
       const tasks = getTasks();
@@ -170,9 +143,6 @@ const TaskStore = (function () {
     }
   }
 
-  /**
-   * Update multiple tasks (array)
-   */
   function updateTasks(tasksArray) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksArray));
@@ -183,42 +153,12 @@ const TaskStore = (function () {
     }
   }
 
-  /**
-   * Clear all tasks
-   */
-  function clearTasks() {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      return true;
-    } catch (e) {
-      console.error("Error clearing tasks:", e);
-      return false;
-    }
-  }
-
-  /**
-   * Reset to default tasks
-   */
-  function resetToDefaults() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TASKS));
-      return true;
-    } catch (e) {
-      console.error("Error resetting tasks:", e);
-      return false;
-    }
-  }
-
   return {
-    initializeTasks,
     getTasks,
     addTask,
     updateTask,
     deleteTask,
     updateTasks,
-    clearTasks,
-    resetToDefaults,
-    STORAGE_KEY,
   };
 })();
 
@@ -228,37 +168,16 @@ const NoteStore = (function () {
 
   const STORAGE_KEY = "confidently_notes";
 
-  // Default notes - Empty array (user will add notes dynamically)
-  const DEFAULT_NOTES = [];
-
-  /**
-   * Initialize notes from localStorage with default values if empty
-   */
-  function initializeNotes() {
-    const existing = localStorage.getItem(STORAGE_KEY);
-    if (!existing) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NOTES));
-      return DEFAULT_NOTES;
-    }
-    return JSON.parse(existing);
-  }
-
-  /**
-   * Get all notes from localStorage
-   */
   function getNotes() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : DEFAULT_NOTES;
+      return stored ? JSON.parse(stored) : [];
     } catch (e) {
       console.error("Error getting notes:", e);
-      return DEFAULT_NOTES;
+      return [];
     }
   }
 
-  /**
-   * Add new note to localStorage
-   */
   function addNote(note) {
     try {
       const notes = getNotes();
@@ -271,15 +190,12 @@ const NoteStore = (function () {
     }
   }
 
-  /**
-   * Update note in localStorage
-   */
   function updateNote(noteId, updates) {
     try {
       const notes = getNotes();
-      const note = notes.find((n) => n.id == noteId);
-      if (note) {
-        Object.assign(note, updates);
+      const index = notes.findIndex((n) => n.id == noteId);
+      if (index !== -1) {
+        notes[index] = { ...notes[index], ...updates };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
         return true;
       }
@@ -290,9 +206,6 @@ const NoteStore = (function () {
     }
   }
 
-  /**
-   * Delete note from localStorage
-   */
   function deleteNote(noteId) {
     try {
       const notes = getNotes();
@@ -305,9 +218,6 @@ const NoteStore = (function () {
     }
   }
 
-  /**
-   * Update multiple notes (array)
-   */
   function updateNotes(notesArray) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(notesArray));
@@ -318,41 +228,11 @@ const NoteStore = (function () {
     }
   }
 
-  /**
-   * Clear all notes
-   */
-  function clearNotes() {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      return true;
-    } catch (e) {
-      console.error("Error clearing notes:", e);
-      return false;
-    }
-  }
-
-  /**
-   * Reset to default notes
-   */
-  function resetToDefaults() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_NOTES));
-      return true;
-    } catch (e) {
-      console.error("Error resetting notes:", e);
-      return false;
-    }
-  }
-
   return {
-    initializeNotes,
     getNotes,
     addNote,
     updateNote,
     deleteNote,
     updateNotes,
-    clearNotes,
-    resetToDefaults,
-    STORAGE_KEY,
   };
 })();

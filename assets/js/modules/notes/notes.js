@@ -1,159 +1,161 @@
 (function () {
   "use strict";
 
-  // State - Load from NoteStore instead of hardcoded notes
   let notes = [];
-
   let noteToDelete = null;
-  let datePicker = null;
-
-  document.addEventListener("DOMContentLoaded", function () {
-    initNotes();
-  });
 
   window.addEventListener("pageLoaded", function (e) {
     if (e.detail.page === "notes") {
-      initNotes();
+      setTimeout(initNotes, 100);
     }
   });
 
   function initNotes() {
-    if (!document.querySelector(".notes-add-section")) return;
+    if (!document.querySelector(".notes-list")) {
+      return;
+    }
 
-    // Load notes from localStorage
-    notes = NoteStore.getNotes() || [];
+    notes = NoteStore.getNotes();
+    renderNotes();
 
-    console.log("Notes initialized with", notes.length, "notes");
-
-    initDatePicker();
-    renderNotesToDOM();
-    attachEvents();
-    updateStats();
     initAddNoteButton();
+    initFilterSelects();
     initModalEvents();
-    // Apply filters on initialization
-    filterNotes();
+    attachEventDelegation();
+    updateStats();
   }
 
-  /**
-   * Render all notes to DOM
-   */
-  function renderNotesToDOM() {
+  function renderNotes() {
     const container = document.querySelector(".notes-list");
     if (!container) return;
 
     container.innerHTML = "";
+
+    if (notes.length === 0) {
+      container.innerHTML = `
+        <div class="notes-empty">
+          <i class="fa-regular fa-note-sticky"></i>
+          <p>No notes found. Add your first note above!</p>
+        </div>
+      `;
+      return;
+    }
+
     notes.forEach((note) => {
-      addNoteToDOM(note);
+      const noteElement = createNoteElement(note);
+      container.appendChild(noteElement);
     });
+
+    applyFilters();
   }
 
-  function initDatePicker() {
-    // No calendar - just plain text input
-    return;
+  function createNoteElement(note) {
+    const categoryLabels = {
+      study: "Study",
+      work: "Work",
+      personal: "Personal",
+      learning: "Learning",
+    };
+
+    const noteDiv = document.createElement("div");
+    noteDiv.className = "note-card";
+    noteDiv.dataset.id = note.id;
+
+    noteDiv.innerHTML = `
+      <div class="note-content">
+        <div class="note-title">${escapeHtml(note.content).replace(/\n/g, "<br>")}</div>
+        <div class="note-meta">
+          <div class="note-category">
+            <span>${categoryLabels[note.category] || note.category}</span>
+          </div>
+          <div class="note-date">
+            <i class="fa-regular fa-calendar"></i>
+            <span>${note.date || formatDate(note.createdAt)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="note-actions">
+        <button class="edit-btn" data-id="${note.id}" title="Edit">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="delete-btn" data-id="${note.id}" title="Delete">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    `;
+
+    return noteDiv;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function attachEventDelegation() {
+    const container = document.querySelector(".notes-list");
+    if (!container) return;
+
+    container.removeEventListener("click", handleNoteClick);
+    container.addEventListener("click", handleNoteClick);
+  }
+
+  function handleNoteClick(e) {
+    const target = e.target;
+
+    if (target.closest(".edit-btn")) {
+      e.preventDefault();
+      const btn = target.closest(".edit-btn");
+      const noteId = parseInt(btn.dataset.id);
+      const noteCard = btn.closest(".note-card");
+      if (noteCard && !noteCard.classList.contains("editing")) {
+        startEditNote(noteId);
+      }
+    } else if (target.closest(".delete-btn")) {
+      e.preventDefault();
+      const btn = target.closest(".delete-btn");
+      const noteId = parseInt(btn.dataset.id);
+      const noteCard = btn.closest(".note-card");
+      const noteTitle = noteCard
+        .querySelector(".note-title")
+        .textContent.substring(0, 30);
+      showDeleteModal(noteId, noteTitle);
+    }
   }
 
   function initAddNoteButton() {
     const textarea = document.getElementById("noteContent");
     const addBtn = document.getElementById("addNoteBtn");
+    const dateInput = document.getElementById("noteDate");
     const categorySelect = document.getElementById("noteCategory");
 
-    // Initialize category select value
+    if (!textarea || !addBtn) return;
+
+    // Input event
+    textarea.removeEventListener("input", handleNoteInput);
+    textarea.addEventListener("input", handleNoteInput);
+
+    // Add button event
+    addBtn.removeEventListener("click", handleAddNote);
+    addBtn.addEventListener("click", handleAddNote);
+
+    addBtn.disabled = textarea.value.trim() === "";
+
+    if (dateInput && !dateInput.value) {
+      dateInput.value = formatDate(new Date());
+    }
+
     if (categorySelect && !categorySelect.dataset.value) {
       categorySelect.dataset.value = "study";
     }
-
-    if (textarea && addBtn) {
-      textarea.removeEventListener("input", handleInput);
-      addBtn.removeEventListener("click", handleAddNote);
-
-      textarea.addEventListener("input", handleInput);
-      addBtn.addEventListener("click", handleAddNote);
-
-      addBtn.disabled = textarea.value.trim() === "";
-    }
   }
 
-  function handleInput() {
+  function handleNoteInput() {
     const textarea = document.getElementById("noteContent");
     const addBtn = document.getElementById("addNoteBtn");
     if (textarea && addBtn) {
-      addBtn.disabled = this.value.trim() === "";
-    }
-  }
-
-  function initModalEvents() {
-    const modal = document.getElementById("deleteNoteModal");
-    const cancelBtn = document.getElementById("cancelDeleteNote");
-    const deleteBtn = document.getElementById("confirmDeleteNote");
-
-    if (cancelBtn) {
-      cancelBtn.removeEventListener("click", closeModal);
-      cancelBtn.addEventListener("click", closeModal);
-    }
-
-    if (deleteBtn) {
-      deleteBtn.removeEventListener("click", confirmDelete);
-      deleteBtn.addEventListener("click", confirmDelete);
-    }
-
-    if (modal) {
-      modal.removeEventListener("click", handleModalClick);
-      modal.addEventListener("click", handleModalClick);
-    }
-
-    document.removeEventListener("keydown", handleEscapeKey);
-    document.addEventListener("keydown", handleEscapeKey);
-  }
-
-  function handleModalClick(e) {
-    if (e.target === document.getElementById("deleteNoteModal")) {
-      closeModal();
-    }
-  }
-
-  function handleEscapeKey(e) {
-    const modal = document.getElementById("deleteNoteModal");
-    if (e.key === "Escape" && modal && modal.classList.contains("show")) {
-      closeModal();
-    }
-  }
-
-  function openModal(noteId, noteTitle) {
-    noteToDelete = noteId;
-    const modal = document.getElementById("deleteNoteModal");
-    const noteTitleElement = modal.querySelector(".modal-note-title");
-    if (noteTitleElement) noteTitleElement.textContent = `"${noteTitle}"`;
-    modal.classList.add("show");
-  }
-
-  function closeModal() {
-    const modal = document.getElementById("deleteNoteModal");
-    if (modal) {
-      modal.classList.remove("show");
-    }
-    noteToDelete = null;
-  }
-
-  function confirmDelete() {
-    if (noteToDelete !== null) {
-      // Remove from array
-      notes = notes.filter((n) => n.id !== noteToDelete);
-      // Update localStorage
-      NoteStore.updateNotes(notes);
-      // Remove from DOM
-      const noteElement = document.querySelector(
-        `.note-card[data-id="${noteToDelete}"]`,
-      );
-      if (noteElement) {
-        noteElement.remove();
-      }
-      // Update stats
-      updateStats();
-      // Close modal
-      closeModal();
-      // Check if empty
-      checkEmptyState();
+      addBtn.disabled = textarea.value.trim() === "";
     }
   }
 
@@ -165,8 +167,8 @@
     const content = textarea.value.trim();
     if (!content) return;
 
-    const category = categorySelect ? categorySelect.dataset.value : "study";
-    const date = dateInput ? dateInput.value : formatDate(new Date());
+    const category = categorySelect?.dataset.value || "study";
+    const date = dateInput?.value || formatDate(new Date());
 
     const newNote = {
       id: Date.now(),
@@ -176,156 +178,32 @@
       createdAt: Date.now(),
     };
 
-    // Add to array
-    notes.unshift(newNote);
-    // Save to localStorage
     NoteStore.addNote(newNote);
-    // Add to DOM
-    addNoteToDOM(newNote, true);
-    // Clear input
-    textarea.value = "";
-    // Disable button
-    const addBtn = document.getElementById("addNoteBtn");
-    if (addBtn) addBtn.disabled = true;
-    // Update stats
-    updateStats();
-    // Remove empty state if present
-    const emptyState = document.querySelector(".notes-empty");
-    if (emptyState) emptyState.remove();
-  }
 
-  function addNoteToDOM(note, prepend = false) {
+    notes.unshift(newNote);
     const container = document.querySelector(".notes-list");
-    if (!container) return;
+    const emptyState = container.querySelector(".notes-empty");
+    if (emptyState) {
+      container.innerHTML = "";
+    }
 
-    const categoryLabels = {
-      study: "Study",
-      work: "Work",
-      personal: "Personal",
-      learning: "Learning",
-    };
-
-    const noteElement = document.createElement("div");
-    noteElement.className = "note-card";
-    noteElement.dataset.id = note.id;
-    noteElement.innerHTML = `
-      <div class="note-content">
-        <div class="note-title">${note.content.replace(/\n/g, "<br>")}</div>
-        <div class="note-meta">
-          <div class="note-category">
-            <span>${categoryLabels[note.category] || note.category}</span>
-          </div>
-          <div class="note-date">
-            <i class="fa-regular fa-calendar"></i>
-            <span>${getRelativeTime(note.createdAt)}</span>
-          </div>
-        </div>
-      </div>
-      <div class="note-actions">
-        <button class="edit-btn" title="Edit">
-          <i class="fa-solid fa-pen"></i>
-        </button>
-        <button class="delete-btn" title="Delete">
-          <i class="fa-solid fa-trash"></i>
-        </button>
-      </div>
-    `;
-
-    if (prepend && container.firstChild) {
+    const noteElement = createNoteElement(newNote);
+    if (container.firstChild) {
       container.insertBefore(noteElement, container.firstChild);
     } else {
       container.appendChild(noteElement);
     }
+
+    textarea.value = "";
+    addBtn.disabled = true;
+
+    updateStats();
   }
 
-  function attachEvents() {
-    // Event delegation for note actions
-    const container = document.querySelector(".notes-list");
-    if (container) {
-      container.addEventListener("click", function (e) {
-        const editBtn = e.target.closest(".edit-btn");
-        const deleteBtn = e.target.closest(".delete-btn");
-        const saveBtn = e.target.closest(".btn-save");
-        const cancelBtn = e.target.closest(".btn-cancel");
-
-        if (editBtn) {
-          const noteId = parseInt(editBtn.closest(".note-card").dataset.id);
-          startEdit(noteId);
-        } else if (deleteBtn) {
-          const noteCard = deleteBtn.closest(".note-card");
-          const noteId = parseInt(noteCard.dataset.id);
-          const noteTitle = noteCard
-            .querySelector(".note-title")
-            .textContent.substring(0, 30);
-          openModal(noteId, noteTitle);
-        } else if (saveBtn) {
-          const noteId = parseInt(saveBtn.closest(".note-card").dataset.id);
-          saveEdit(noteId);
-        } else if (cancelBtn) {
-          const noteId = parseInt(cancelBtn.closest(".note-card").dataset.id);
-          cancelEdit(noteId);
-        }
-      });
-    }
-
-    // Event delegation for custom selects
-    document.addEventListener("click", function (e) {
-      // Custom select triggers
-      if (e.target.closest(".select-trigger")) {
-        const select = e.target.closest(".custom-select");
-        if (select) {
-          e.stopPropagation();
-
-          document.querySelectorAll(".custom-select").forEach((s) => {
-            if (s !== select) s.classList.remove("open");
-          });
-
-          select.classList.toggle("open");
-        }
-        return;
-      }
-
-      // Custom select options
-      if (e.target.closest(".option")) {
-        const option = e.target.closest(".option");
-        const select = option.closest(".custom-select");
-        if (!select) return;
-
-        const value = option.dataset.value;
-        const text = option.textContent;
-        const triggerSpan = select.querySelector(".select-trigger span");
-
-        if (triggerSpan) {
-          triggerSpan.textContent = text;
-        }
-
-        select.dataset.value = value;
-        select.classList.remove("open");
-
-        // Dispatch filter change event for filter selects
-        if (select.id === "noteFilter" || select.id === "categoryFilter") {
-          filterNotes();
-        }
-
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-
-      // Click outside - close all custom selects
-      if (!e.target.closest(".custom-select")) {
-        document.querySelectorAll(".custom-select.open").forEach((s) => {
-          s.classList.remove("open");
-        });
-      }
-    });
-  }
-
-  function startEdit(noteId) {
+  function startEditNote(noteId) {
     const noteCard = document.querySelector(`.note-card[data-id="${noteId}"]`);
     if (!noteCard) return;
 
-    // Close any other editing cards
     exitAllEditModes();
 
     const note = notes.find((n) => n.id === noteId);
@@ -346,20 +224,19 @@
 
     let categoryOptionsHtml = "";
     categoryOptions.forEach((opt) => {
-      const selected =
-        opt.value === note.category ? 'data-selected="true"' : "";
-      categoryOptionsHtml += `<div class="option" data-value="${opt.value}" ${selected}>${opt.label}</div>`;
+      const selected = opt.value === note.category ? "selected" : "";
+      categoryOptionsHtml += `<div class="option" data-value="${opt.value}" ${selected ? 'data-selected="true"' : ""}>${opt.label}</div>`;
     });
 
     const editHTML = `
       <div class="note-edit-form">
         <div class="edit-wrapper">
           <div class="edit-textarea-container">
-            <textarea class="edit-content" placeholder="Note content">${note.content}</textarea>
+            <textarea class="edit-content" placeholder="Note content">${escapeHtml(note.content)}</textarea>
           </div>
           <div class="edit-sidebar">
-            <button class="edit-save-btn"><i class="fa-solid fa-check"></i> Save</button>
-            <button class="edit-cancel-btn"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            <button class="edit-save-btn" data-id="${noteId}"><i class="fa-solid fa-check"></i> Save</button>
+            <button class="edit-cancel-btn" data-id="${noteId}"><i class="fa-solid fa-xmark"></i> Cancel</button>
             <div class="edit-field">
               <label>Date</label>
               <div class="input-with-icon">
@@ -383,62 +260,46 @@
 
     noteContent.innerHTML = editHTML;
 
-    // Focus on textarea
-    const textarea = noteContent.querySelector(".edit-content");
-    if (textarea) {
-      textarea.focus();
-    }
-
-    // Attach edit mode events
-    attachEditModeEvents(noteCard, noteId);
-  }
-
-  function exitAllEditModes() {
-    const editingCards = document.querySelectorAll(".note-card.editing");
-    editingCards.forEach((card) => {
-      const originalHTML = card.dataset.originalHTML;
-      if (originalHTML) {
-        const noteContent = card.querySelector(".note-content");
-        if (noteContent) {
-          noteContent.outerHTML = originalHTML;
-        }
-      }
-      card.classList.remove("editing");
-      delete card.dataset.originalHTML;
-    });
-  }
-
-  function attachEditModeEvents(noteCard, noteId) {
     const saveBtn = noteCard.querySelector(".edit-save-btn");
-    const cancelBtn = noteCard.querySelector(".edit-cancel-btn");
-
     if (saveBtn) {
       saveBtn.addEventListener("click", function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        saveEdit(noteId);
+        saveEditNote(noteId);
       });
     }
 
+    const cancelBtn = noteCard.querySelector(".edit-cancel-btn");
     if (cancelBtn) {
       cancelBtn.addEventListener("click", function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        cancelEdit(noteId);
+        cancelEditNote(noteId);
       });
     }
 
-    // Handle custom select in edit mode
-    const editSelects = noteCard.querySelectorAll(".edit-category-select");
-    editSelects.forEach((select) => {
+    initEditModeSelects(noteCard);
+
+    const textarea = noteCard.querySelector(".edit-content");
+    if (textarea) textarea.focus();
+  }
+
+  function initEditModeSelects(noteCard) {
+    const selects = noteCard.querySelectorAll(".custom-select");
+
+    selects.forEach((select) => {
       const trigger = select.querySelector(".select-trigger");
       const options = select.querySelectorAll(".option");
 
       if (trigger) {
         trigger.addEventListener("click", function (e) {
           e.stopPropagation();
-          // Close other selects
-          document.querySelectorAll(".custom-select.open").forEach((s) => {
+          e.preventDefault();
+
+          noteCard.querySelectorAll(".custom-select").forEach((s) => {
             if (s !== select) s.classList.remove("open");
           });
+
           select.classList.toggle("open");
         });
       }
@@ -446,6 +307,8 @@
       options.forEach((option) => {
         option.addEventListener("click", function (e) {
           e.stopPropagation();
+          e.preventDefault();
+
           const triggerSpan = select.querySelector(".select-trigger span");
           if (triggerSpan) {
             triggerSpan.textContent = option.textContent;
@@ -457,7 +320,7 @@
     });
   }
 
-  function saveEdit(noteId) {
+  function saveEditNote(noteId) {
     const noteCard = document.querySelector(`.note-card[data-id="${noteId}"]`);
     if (!noteCard) return;
 
@@ -466,130 +329,192 @@
     const categorySelect = noteCard.querySelector(".edit-category-select");
 
     const newContent = textarea ? textarea.value.trim() : "";
-    const newDate = dateInput ? dateInput.value : "";
-    const newCategory = categorySelect ? categorySelect.dataset.value : "study";
-
     if (!newContent) return;
 
-    // Update in array
     const note = notes.find((n) => n.id === noteId);
-    if (note) {
-      note.content = newContent;
-      note.date = newDate;
-      note.category = newCategory;
-      // Update localStorage
-      NoteStore.updateNote(noteId, {
-        content: newContent,
-        date: newDate,
-        category: newCategory,
-      });
-    }
+    if (!note) return;
 
-    // Re-render the note card
-    noteCard.classList.remove("editing");
-    delete noteCard.dataset.originalHTML;
+    note.content = newContent;
+    if (dateInput) note.date = dateInput.value;
+    if (categorySelect)
+      note.category = categorySelect.dataset.value || note.category;
 
-    // Re-render the note card with updated content
-    const categoryLabels = {
-      study: "Study",
-      work: "Work",
-      personal: "Personal",
-      learning: "Learning",
-    };
+    NoteStore.updateNote(noteId, note);
 
-    const noteContent = noteCard.querySelector(".note-content");
-    if (noteContent && note) {
-      noteContent.innerHTML = `
-        <div class="note-title">${note.content.replace(/\n/g, "<br>")}</div>
-        <div class="note-meta">
-          <div class="note-category">
-            <span>${categoryLabels[note.category] || note.category}</span>
-          </div>
-          <div class="note-date">
-            <i class="fa-regular fa-calendar"></i>
-            <span>${getRelativeTime(note.createdAt)}</span>
-          </div>
-        </div>
-      `;
-    }
+    exitAllEditModes();
+
+    renderNotes();
   }
 
-  function cancelEdit(noteId) {
+  function cancelEditNote(noteId) {
     const noteCard = document.querySelector(`.note-card[data-id="${noteId}"]`);
     if (!noteCard) return;
 
-    const originalHTML = noteCard.dataset.originalHTML;
-    if (originalHTML) {
+    if (noteCard.dataset.originalHTML) {
       const noteContent = noteCard.querySelector(".note-content");
-      if (noteContent) {
-        noteContent.outerHTML = originalHTML;
-      }
+      noteContent.outerHTML = noteCard.dataset.originalHTML;
     }
 
     noteCard.classList.remove("editing");
     delete noteCard.dataset.originalHTML;
   }
 
-  function filterNotes() {
+  function exitAllEditModes() {
+    const editingCards = document.querySelectorAll(".note-card.editing");
+    editingCards.forEach((card) => {
+      if (card.dataset.originalHTML) {
+        const noteContent = card.querySelector(".note-content");
+        noteContent.outerHTML = card.dataset.originalHTML;
+      }
+      card.classList.remove("editing");
+      delete card.dataset.originalHTML;
+    });
+  }
+
+  function initFilterSelects() {
     const noteFilter = document.getElementById("noteFilter");
     const categoryFilter = document.getElementById("categoryFilter");
 
-    const filterValue = noteFilter ? noteFilter.dataset.value : "all";
-    const categoryValue = categoryFilter ? categoryFilter.dataset.value : "all";
+    if (noteFilter) {
+      noteFilter.removeEventListener("filterChange", handleFilterChange);
+      noteFilter.addEventListener("filterChange", handleFilterChange);
+    }
+
+    if (categoryFilter) {
+      categoryFilter.removeEventListener("filterChange", handleFilterChange);
+      categoryFilter.addEventListener("filterChange", handleFilterChange);
+    }
+  }
+
+  function handleFilterChange() {
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const noteFilter = document.getElementById("noteFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
+
+    const filterValue = noteFilter?.dataset.value || "all";
+    const categoryValue = categoryFilter?.dataset.value || "all";
 
     let filtered = [...notes];
 
-    // Filter by category
     if (categoryValue && categoryValue !== "all") {
       filtered = filtered.filter((n) => n.category === categoryValue);
     }
 
-    // Sort by filter
     if (filterValue === "recent") {
       filtered.sort((a, b) => b.createdAt - a.createdAt);
     } else if (filterValue === "oldest") {
       filtered.sort((a, b) => a.createdAt - b.createdAt);
     }
 
-    // Render filtered notes
     const container = document.querySelector(".notes-list");
     if (!container) return;
 
     container.innerHTML = "";
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="notes-empty">
+          <i class="fa-regular fa-note-sticky"></i>
+          <p>No notes match your filters.</p>
+        </div>
+      `;
+      return;
+    }
+
     filtered.forEach((note) => {
-      addNoteToDOM(note);
+      const noteElement = createNoteElement(note);
+      container.appendChild(noteElement);
     });
 
-    // Update count
     updateStats(filtered.length);
-    // Check empty state
-    checkEmptyState();
+  }
+
+  function initModalEvents() {
+    const modal = document.getElementById("deleteNoteModal");
+    const cancelBtn = document.getElementById("cancelDeleteNote");
+    const deleteBtn = document.getElementById("confirmDeleteNote");
+
+    if (cancelBtn) {
+      cancelBtn.removeEventListener("click", closeDeleteModal);
+      cancelBtn.addEventListener("click", closeDeleteModal);
+    }
+
+    if (deleteBtn) {
+      deleteBtn.removeEventListener("click", confirmDeleteNote);
+      deleteBtn.addEventListener("click", confirmDeleteNote);
+    }
+
+    if (modal) {
+      modal.removeEventListener("click", handleModalClick);
+      modal.addEventListener("click", handleModalClick);
+    }
+
+    document.removeEventListener("keydown", handleEscapeKey);
+    document.addEventListener("keydown", handleEscapeKey);
+  }
+
+  function showDeleteModal(noteId, noteTitle) {
+    noteToDelete = noteId;
+    const modal = document.getElementById("deleteNoteModal");
+    const titleElement = modal.querySelector(".modal-note-title");
+    if (titleElement) titleElement.textContent = `"${noteTitle}"`;
+    modal.classList.add("show");
+  }
+
+  function closeDeleteModal() {
+    const modal = document.getElementById("deleteNoteModal");
+    modal.classList.remove("show");
+    noteToDelete = null;
+  }
+
+  function confirmDeleteNote() {
+    if (noteToDelete !== null) {
+      NoteStore.deleteNote(noteToDelete);
+
+      notes = notes.filter((n) => n.id !== noteToDelete);
+
+      const noteElement = document.querySelector(
+        `.note-card[data-id="${noteToDelete}"]`,
+      );
+      if (noteElement) noteElement.remove();
+
+      if (notes.length === 0) {
+        const container = document.querySelector(".notes-list");
+        container.innerHTML = `
+          <div class="notes-empty">
+            <i class="fa-regular fa-note-sticky"></i>
+            <p>No notes found. Add your first note above!</p>
+          </div>
+        `;
+      }
+
+      updateStats();
+      closeDeleteModal();
+    }
+  }
+
+  function handleModalClick(e) {
+    if (e.target === document.getElementById("deleteNoteModal")) {
+      closeDeleteModal();
+    }
+  }
+
+  function handleEscapeKey(e) {
+    if (e.key === "Escape") {
+      const modal = document.getElementById("deleteNoteModal");
+      if (modal && modal.classList.contains("show")) {
+        closeDeleteModal();
+      }
+    }
   }
 
   function updateStats(count) {
     const countElement = document.getElementById("notesCount");
     if (countElement) {
-      const displayCount = count !== undefined ? count : notes.length;
-      countElement.textContent = displayCount;
-    }
-  }
-
-  function checkEmptyState() {
-    const container = document.querySelector(".notes-list");
-    if (!container) return;
-
-    const existingEmpty = container.querySelector(".notes-empty");
-    const noteCards = container.querySelectorAll(".note-card");
-
-    if (noteCards.length === 0 && !existingEmpty) {
-      container.innerHTML = `
-        <div class="notes-empty">
-          <i class="fa-regular fa-note-sticky"></i>
-          <p>No notes found. Add your first note above!</p>
-        </div>
-      `;
-    } else if (noteCards.length > 0 && existingEmpty) {
-      existingEmpty.remove();
+      countElement.textContent = count !== undefined ? count : notes.length;
     }
   }
 
@@ -600,25 +525,4 @@
     const year = d.getFullYear();
     return `${month}/${day}/${year}`;
   }
-
-  function getRelativeTime(timestamp) {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (days === 0) return "Today";
-    if (days === 1) return "1 day ago";
-    if (days < 7) return `${days} days ago`;
-    if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
-    return `${Math.floor(days / 30)} months ago`;
-  }
-
-  // Public API
-  window.NotesModule = {
-    initNotes,
-    startEdit,
-    saveEdit,
-    cancelEdit,
-    openDeleteModal: openModal,
-  };
 })();

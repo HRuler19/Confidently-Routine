@@ -26,12 +26,6 @@
   const cancelLogout = document.getElementById("cancelLogout");
   const confirmLogout = document.getElementById("confirmLogout");
 
-  // LocalStorage keys
-  const STORAGE_KEYS = {
-    USER: "confidently_user",
-    REMEMBER_ME: "confidently_remember",
-  };
-
   let selectedAvatar = "assets/images/Boy image 1.svg";
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -39,10 +33,24 @@
     mainHeader.style.display = "none";
     sidebar.style.display = "none";
 
-    checkSavedUser();
-    loadPage("dashboard");
+    const isLoggedIn = checkSavedUser();
+
+    if (isLoggedIn) {
+      loginSection.style.display = "none";
+      mainHeader.style.display = "flex";
+      sidebar.style.display = "flex";
+    } else {
+      console.log("No user found, showing login page");
+    }
+
     setupMobileNavigation();
     setupGlobalEvents();
+
+    if (isLoggedIn) {
+      setTimeout(() => loadPage("dashboard"), 0);
+    } else {
+      content.innerHTML = "";
+    }
   });
 
   function initCustomSelects() {
@@ -125,7 +133,6 @@
 
       mobileNavItems.forEach((item) => {
         item.classList.remove("active");
-
         if (item.dataset.page === pageName) {
           item.classList.add("active");
         }
@@ -135,11 +142,13 @@
         sidebar.classList.remove("mobile-open");
       }
 
-      window.dispatchEvent(
-        new CustomEvent("pageLoaded", {
-          detail: { page: pageName },
-        }),
-      );
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("pageLoaded", {
+            detail: { page: pageName },
+          }),
+        );
+      }, 100);
     } catch (error) {
       content.innerHTML = `<div style="padding:20px;color:red;">Page not found: ${pageName}</div>`;
     }
@@ -195,10 +204,8 @@
 
     sidebarLinks.forEach((link) => {
       const menuItem = link.querySelector(".menu-item");
-
       if (menuItem) {
         menuItem.classList.remove("active");
-
         if (link.dataset.page === pageName) {
           menuItem.classList.add("active");
         }
@@ -207,16 +214,14 @@
   }
 
   function checkSavedUser() {
-    const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const rememberMeValue =
-      localStorage.getItem(STORAGE_KEYS.REMEMBER_ME) === "true";
+    const userData = window.AppStore ? window.AppStore.getUser() : null;
 
-    if (savedUser && rememberMeValue) {
-      try {
-        const userData = JSON.parse(savedUser);
-        loginUser(userData);
-      } catch {}
+    if (userData) {
+      loginUser(userData);
+      return true;
     }
+
+    return false;
   }
 
   function loginUser(userData) {
@@ -230,25 +235,22 @@
 
     if (headerAvatar) {
       const avatarImg = headerAvatar.querySelector("img");
-
       if (avatarImg) {
         avatarImg.src = userData.avatar;
       }
     }
-
-    loadPage("dashboard");
   }
 
   function performLogout() {
-    if (!rememberMe.checked) {
-      localStorage.removeItem(STORAGE_KEYS.USER);
-      localStorage.removeItem(STORAGE_KEYS.REMEMBER_ME);
+    if (window.AppStore) {
+      window.AppStore.removeUser();
     }
 
     loginSection.style.display = "flex";
     mainHeader.style.display = "none";
     sidebar.style.display = "none";
     sidebar.classList.remove("mobile-open");
+    content.innerHTML = "";
 
     if (loginForm) loginForm.reset();
 
@@ -297,14 +299,12 @@
         lastLogin: new Date().toISOString(),
       };
 
-      if (rememberMe.checked) {
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
-        localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "true");
-      } else {
-        localStorage.setItem(STORAGE_KEYS.REMEMBER_ME, "false");
+      if (window.AppStore) {
+        window.AppStore.saveUser(userData, rememberMe.checked);
       }
 
       loginUser(userData);
+      loadPage("dashboard");
     });
   }
 
@@ -385,4 +385,243 @@
       .querySelectorAll(".input-field")
       .forEach((el) => (el.style.borderColor = "#d1d5db"));
   }
+})();
+
+window.AppStore = (function () {
+  "use strict";
+
+  const STORAGE_KEYS = {
+    USER: "confidently_user",
+    REMEMBER_ME: "confidently_remember",
+    SESSION_USER: "confidently_session_user",
+  };
+
+  function setItem(key, value, useSession = false) {
+    try {
+      const serialized = JSON.stringify(value);
+      if (useSession) {
+        sessionStorage.setItem(key, serialized);
+      } else {
+        localStorage.setItem(key, serialized);
+      }
+      return true;
+    } catch (e) {
+      console.error("Storage error:", e);
+      return false;
+    }
+  }
+
+  function getItem(key, useSession = false) {
+    try {
+      const storage = useSession ? sessionStorage : localStorage;
+      const serialized = storage.getItem(key);
+      if (serialized === null) return null;
+      return JSON.parse(serialized);
+    } catch (e) {
+      console.error("Storage error:", e);
+      return null;
+    }
+  }
+
+  function removeItem(key, useSession = false) {
+    try {
+      const storage = useSession ? sessionStorage : localStorage;
+      storage.removeItem(key);
+      return true;
+    } catch (e) {
+      console.error("Storage error:", e);
+      return false;
+    }
+  }
+
+  function clearAll() {
+    localStorage.clear();
+    sessionStorage.clear();
+  }
+
+  function saveUser(userData, rememberMe = false) {
+    if (rememberMe) {
+      setItem(STORAGE_KEYS.USER, userData);
+      setItem(STORAGE_KEYS.REMEMBER_ME, true);
+    } else {
+      setItem(STORAGE_KEYS.SESSION_USER, userData, true);
+      setItem(STORAGE_KEYS.REMEMBER_ME, false);
+    }
+  }
+
+  function getUser() {
+    let user = getItem(STORAGE_KEYS.USER);
+    if (user) return user;
+    user = getItem(STORAGE_KEYS.SESSION_USER, true);
+    return user;
+  }
+
+  function isRememberMe() {
+    return getItem(STORAGE_KEYS.REMEMBER_ME) === true;
+  }
+
+  function removeUser() {
+    removeItem(STORAGE_KEYS.USER);
+    removeItem(STORAGE_KEYS.SESSION_USER, true);
+    removeItem(STORAGE_KEYS.REMEMBER_ME);
+  }
+
+  return {
+    saveUser,
+    getUser,
+    isRememberMe,
+    removeUser,
+    clearAll,
+    KEYS: STORAGE_KEYS,
+  };
+})();
+
+// Task Management Store
+window.TaskStore = (function () {
+  "use strict";
+
+  const STORAGE_KEY = "confidently_tasks";
+
+  function getTasks() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Error getting tasks:", e);
+      return [];
+    }
+  }
+
+  function addTask(task) {
+    try {
+      const tasks = getTasks();
+      tasks.push(task);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      return true;
+    } catch (e) {
+      console.error("Error adding task:", e);
+      return false;
+    }
+  }
+
+  function updateTask(taskId, updates) {
+    try {
+      const tasks = getTasks();
+      const index = tasks.findIndex((t) => t.id == taskId);
+      if (index !== -1) {
+        tasks[index] = { ...tasks[index], ...updates };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Error updating task:", e);
+      return false;
+    }
+  }
+
+  function deleteTask(taskId) {
+    try {
+      const tasks = getTasks();
+      const filtered = tasks.filter((t) => t.id != taskId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      return true;
+    } catch (e) {
+      console.error("Error deleting task:", e);
+      return false;
+    }
+  }
+
+  function updateTasks(tasksArray) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksArray));
+      return true;
+    } catch (e) {
+      console.error("Error updating tasks:", e);
+      return false;
+    }
+  }
+
+  return {
+    getTasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    updateTasks,
+  };
+})();
+
+// Note Management Store
+window.NoteStore = (function () {
+  "use strict";
+
+  const STORAGE_KEY = "confidently_notes";
+
+  function getNotes() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Error getting notes:", e);
+      return [];
+    }
+  }
+
+  function addNote(note) {
+    try {
+      const notes = getNotes();
+      notes.unshift(note);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      return true;
+    } catch (e) {
+      console.error("Error adding note:", e);
+      return false;
+    }
+  }
+
+  function updateNote(noteId, updates) {
+    try {
+      const notes = getNotes();
+      const index = notes.findIndex((n) => n.id == noteId);
+      if (index !== -1) {
+        notes[index] = { ...notes[index], ...updates };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Error updating note:", e);
+      return false;
+    }
+  }
+
+  function deleteNote(noteId) {
+    try {
+      const notes = getNotes();
+      const filtered = notes.filter((n) => n.id != noteId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      return true;
+    } catch (e) {
+      console.error("Error deleting note:", e);
+      return false;
+    }
+  }
+
+  function updateNotes(notesArray) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(notesArray));
+      return true;
+    } catch (e) {
+      console.error("Error updating notes:", e);
+      return false;
+    }
+  }
+
+  return {
+    getNotes,
+    addNote,
+    updateNote,
+    deleteNote,
+    updateNotes,
+  };
 })();
