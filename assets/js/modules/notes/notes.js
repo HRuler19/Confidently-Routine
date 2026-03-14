@@ -3,50 +3,70 @@
 
   let notes = [];
   let noteToDelete = null;
+  let isInitialized = false;
 
+  // Only use pageLoaded event - app.js handles initial page load
   window.addEventListener("pageLoaded", function (e) {
     if (e.detail.page === "notes") {
-      setTimeout(initNotes, 100);
+      initNotes();
     }
   });
 
   function initNotes() {
-    if (!document.querySelector(".notes-list")) {
-      return;
+    if (!document.querySelector(".notes-add-section")) return;
+
+    // Load fresh notes from localStorage
+    notes = NoteStore.getNotes() || [];
+
+    console.log("Notes initialized with", notes.length, "notes");
+
+    // Only attach events once
+    if (!isInitialized) {
+      attachEvents();
+      isInitialized = true;
     }
 
-    notes = NoteStore.getNotes();
-    renderNotes();
-
     initAddNoteButton();
-    initFilterSelects();
     initModalEvents();
-    attachEventDelegation();
+    initFilterSelects();
     updateStats();
+    filterNotes();
   }
 
-  function renderNotes() {
+  function filterNotes() {
+    const noteFilter = document.getElementById("noteFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
+
+    const filterValue = noteFilter ? noteFilter.dataset.value || "all" : "all";
+    const categoryValue = categoryFilter ? categoryFilter.dataset.value || "all" : "all";
+
+    let filtered = [...notes];
+
+    // Filter by category
+    if (categoryValue && categoryValue !== "all") {
+      filtered = filtered.filter((n) => n.category === categoryValue);
+    }
+
+    // Sort by filter
+    if (filterValue === "recent") {
+      filtered.sort((a, b) => b.createdAt - a.createdAt);
+    } else if (filterValue === "oldest") {
+      filtered.sort((a, b) => a.createdAt - b.createdAt);
+    }
+
+    // Render filtered notes
     const container = document.querySelector(".notes-list");
     if (!container) return;
 
     container.innerHTML = "";
-
-    if (notes.length === 0) {
-      container.innerHTML = `
-        <div class="notes-empty">
-          <i class="fa-regular fa-note-sticky"></i>
-          <p>No notes found. Add your first note above!</p>
-        </div>
-      `;
-      return;
-    }
-
-    notes.forEach((note) => {
-      const noteElement = createNoteElement(note);
-      container.appendChild(noteElement);
+    filtered.forEach((note) => {
+      addNoteToDOM(note);
     });
 
-    applyFilters();
+    // Update count
+    updateStats(filtered.length);
+    // Check empty state
+    checkEmptyState();
   }
 
   function createNoteElement(note) {
