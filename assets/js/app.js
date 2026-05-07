@@ -20,6 +20,7 @@
   const logoutBtn = document.getElementById("logoutBtn");
   const hamburgerBtn = document.getElementById("hamburgerBtn");
   const mobileNavItems = document.querySelectorAll(".mobile-nav-item");
+  const appLogo = document.getElementById("appLogo");
 
   // Modal elements
   const logoutModal = document.getElementById("logoutModal");
@@ -313,6 +314,12 @@
     logoutBtn.addEventListener("click", (e) => {
       e.preventDefault();
       showLogoutModal();
+    });
+
+  if (appLogo)
+    appLogo.addEventListener("click", (e) => {
+      e.preventDefault();
+      loadPage("dashboard");
     });
 
   if (cancelLogout) cancelLogout.addEventListener("click", hideLogoutModal);
