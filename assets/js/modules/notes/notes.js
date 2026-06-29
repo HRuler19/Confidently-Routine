@@ -22,7 +22,7 @@
 
     // Only attach events once
     if (!isInitialized) {
-      attachEvents();
+      attachEventDelegation();
       isInitialized = true;
     }
 
@@ -38,7 +38,9 @@
     const categoryFilter = document.getElementById("categoryFilter");
 
     const filterValue = noteFilter ? noteFilter.dataset.value || "all" : "all";
-    const categoryValue = categoryFilter ? categoryFilter.dataset.value || "all" : "all";
+    const categoryValue = categoryFilter
+      ? categoryFilter.dataset.value || "all"
+      : "all";
 
     let filtered = [...notes];
 
@@ -67,6 +69,14 @@
     updateStats(filtered.length);
     // Check empty state
     checkEmptyState();
+  }
+
+  function addNoteToDOM(note) {
+    const container = document.querySelector(".notes-list");
+    if (!container) return;
+
+    const noteElement = createNoteElement(note);
+    container.appendChild(noteElement);
   }
 
   function createNoteElement(note) {
@@ -181,6 +191,7 @@
 
   function handleAddNote() {
     const textarea = document.getElementById("noteContent");
+    const addBtn = document.getElementById("addNoteBtn");
     const dateInput = document.getElementById("noteDate");
     const categorySelect = document.getElementById("noteCategory");
 
@@ -215,7 +226,7 @@
     }
 
     textarea.value = "";
-    addBtn.disabled = true;
+    if (addBtn) addBtn.disabled = true;
 
     updateStats();
   }
@@ -528,6 +539,20 @@
       if (modal && modal.classList.contains("show")) {
         closeDeleteModal();
       }
+    }
+  }
+
+  function checkEmptyState() {
+    const container = document.querySelector(".notes-list");
+    if (!container) return;
+
+    if (notes.length === 0) {
+      container.innerHTML = `
+        <div class="notes-empty">
+          <i class="fa-regular fa-note-sticky"></i>
+          <p>No notes found. Add your first note above!</p>
+        </div>
+      `;
     }
   }
 
