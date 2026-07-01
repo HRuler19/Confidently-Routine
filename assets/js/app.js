@@ -50,7 +50,6 @@ import NoteStore from "./core/storage/NoteStore.js";
     }
 
     setupMobileNavigation();
-    setupGlobalEvents();
 
     if (isLoggedIn) {
       setTimeout(() => loadPage("dashboard"), 0);
@@ -58,70 +57,6 @@ import NoteStore from "./core/storage/NoteStore.js";
       content.innerHTML = "";
     }
   });
-
-  function initCustomSelects() {
-    const selects = document.querySelectorAll(".custom-select");
-
-    selects.forEach((select) => {
-      if (select.dataset.initialized) return;
-
-      const trigger = select.querySelector(".select-trigger");
-      const options = select.querySelectorAll(".option");
-
-      if (trigger) {
-        trigger.replaceWith(trigger.cloneNode(true));
-        const newTrigger = select.querySelector(".select-trigger");
-
-        newTrigger.addEventListener("click", (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          document.querySelectorAll(".custom-select").forEach((s) => {
-            if (s !== select) s.classList.remove("open");
-          });
-
-          select.classList.toggle("open");
-        });
-      }
-
-      options.forEach((option) => {
-        option.replaceWith(option.cloneNode(true));
-        const newOption = select.querySelector(
-          `.option[data-value="${option.dataset.value}"]`,
-        );
-
-        newOption.addEventListener("click", (e) => {
-          e.stopPropagation();
-          e.preventDefault();
-
-          const triggerSpan = select.querySelector(".select-trigger span");
-          if (triggerSpan) {
-            triggerSpan.innerText = newOption.innerText;
-          }
-
-          select.classList.remove("open");
-          select.dataset.value = newOption.dataset.value;
-
-          if (select.id.includes("Filter") || select.id.includes("Status")) {
-            const filterEvent = new CustomEvent("filterChange", {
-              detail: { filter: select.id, value: newOption.dataset.value },
-            });
-            select.dispatchEvent(filterEvent);
-          }
-        });
-      });
-
-      select.dataset.initialized = "true";
-    });
-  }
-
-  function setupGlobalEvents() {
-    window.addEventListener("click", () => {
-      document
-        .querySelectorAll(".custom-select")
-        .forEach((s) => s.classList.remove("open"));
-    });
-  }
 
   async function loadPage(pageName) {
     try {
@@ -134,7 +69,7 @@ import NoteStore from "./core/storage/NoteStore.js";
       const html = await response.text();
       content.innerHTML = html;
 
-      initCustomSelects();
+      window.DomHelpers.initCustomSelects();
       updateSidebarActive(pageName);
 
       mobileNavItems.forEach((item) => {

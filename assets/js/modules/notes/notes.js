@@ -93,7 +93,7 @@
 
     noteDiv.innerHTML = `
       <div class="note-content">
-        <div class="note-title">${escapeHtml(note.content).replace(/\n/g, "<br>")}</div>
+        <div class="note-title">${DomHelpers.escapeHtml(note.content).replace(/\n/g, "<br>")}</div>
         <div class="note-meta">
           <div class="note-category">
             <span>${categoryLabels[note.category] || note.category}</span>
@@ -115,12 +115,6 @@
     `;
 
     return noteDiv;
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 
   function attachEventDelegation() {
@@ -263,7 +257,7 @@
       <div class="note-edit-form">
         <div class="edit-wrapper">
           <div class="edit-textarea-container">
-            <textarea class="edit-content" placeholder="Note content">${escapeHtml(note.content)}</textarea>
+            <textarea class="edit-content" placeholder="Note content">${DomHelpers.escapeHtml(note.content)}</textarea>
           </div>
           <div class="edit-sidebar">
             <button class="edit-save-btn" data-id="${noteId}"><i class="fa-solid fa-check"></i> Save</button>
@@ -309,46 +303,10 @@
       });
     }
 
-    initEditModeSelects(noteCard);
+    DomHelpers.initCustomSelects(noteCard);
 
     const textarea = noteCard.querySelector(".edit-content");
     if (textarea) textarea.focus();
-  }
-
-  function initEditModeSelects(noteCard) {
-    const selects = noteCard.querySelectorAll(".custom-select");
-
-    selects.forEach((select) => {
-      const trigger = select.querySelector(".select-trigger");
-      const options = select.querySelectorAll(".option");
-
-      if (trigger) {
-        trigger.addEventListener("click", function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          noteCard.querySelectorAll(".custom-select").forEach((s) => {
-            if (s !== select) s.classList.remove("open");
-          });
-
-          select.classList.toggle("open");
-        });
-      }
-
-      options.forEach((option) => {
-        option.addEventListener("click", function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          const triggerSpan = select.querySelector(".select-trigger span");
-          if (triggerSpan) {
-            triggerSpan.textContent = option.textContent;
-          }
-          select.dataset.value = option.dataset.value;
-          select.classList.remove("open");
-        });
-      });
-    });
   }
 
   function saveEditNote(noteId) {
@@ -374,7 +332,7 @@
 
     exitAllEditModes();
 
-    renderNotes();
+    applyFilters();
   }
 
   function cancelEditNote(noteId) {
@@ -464,27 +422,13 @@
   }
 
   function initModalEvents() {
-    const modal = document.getElementById("deleteNoteModal");
-    const cancelBtn = document.getElementById("cancelDeleteNote");
-    const deleteBtn = document.getElementById("confirmDeleteNote");
-
-    if (cancelBtn) {
-      cancelBtn.removeEventListener("click", closeDeleteModal);
-      cancelBtn.addEventListener("click", closeDeleteModal);
-    }
-
-    if (deleteBtn) {
-      deleteBtn.removeEventListener("click", confirmDeleteNote);
-      deleteBtn.addEventListener("click", confirmDeleteNote);
-    }
-
-    if (modal) {
-      modal.removeEventListener("click", handleModalClick);
-      modal.addEventListener("click", handleModalClick);
-    }
-
-    document.removeEventListener("keydown", handleEscapeKey);
-    document.addEventListener("keydown", handleEscapeKey);
+    DomHelpers.setupConfirmModal({
+      modalId: "deleteNoteModal",
+      cancelId: "cancelDeleteNote",
+      confirmId: "confirmDeleteNote",
+      onConfirm: confirmDeleteNote,
+      onClose: closeDeleteModal,
+    });
   }
 
   function showDeleteModal(noteId, noteTitle) {
@@ -524,21 +468,6 @@
 
       updateStats();
       closeDeleteModal();
-    }
-  }
-
-  function handleModalClick(e) {
-    if (e.target === document.getElementById("deleteNoteModal")) {
-      closeDeleteModal();
-    }
-  }
-
-  function handleEscapeKey(e) {
-    if (e.key === "Escape") {
-      const modal = document.getElementById("deleteNoteModal");
-      if (modal && modal.classList.contains("show")) {
-        closeDeleteModal();
-      }
     }
   }
 

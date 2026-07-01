@@ -63,11 +63,11 @@
         <div class="task-left">
           <input type="checkbox" class="task-checkbox" id="task-${task.id}" ${checked}>
           <label for="task-${task.id}" class="task-checkbox-label"></label>
-          <h3 class="task-title">${escapeHtml(task.title)}</h3>
+          <h3 class="task-title">${DomHelpers.escapeHtml(task.title)}</h3>
         </div>
 
         <div class="task-meta">
-          <span class="task-category ${categoryClass}">${escapeHtml(task.category)}</span>
+          <span class="task-category ${categoryClass}">${DomHelpers.escapeHtml(task.category)}</span>
           <span class="task-priority priority-${task.priority}">
             ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
           </span>
@@ -85,12 +85,6 @@
     `;
 
     return taskDiv;
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
   }
 
   function attachEventDelegation() {
@@ -190,7 +184,7 @@
       <div class="task-edit-form">
         <div class="edit-field">
           <label>Task Title</label>
-          <input type="text" class="edit-title" value="${escapeHtml(task.title)}" placeholder="Task title">
+          <input type="text" class="edit-title" value="${DomHelpers.escapeHtml(task.title)}" placeholder="Task title">
         </div>
         
         <div class="edit-row">
@@ -235,68 +229,8 @@
 
       try {
         const picker = flatpickr(editDateInput, {
-          dateFormat: "Y-m-d",
+          ...DomHelpers.getFlatpickrBaseConfig(),
           defaultDate: task.dueDate,
-          minDate: "today",
-          disableMobile: true,
-          animate: true,
-          static: true,
-          monthSelectorType: "static",
-          locale: {
-            firstDayOfWeek: 1,
-            weekdays: {
-              shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-              longhand: [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-              ],
-            },
-            months: {
-              shorthand: [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-              ],
-              longhand: [
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ],
-            },
-          },
-          onOpen: function (selectedDates, dateStr, instance) {
-            if (instance.calendarContainer) {
-              instance.calendarContainer.classList.add("open-animation");
-            }
-          },
-          onReady: function (selectedDates, dateStr, instance) {
-            if (instance.calendarContainer) {
-              instance.calendarContainer.classList.add("ios-wheel-picker");
-            }
-          },
         });
         editDatePickers.push(picker);
 
@@ -328,43 +262,7 @@
       });
     }
 
-    initEditModeSelects(taskItem);
-  }
-
-  function initEditModeSelects(taskItem) {
-    const selects = taskItem.querySelectorAll(".custom-select");
-
-    selects.forEach((select) => {
-      const trigger = select.querySelector(".select-trigger");
-      const options = select.querySelectorAll(".option");
-
-      if (trigger) {
-        trigger.addEventListener("click", function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          taskItem.querySelectorAll(".custom-select").forEach((s) => {
-            if (s !== select) s.classList.remove("open");
-          });
-
-          select.classList.toggle("open");
-        });
-      }
-
-      options.forEach((option) => {
-        option.addEventListener("click", function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-
-          const triggerSpan = select.querySelector(".select-trigger span");
-          if (triggerSpan) {
-            triggerSpan.textContent = option.textContent;
-          }
-          select.dataset.value = option.dataset.value;
-          select.classList.remove("open");
-        });
-      });
-    });
+    DomHelpers.initCustomSelects(taskItem);
   }
 
   function saveEditTask(taskId) {
@@ -463,6 +361,7 @@
 
   function handleAddTaskClick() {
     const input = document.getElementById("taskInput");
+    const addBtn = document.getElementById("addTaskBtn");
     const title = input.value.trim();
 
     if (!title) return;
@@ -578,27 +477,13 @@
   }
 
   function initModalEvents() {
-    const modal = document.getElementById("deleteTaskModal");
-    const cancelBtn = document.getElementById("cancelDelete");
-    const deleteBtn = document.getElementById("confirmDelete");
-
-    if (cancelBtn) {
-      cancelBtn.removeEventListener("click", closeDeleteModal);
-      cancelBtn.addEventListener("click", closeDeleteModal);
-    }
-
-    if (deleteBtn) {
-      deleteBtn.removeEventListener("click", confirmDeleteTask);
-      deleteBtn.addEventListener("click", confirmDeleteTask);
-    }
-
-    if (modal) {
-      modal.removeEventListener("click", handleModalClick);
-      modal.addEventListener("click", handleModalClick);
-    }
-
-    document.removeEventListener("keydown", handleEscapeKey);
-    document.addEventListener("keydown", handleEscapeKey);
+    DomHelpers.setupConfirmModal({
+      modalId: "deleteTaskModal",
+      cancelId: "cancelDelete",
+      confirmId: "confirmDelete",
+      onConfirm: confirmDeleteTask,
+      onClose: closeDeleteModal,
+    });
   }
 
   let taskToDelete = null;
@@ -639,21 +524,6 @@
     }
   }
 
-  function handleModalClick(e) {
-    if (e.target === document.getElementById("deleteTaskModal")) {
-      closeDeleteModal();
-    }
-  }
-
-  function handleEscapeKey(e) {
-    if (e.key === "Escape") {
-      const modal = document.getElementById("deleteTaskModal");
-      if (modal && modal.classList.contains("show")) {
-        closeDeleteModal();
-      }
-    }
-  }
-
   function initDatePicker() {
     const dateInput = document.getElementById("taskDate");
     if (!dateInput) return;
@@ -663,70 +533,10 @@
     }
 
     datePicker = flatpickr(dateInput, {
-      dateFormat: "Y-m-d",
+      ...DomHelpers.getFlatpickrBaseConfig(),
       defaultDate: dateInput.value || new Date().toISOString().split("T")[0],
-      minDate: "today",
-      disableMobile: true,
-      animate: true,
-      static: true,
-      monthSelectorType: "static",
-      locale: {
-        firstDayOfWeek: 1,
-        weekdays: {
-          shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-          longhand: [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-          ],
-        },
-        months: {
-          shorthand: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ],
-          longhand: [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-          ],
-        },
-      },
-      onOpen: function (selectedDates, dateStr, instance) {
-        if (instance.calendarContainer) {
-          instance.calendarContainer.classList.add("open-animation");
-        }
-      },
       onChange: function (selectedDates, dateStr) {
         dateInput.value = dateStr;
-      },
-      onReady: function (selectedDates, dateStr, instance) {
-        if (instance.calendarContainer) {
-          instance.calendarContainer.classList.add("ios-wheel-picker");
-        }
       },
     });
 
