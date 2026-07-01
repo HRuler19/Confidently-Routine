@@ -292,6 +292,14 @@
   font-weight: 600;
   box-sizing: border-box;
   transition: all 0.2s ease;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.habit-entry-count-field input::-webkit-outer-spin-button,
+.habit-entry-count-field input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .habit-entry-count-field input:focus {
@@ -418,6 +426,14 @@
   background-color: white;
   text-align: center;
   box-sizing: border-box;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.sleep-table input[type="number"]::-webkit-outer-spin-button,
+.sleep-table input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .sleep-table input[type="number"]:focus {
