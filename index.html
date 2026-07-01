@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/assets/css/layouts/sidebar.css" />
     <link rel="stylesheet" href="/assets/css/pages/login.css" />
     <link rel="stylesheet" href="/assets/css/pages/routine.css" />
+    <link rel="stylesheet" href="/assets/css/pages/my-routine.css" />
     <link rel="stylesheet" href="/assets/css/pages/notes.css" />
     <link rel="stylesheet" href="/assets/css/pages/settings.css" />
     <link rel="stylesheet" href="/assets/css/components/modal.css" />
@@ -71,10 +72,17 @@
           </div>
         </a>
 
+        <a href="#" data-page="my-routine">
+          <div class="menu-item">
+            <div><i class="fa-solid fa-list-check"></i></div>
+            <div class="myRoutine">My routine</div>
+          </div>
+        </a>
+
         <a href="#" data-page="routines">
           <div class="menu-item">
             <div><i class="fa-regular fa-calendar"></i></div>
-            <div class="myRoutine">My routine</div>
+            <div class="myRoutine">Daily tasks</div>
           </div>
         </a>
 
@@ -105,6 +113,10 @@
         <a href="#" data-page="dashboard" class="mobile-nav-item">
           <i class="fa-solid fa-house"></i>
           <span>Dashboard</span>
+        </a>
+        <a href="#" data-page="my-routine" class="mobile-nav-item">
+          <i class="fa-solid fa-list-check"></i>
+          <span>My routine</span>
         </a>
         <a href="#" data-page="routines" class="mobile-nav-item">
           <i class="fa-regular fa-calendar"></i>
@@ -333,6 +345,7 @@
     <!-- Shared DOM helpers (custom selects, flatpickr config, confirm modals) -->
     <script src="/assets/js/utils/dom-helpers.js"></script>
     <!-- Module scripts -->
+    <script src="/assets/js/modules/my-routine/my-routine.js"></script>
     <script src="/assets/js/modules/routines/routines.js"></script>
     <script src="/assets/js/modules/notes/notes.js"></script>
     <script src="/assets/js/modules/settings/settings.js"></script>

@@ -2,6 +2,9 @@ import ErrorHandler from "./core/ErrorHandler.js";
 import UserStore from "./core/storage/UserStore.js";
 import TaskStore from "./core/storage/TaskStore.js";
 import NoteStore from "./core/storage/NoteStore.js";
+import HabitStore from "./core/storage/HabitStore.js";
+import HabitEntryStore from "./core/storage/HabitEntryStore.js";
+import SleepStore from "./core/storage/SleepStore.js";
 
 (function () {
   "use strict";
@@ -321,3 +324,6 @@ import NoteStore from "./core/storage/NoteStore.js";
 window.AppStore = UserStore;
 window.TaskStore = TaskStore;
 window.NoteStore = NoteStore;
+window.HabitStore = HabitStore;
+window.HabitEntryStore = HabitEntryStore;
+window.SleepStore = SleepStore;

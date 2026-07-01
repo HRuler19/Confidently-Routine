@@ -1,0 +1,559 @@
+/* My Routine (habit tracker + sleep chart) */
+.my-routine-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.myroutine-card {
+  width: 100%;
+  padding: 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.myroutine-card hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 30px 0;
+}
+
+.myroutine-section-title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 20px 0;
+}
+
+/* Add habit row */
+.myroutine-add-habit-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.myroutine-add-habit-row input[type="text"] {
+  flex: 1;
+  height: 40px;
+  min-height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 15px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.myroutine-add-habit-row button {
+  width: 152px;
+  height: 40px;
+  background-color: #0e5e0a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.myroutine-add-habit-row button:hover:not(:disabled) {
+  background-color: #0a4707;
+}
+
+.myroutine-add-habit-row button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Habit table */
+.habit-table-hint {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0 0 16px 0;
+  font-family: "DM Sans", sans-serif;
+}
+
+.habit-table-hint.is-hidden {
+  display: none;
+}
+
+.habit-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.habit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+}
+
+.habit-table th,
+.habit-table td {
+  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.habit-table thead th {
+  background-color: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Day column stays put while habit columns scroll horizontally */
+.habit-day-col,
+.habit-day-cell {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.08);
+}
+
+.habit-table thead .habit-day-col {
+  z-index: 3;
+}
+
+.habit-day-col {
+  min-width: 56px;
+  background-color: #f9fafb;
+}
+
+.habit-day-cell {
+  font-weight: 600;
+  color: #4b5563;
+  background-color: #f9fafb;
+}
+
+.habit-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.habit-col-edit,
+.habit-col-delete {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.habit-col-edit:hover {
+  color: #0e5e0a;
+  background-color: #f0fdf4;
+}
+
+.habit-col-delete:hover {
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.habit-col-rename-input {
+  width: 100%;
+  min-width: 60px;
+  height: 26px;
+  border: 1px solid #0e5e0a;
+  border-radius: 6px;
+  padding: 0 6px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+  color: #111827;
+  outline: none;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.habit-cell {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 70px;
+}
+
+.habit-cell:hover {
+  background-color: #f3f3f3;
+}
+
+.habit-cell-plus {
+  color: #0e5e0a;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.habit-cell-x {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.habit-cell-count {
+  color: #0066ff;
+  font-weight: 600;
+}
+
+/* Habit entry modal */
+.habit-entry-modal-content {
+  max-width: 320px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.habit-entry-toggle-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.habit-toggle-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  background-color: white;
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.habit-toggle-btn:hover {
+  transform: translateY(-2px);
+}
+
+.habit-toggle-plus.active {
+  background-color: #0e5e0a;
+  border-color: #0e5e0a;
+  color: white;
+}
+
+.habit-toggle-x.active {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.habit-entry-count-field {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.habit-entry-count-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.habit-entry-count-field input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  outline: none;
+  color: #0066ff;
+  font-weight: 600;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.habit-entry-count-field input:focus {
+  border-color: #0066ff;
+}
+
+.habit-entry-count-field input:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.habit-entry-clear-btn {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: "DM Sans", sans-serif;
+}
+
+.habit-entry-clear-btn:hover {
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.habit-entry-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Sleep tracker */
+.sleep-chart-wrapper {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: #fbfbfb;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.sleep-chart {
+  width: 100%;
+  height: 220px;
+  display: block;
+}
+
+.sleep-chart .sleep-chart-line {
+  fill: none;
+  stroke: #dc2626;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.sleep-chart .sleep-chart-point {
+  fill: #dc2626;
+}
+
+.sleep-chart .sleep-chart-grid {
+  stroke: #e5e7eb;
+  stroke-width: 1;
+}
+
+.sleep-chart .sleep-chart-label {
+  fill: #9ca3af;
+  font-size: 10px;
+  font-family: "DM Sans", sans-serif;
+}
+
+.sleep-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 320px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sleep-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+}
+
+.sleep-table th,
+.sleep-table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: center;
+}
+
+.sleep-table thead th {
+  background-color: #f9fafb;
+  color: #374151;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  position: sticky;
+  top: 0;
+}
+
+.sleep-table input[type="number"] {
+  width: 90px;
+  height: 34px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0 8px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  outline: none;
+  color: #4b5563;
+  background-color: white;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.sleep-table input[type="number"]:focus {
+  border-color: #0e5e0a;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .my-routine-page {
+    gap: 16px;
+  }
+
+  .myroutine-card {
+    padding: 20px;
+  }
+
+  .myroutine-add-habit-row {
+    flex-direction: column;
+  }
+
+  .myroutine-add-habit-row button {
+    width: 100%;
+  }
+
+  .habit-table th,
+  .habit-table td,
+  .sleep-table th,
+  .sleep-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .habit-toggle-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .sleep-chart {
+    height: 190px;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-routine-page {
+    gap: 12px;
+  }
+
+  .myroutine-card {
+    padding: 14px;
+  }
+
+  .myroutine-section-title {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .myroutine-card hr {
+    margin: 20px 0;
+  }
+
+  .habit-table-hint {
+    font-size: 12px;
+  }
+
+  .habit-table th,
+  .habit-table td,
+  .sleep-table th,
+  .sleep-table td {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+
+  .habit-day-col,
+  .habit-day-cell {
+    min-width: 40px;
+  }
+
+  .habit-cell {
+    min-width: 46px;
+  }
+
+  .habit-col-header {
+    gap: 4px;
+  }
+
+  .habit-col-header span {
+    max-width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .habit-col-edit,
+  .habit-col-delete {
+    width: 15px;
+    height: 15px;
+    font-size: 10px;
+  }
+
+  .sleep-chart {
+    height: 170px;
+  }
+
+  .sleep-chart .sleep-chart-label {
+    font-size: 9px;
+  }
+
+  .sleep-table input[type="number"] {
+    width: 64px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .habit-entry-modal-content {
+    max-width: 280px;
+  }
+
+  .habit-entry-toggle-group {
+    gap: 12px;
+    margin: 14px 0;
+  }
+
+  .habit-toggle-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .habit-entry-actions {
+    gap: 8px;
+  }
+
+  .habit-entry-actions .edit-save-btn,
+  .habit-entry-actions .edit-cancel-btn {
+    font-size: 13px;
+    height: 40px;
+  }
+}
