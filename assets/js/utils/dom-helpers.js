@@ -74,52 +74,6 @@ window.DomHelpers = (function () {
       .forEach((s) => s.classList.remove("open"));
   });
 
-  const FLATPICKR_LOCALE = {
-    firstDayOfWeek: 1,
-    weekdays: {
-      shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-      longhand: [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ],
-    },
-    months: {
-      shorthand: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
-      longhand: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
-    },
-  };
-
   function getFlatpickrBaseConfig() {
     return {
       dateFormat: "Y-m-d",
@@ -128,7 +82,7 @@ window.DomHelpers = (function () {
       animate: true,
       static: true,
       monthSelectorType: "static",
-      locale: FLATPICKR_LOCALE,
+      locale: window.I18n ? window.I18n.flatpickrLocale() : undefined,
       onOpen: function (selectedDates, dateStr, instance) {
         if (instance.calendarContainer) {
           instance.calendarContainer.classList.add("open-animation");

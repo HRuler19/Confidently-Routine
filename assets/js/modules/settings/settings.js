@@ -18,6 +18,38 @@
     loadCurrentUserData();
     attachAvatarEvents();
     attachSaveButton();
+    initLanguageSelect();
+  }
+
+  function initLanguageSelect() {
+    const languageSelect = document.getElementById("languageSelect");
+    if (!languageSelect || !window.I18n) return;
+
+    syncLanguageSelectDisplay();
+
+    languageSelect.querySelectorAll(".option").forEach((option) => {
+      option.addEventListener("click", () => {
+        window.I18n.setLanguage(option.dataset.value);
+      });
+    });
+
+    window.removeEventListener("languageChange", syncLanguageSelectDisplay);
+    window.addEventListener("languageChange", syncLanguageSelectDisplay);
+  }
+
+  function syncLanguageSelectDisplay() {
+    const languageSelect = document.getElementById("languageSelect");
+    if (!languageSelect || !window.I18n) return;
+
+    const currentLang = window.I18n.getLanguage();
+    const currentOption = languageSelect.querySelector(
+      `.option[data-value="${currentLang}"]`,
+    );
+    if (!currentOption) return;
+
+    languageSelect.dataset.value = currentLang;
+    const triggerSpan = languageSelect.querySelector(".select-trigger span");
+    if (triggerSpan) triggerSpan.textContent = currentOption.textContent;
   }
 
   function loadCurrentUserData() {
@@ -174,7 +206,8 @@
     const saveBtn = document.getElementById("settingsSaveBtn");
     if (saveBtn) {
       const originalText = saveBtn.innerHTML;
-      saveBtn.innerHTML = '<i class="fa-solid fa-check"></i><span>Saved!</span>';
+      const savedText = window.I18n ? window.I18n.t("settings.save_success") : "Saved!";
+      saveBtn.innerHTML = `<i class="fa-solid fa-check"></i><span>${DomHelpers.escapeHtml(savedText)}</span>`;
       saveBtn.style.background = "#0a4a08";
       
       setTimeout(() => {

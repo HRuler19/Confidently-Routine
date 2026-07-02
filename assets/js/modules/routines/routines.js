@@ -11,6 +11,12 @@
     }
   });
 
+  window.addEventListener("languageChange", function () {
+    if (!document.querySelector(".tasks-container")) return;
+    renderTasks();
+    updateStats();
+  });
+
   function initRoutines() {
     if (!document.querySelector(".tasks-container")) {
       return;
@@ -35,8 +41,7 @@
     container.innerHTML = "";
 
     if (tasks.length === 0) {
-      container.innerHTML =
-        '<div class="empty-state">No tasks yet. Add your first task above!</div>';
+      container.innerHTML = `<div class="empty-state">${I18n.t("routines.empty_state")}</div>`;
       return;
     }
 
@@ -67,13 +72,13 @@
         </div>
 
         <div class="task-meta">
-          <span class="task-category ${categoryClass}">${DomHelpers.escapeHtml(task.category)}</span>
+          <span class="task-category ${categoryClass}">${DomHelpers.escapeHtml(I18n.t("routines.category_" + task.category.toLowerCase()))}</span>
           <span class="task-priority priority-${task.priority}">
-            ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            ${DomHelpers.escapeHtml(I18n.t("routines.priority_" + task.priority))}
           </span>
           <span class="task-date">
             <i class="fa-regular fa-calendar"></i>
-            ${task.displayDate || formatDisplayDate(task.dueDate)}
+            ${formatDisplayDate(task.dueDate)}
           </span>
         </div>
 
@@ -155,17 +160,17 @@
     taskItem.dataset.originalHTML = originalHTML;
 
     const categoryOptions = [
-      { value: "Personal", label: "Personal" },
-      { value: "Work", label: "Work" },
-      { value: "Shopping", label: "Shopping" },
-      { value: "Other", label: "Other" },
+      { value: "Personal", label: I18n.t("routines.category_personal") },
+      { value: "Work", label: I18n.t("routines.category_work") },
+      { value: "Shopping", label: I18n.t("routines.category_shopping") },
+      { value: "Other", label: I18n.t("routines.category_other") },
     ];
 
     const priorityOptions = [
-      { value: "low", label: "Low" },
-      { value: "medium", label: "Medium" },
-      { value: "high", label: "High" },
-      { value: "hard", label: "Hard" },
+      { value: "low", label: I18n.t("routines.priority_low") },
+      { value: "medium", label: I18n.t("routines.priority_medium") },
+      { value: "high", label: I18n.t("routines.priority_high") },
+      { value: "hard", label: I18n.t("routines.priority_hard") },
     ];
 
     let categoryOptionsHtml = "";
@@ -180,43 +185,48 @@
       priorityOptionsHtml += `<div class="option" data-value="${opt.value}" ${selected ? 'data-selected="true"' : ""}>${opt.label}</div>`;
     });
 
+    const categoryLabel =
+      categoryOptions.find((o) => o.value === task.category)?.label || task.category;
+    const priorityLabel =
+      priorityOptions.find((o) => o.value === task.priority)?.label || task.priority;
+
     const editHTML = `
       <div class="task-edit-form">
         <div class="edit-field">
-          <label>Task Title</label>
-          <input type="text" class="edit-title" value="${DomHelpers.escapeHtml(task.title)}" placeholder="Task title">
+          <label>${I18n.t("routines.task_title_label")}</label>
+          <input type="text" class="edit-title" value="${DomHelpers.escapeHtml(task.title)}" placeholder="${I18n.t("routines.task_title_label")}">
         </div>
-        
+
         <div class="edit-row">
           <div class="edit-field">
-            <label>Category</label>
+            <label>${I18n.t("routines.category_label")}</label>
             <div class="custom-select edit-category-select" data-value="${task.category}">
-              <div class="select-trigger"><span>${task.category}</span></div>
+              <div class="select-trigger"><span>${DomHelpers.escapeHtml(categoryLabel)}</span></div>
               <div class="select-options">
                 ${categoryOptionsHtml}
               </div>
             </div>
           </div>
-          
+
           <div class="edit-field">
-            <label>Priority</label>
+            <label>${I18n.t("routines.priority_label")}</label>
             <div class="custom-select edit-priority-select" data-value="${task.priority}">
-              <div class="select-trigger"><span>${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span></div>
+              <div class="select-trigger"><span>${DomHelpers.escapeHtml(priorityLabel)}</span></div>
               <div class="select-options">
                 ${priorityOptionsHtml}
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="edit-field due-date-field">
-          <label>Due Date</label>
-          <input type="text" class="edit-date" value="${task.dueDate}" placeholder="Select date">
+          <label>${I18n.t("routines.due_date_label")}</label>
+          <input type="text" class="edit-date" value="${task.dueDate}" placeholder="${I18n.t("routines.select_date_placeholder")}">
         </div>
-        
+
         <div class="edit-actions">
-          <button class="edit-save-btn" data-id="${taskId}"><i class="fa-solid fa-check"></i> Save</button>
-          <button class="edit-cancel-btn" data-id="${taskId}"><i class="fa-solid fa-xmark"></i> Cancel</button>
+          <button class="edit-save-btn" data-id="${taskId}"><i class="fa-solid fa-check"></i> ${I18n.t("common.save")}</button>
+          <button class="edit-cancel-btn" data-id="${taskId}"><i class="fa-solid fa-xmark"></i> ${I18n.t("common.cancel")}</button>
         </div>
       </div>
     `;
@@ -515,8 +525,7 @@
 
       if (tasks.length === 0) {
         const container = document.querySelector(".tasks-container");
-        container.innerHTML =
-          '<div class="empty-state">No tasks yet. Add your first task above!</div>';
+        container.innerHTML = `<div class="empty-state">${I18n.t("routines.empty_state")}</div>`;
       }
 
       updateStats();
@@ -556,11 +565,12 @@
     const diffTime = dueDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Tomorrow";
-    if (diffDays === -1) return "Yesterday";
-    if (diffDays < -1) return `${Math.abs(diffDays)} days ago`;
-    if (diffDays > 1) return `in ${diffDays} days`;
+    if (diffDays === 0) return I18n.t("routines.date_today");
+    if (diffDays === 1) return I18n.t("routines.date_tomorrow");
+    if (diffDays === -1) return I18n.t("routines.date_yesterday");
+    if (diffDays < -1)
+      return I18n.t("routines.date_days_ago", { n: Math.abs(diffDays) });
+    if (diffDays > 1) return I18n.t("routines.date_in_days", { n: diffDays });
     return dateStr.split("-").reverse().join("/");
   }
 

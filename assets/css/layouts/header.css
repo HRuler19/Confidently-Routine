@@ -52,6 +52,31 @@
   z-index: 1001;
 }
 
+/* Language switcher */
+.header .lang-select {
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.header .lang-select .select-trigger {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: #0e5e0a;
+}
+
+.header .lang-select .select-options {
+  left: auto;
+  right: 0;
+  width: 160px;
+}
+
+.header .lang-select .option {
+  font-size: 13px;
+}
+
 /* Avatar Container */
 .header .avatar {
   width: 40px;
@@ -88,7 +113,16 @@
     display: block;
   }
 
-  .header .headerRight > div:not(.avatar) {
+  .header .headerRight > div:not(.avatar):not(.lang-select) {
     display: none;
+  }
+
+  .header .lang-select {
+    width: 60px;
+  }
+
+  .header .lang-select .select-trigger {
+    height: 32px;
+    padding: 0 8px;
   }
 }

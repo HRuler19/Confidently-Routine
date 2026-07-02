@@ -13,6 +13,11 @@
     }
   });
 
+  window.addEventListener("languageChange", function () {
+    if (!document.querySelector(".my-routine-page")) return;
+    renderAll();
+  });
+
   function initMyRoutine() {
     if (!document.querySelector(".my-routine-page")) return;
 
@@ -163,17 +168,17 @@
 
     if (hint) hint.classList.toggle("is-hidden", habits.length > 0);
 
-    let headHtml = `<th class="habit-day-col">Day</th>`;
+    let headHtml = `<th class="habit-day-col">${I18n.t("myroutine.day_col")}</th>`;
     habits.forEach((habit) => {
       const safeName = DomHelpers.escapeHtml(habit.name);
       headHtml += `
         <th data-habit-id="${habit.id}">
           <div class="habit-col-header">
             <span>${safeName}</span>
-            <button type="button" class="habit-col-edit" data-habit-id="${habit.id}" title="Rename habit">
+            <button type="button" class="habit-col-edit" data-habit-id="${habit.id}" title="${I18n.t("myroutine.rename_tooltip")}">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button type="button" class="habit-col-delete" data-habit-id="${habit.id}" data-habit-name="${safeName}" title="Delete habit">
+            <button type="button" class="habit-col-delete" data-habit-id="${habit.id}" data-habit-name="${safeName}" title="${I18n.t("myroutine.delete_tooltip")}">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -291,10 +296,8 @@
     const dateStr = formatDateKey(selectedYear, selectedMonth, day);
     activeEntryContext = { habitId, dateStr };
 
-    const dateLabel = new Date(selectedYear, selectedMonth - 1, day).toLocaleDateString(
-      "en-US",
-      { month: "short", day: "numeric" },
-    );
+    const monthShort = I18n.t(`calendar.months_short.${selectedMonth - 1}`);
+    const dateLabel = `${monthShort} ${day}`;
     const titleEl = document.getElementById("habitEntryModalTitle");
     if (titleEl) titleEl.textContent = `${habitName} — ${dateLabel}`;
 
@@ -493,7 +496,7 @@
               max="24"
               step="0.5"
               inputmode="decimal"
-              placeholder="e.g. 7"
+              placeholder="${I18n.t("myroutine.sleep_placeholder")}"
               data-day="${day}"
               value="${displayValue}"
             />
@@ -532,7 +535,7 @@
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
     if (points.length === 0) {
-      svg.innerHTML = `<text x="${width / 2}" y="${height / 2}" text-anchor="middle" class="sleep-chart-label">No sleep data yet for this month.</text>`;
+      svg.innerHTML = `<text x="${width / 2}" y="${height / 2}" text-anchor="middle" class="sleep-chart-label">${I18n.t("myroutine.no_sleep_data")}</text>`;
       return;
     }
 

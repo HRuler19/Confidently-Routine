@@ -12,6 +12,11 @@
     }
   });
 
+  window.addEventListener("languageChange", function () {
+    if (!document.querySelector(".notes-add-section")) return;
+    applyFilters();
+  });
+
   function initNotes() {
     if (!document.querySelector(".notes-add-section")) return;
 
@@ -80,12 +85,7 @@
   }
 
   function createNoteElement(note) {
-    const categoryLabels = {
-      study: "Study",
-      work: "Work",
-      personal: "Personal",
-      learning: "Learning",
-    };
+    const categoryLabel = I18n.t("notes.category_" + note.category);
 
     const noteDiv = document.createElement("div");
     noteDiv.className = "note-card";
@@ -96,7 +96,7 @@
         <div class="note-title">${DomHelpers.escapeHtml(note.content).replace(/\n/g, "<br>")}</div>
         <div class="note-meta">
           <div class="note-category">
-            <span>${categoryLabels[note.category] || note.category}</span>
+            <span>${DomHelpers.escapeHtml(categoryLabel)}</span>
           </div>
           <div class="note-date">
             <i class="fa-regular fa-calendar"></i>
@@ -105,10 +105,10 @@
         </div>
       </div>
       <div class="note-actions">
-        <button class="edit-btn" data-id="${note.id}" title="Edit">
+        <button class="edit-btn" data-id="${note.id}" title="${I18n.t("notes.edit_tooltip")}">
           <i class="fa-solid fa-pen"></i>
         </button>
-        <button class="delete-btn" data-id="${note.id}" title="Delete">
+        <button class="delete-btn" data-id="${note.id}" title="${I18n.t("notes.delete_tooltip")}">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
@@ -241,10 +241,10 @@
     noteCard.dataset.originalHTML = originalHTML;
 
     const categoryOptions = [
-      { value: "study", label: "Study" },
-      { value: "work", label: "Work" },
-      { value: "personal", label: "Personal" },
-      { value: "learning", label: "Learning" },
+      { value: "study", label: I18n.t("notes.category_study") },
+      { value: "work", label: I18n.t("notes.category_work") },
+      { value: "personal", label: I18n.t("notes.category_personal") },
+      { value: "learning", label: I18n.t("notes.category_learning") },
     ];
 
     let categoryOptionsHtml = "";
@@ -257,22 +257,22 @@
       <div class="note-edit-form">
         <div class="edit-wrapper">
           <div class="edit-textarea-container">
-            <textarea class="edit-content" placeholder="Note content">${DomHelpers.escapeHtml(note.content)}</textarea>
+            <textarea class="edit-content" placeholder="${I18n.t("notes.edit_content_placeholder")}">${DomHelpers.escapeHtml(note.content)}</textarea>
           </div>
           <div class="edit-sidebar">
-            <button class="edit-save-btn" data-id="${noteId}"><i class="fa-solid fa-check"></i> Save</button>
-            <button class="edit-cancel-btn" data-id="${noteId}"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            <button class="edit-save-btn" data-id="${noteId}"><i class="fa-solid fa-check"></i> ${I18n.t("common.save")}</button>
+            <button class="edit-cancel-btn" data-id="${noteId}"><i class="fa-solid fa-xmark"></i> ${I18n.t("common.cancel")}</button>
             <div class="edit-field">
-              <label>Date</label>
+              <label>${I18n.t("notes.date_label")}</label>
               <div class="input-with-icon">
-                <input type="text" class="edit-date" value="${note.date}" placeholder="mm/dd/yyyy">
+                <input type="text" class="edit-date" value="${note.date}" placeholder="${I18n.t("notes.date_placeholder")}">
                 <i class="fa-regular fa-calendar"></i>
               </div>
             </div>
             <div class="edit-field">
-              <label>Category</label>
+              <label>${I18n.t("notes.category_label")}</label>
               <div class="custom-select edit-category-select" data-value="${note.category}">
-                <div class="select-trigger"><span>${categoryOptions.find((o) => o.value === note.category)?.label || note.category}</span></div>
+                <div class="select-trigger"><span>${DomHelpers.escapeHtml(categoryOptions.find((o) => o.value === note.category)?.label || note.category)}</span></div>
                 <div class="select-options">
                   ${categoryOptionsHtml}
                 </div>
@@ -407,7 +407,7 @@
       container.innerHTML = `
         <div class="notes-empty">
           <i class="fa-regular fa-note-sticky"></i>
-          <p>No notes match your filters.</p>
+          <p>${I18n.t("notes.empty_filtered")}</p>
         </div>
       `;
       return;
@@ -461,7 +461,7 @@
         container.innerHTML = `
           <div class="notes-empty">
             <i class="fa-regular fa-note-sticky"></i>
-            <p>No notes found. Add your first note above!</p>
+            <p>${I18n.t("notes.empty_state")}</p>
           </div>
         `;
       }
@@ -479,7 +479,7 @@
       container.innerHTML = `
         <div class="notes-empty">
           <i class="fa-regular fa-note-sticky"></i>
-          <p>No notes found. Add your first note above!</p>
+          <p>${I18n.t("notes.empty_state")}</p>
         </div>
       `;
     }

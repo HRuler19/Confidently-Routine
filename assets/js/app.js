@@ -38,6 +38,9 @@ import SleepStore from "./core/storage/SleepStore.js";
   let selectedAvatar = "assets/images/Boy image 1.svg";
 
   document.addEventListener("DOMContentLoaded", function () {
+    if (window.I18n) window.I18n.applyTranslations();
+    initLanguageSwitcher();
+
     loginSection.style.display = "flex";
     mainHeader.style.display = "none";
     sidebar.style.display = "none";
@@ -73,6 +76,7 @@ import SleepStore from "./core/storage/SleepStore.js";
       content.innerHTML = html;
 
       window.DomHelpers.initCustomSelects();
+      if (window.I18n) window.I18n.applyTranslations();
       updateSidebarActive(pageName);
 
       mobileNavItems.forEach((item) => {
@@ -227,13 +231,12 @@ import SleepStore from "./core/storage/SleepStore.js";
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
 
-      if (!username) return showError(usernameInput, "Please enter username");
-      if (!password) return showError(passwordInput, "Please enter password");
+      if (!username)
+        return showError(usernameInput, window.I18n.t("login.error_username_required"));
+      if (!password)
+        return showError(passwordInput, window.I18n.t("login.error_password_required"));
       if (password.length < 6)
-        return showError(
-          passwordInput,
-          "Password must be at least 6 characters",
-        );
+        return showError(passwordInput, window.I18n.t("login.error_password_length"));
 
       clearErrors();
 
@@ -309,6 +312,43 @@ import SleepStore from "./core/storage/SleepStore.js";
         reader.readAsDataURL(file);
       }
     });
+  }
+
+  // Language switcher (header)
+  function initLanguageSwitcher() {
+    const headerSelect = document.getElementById("headerLanguageSelect");
+    if (!headerSelect || !window.I18n) return;
+
+    // Ensure DomHelpers has already wired (and cloned) this select's
+    // trigger/options before we attach our own option listeners below —
+    // otherwise DomHelpers' later cloneNode-based init would silently
+    // strip the listeners we add here.
+    if (window.DomHelpers) window.DomHelpers.initCustomSelects();
+
+    syncLanguageSelectDisplay(headerSelect);
+
+    headerSelect.querySelectorAll(".option").forEach((option) => {
+      option.addEventListener("click", () => {
+        window.I18n.setLanguage(option.dataset.value);
+      });
+    });
+
+    window.addEventListener("languageChange", () => {
+      syncLanguageSelectDisplay(headerSelect);
+    });
+  }
+
+  function syncLanguageSelectDisplay(select) {
+    const lang = window.I18n.getLanguage();
+    const option = select.querySelector(`.option[data-value="${lang}"]`);
+    if (!option) return;
+
+    select.dataset.value = lang;
+
+    const triggerSpan = select.querySelector(".select-trigger span");
+    if (triggerSpan) {
+      triggerSpan.textContent = option.dataset.code || option.textContent;
+    }
   }
 
   // Error handling functions

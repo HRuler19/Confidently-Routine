@@ -47,13 +47,27 @@
               alt=""
             />
           </div>
-          <div>Confidently Routine</div>
+          <div data-i18n="header.brand">Confidently Routine</div>
         </div>
 
         <div class="headerRight">
           <button class="hamburger-menu" id="hamburgerBtn">
             <i class="fa-solid fa-bars"></i>
           </button>
+
+          <div
+            class="custom-select lang-select"
+            id="headerLanguageSelect"
+            data-i18n-aria-label="header.language_switcher"
+          >
+            <div class="select-trigger"><span>EN</span></div>
+            <div class="select-options">
+              <div class="option" data-value="en" data-code="EN">English</div>
+              <div class="option" data-value="tk" data-code="TM">Türkmençe</div>
+              <div class="option" data-value="ru" data-code="RU">Русский</div>
+              <div class="option" data-value="tr" data-code="TR">Türkçe</div>
+            </div>
+          </div>
 
           <div id="welcomeMessage">Cholukov Hangeldi</div>
 
@@ -68,42 +82,42 @@
         <a href="#" data-page="dashboard">
           <div class="menu-item">
             <div><i class="fa-solid fa-house"></i></div>
-            <div class="dashboard">Dashboard</div>
+            <div class="dashboard" data-i18n="nav.dashboard">Dashboard</div>
           </div>
         </a>
 
         <a href="#" data-page="my-routine">
           <div class="menu-item">
             <div><i class="fa-solid fa-list-check"></i></div>
-            <div class="myRoutine">My routine</div>
+            <div class="myRoutine" data-i18n="nav.my_routine">My routine</div>
           </div>
         </a>
 
         <a href="#" data-page="routines">
           <div class="menu-item">
             <div><i class="fa-regular fa-calendar"></i></div>
-            <div class="myRoutine">Daily tasks</div>
+            <div class="myRoutine" data-i18n="nav.daily_tasks">Daily tasks</div>
           </div>
         </a>
 
         <a href="#" data-page="notes">
           <div class="menu-item">
             <div><i class="fa-regular fa-pen-to-square"></i></div>
-            <div class="notes">Notes</div>
+            <div class="notes" data-i18n="nav.notes">Notes</div>
           </div>
         </a>
 
         <a href="#" data-page="settings">
           <div class="menu-item">
             <div><i class="fa-solid fa-gear"></i></div>
-            <div class="settings">Settings</div>
+            <div class="settings" data-i18n="nav.settings">Settings</div>
           </div>
         </a>
 
         <a href="#" id="logoutBtn">
           <div class="menu-item">
             <div><i class="fa-solid fa-sign-out-alt"></i></div>
-            <div class="logout">Logout</div>
+            <div class="logout" data-i18n="nav.logout">Logout</div>
           </div>
         </a>
       </div>
@@ -112,23 +126,23 @@
       <div class="mobile-bottom-nav" id="mobileBottomNav">
         <a href="#" data-page="dashboard" class="mobile-nav-item">
           <i class="fa-solid fa-house"></i>
-          <span>Dashboard</span>
+          <span data-i18n="nav.dashboard">Dashboard</span>
         </a>
         <a href="#" data-page="my-routine" class="mobile-nav-item">
           <i class="fa-solid fa-list-check"></i>
-          <span>My routine</span>
+          <span data-i18n="nav.my_routine">My routine</span>
         </a>
         <a href="#" data-page="routines" class="mobile-nav-item">
           <i class="fa-regular fa-calendar"></i>
-          <span>Routine</span>
+          <span data-i18n="nav.routine_short">Routine</span>
         </a>
         <a href="#" data-page="notes" class="mobile-nav-item">
           <i class="fa-regular fa-pen-to-square"></i>
-          <span>Notes</span>
+          <span data-i18n="nav.notes">Notes</span>
         </a>
         <a href="#" data-page="settings" class="mobile-nav-item">
           <i class="fa-solid fa-gear"></i>
-          <span>Settings</span>
+          <span data-i18n="nav.settings">Settings</span>
         </a>
       </div>
 
@@ -144,14 +158,16 @@
             </div>
           </div>
           <div class="modal-body">
-            <h2>Ready to leave?</h2>
-            <p>Are you sure you want to log out of your account?</p>
+            <h2 data-i18n="logout_modal.title">Ready to leave?</h2>
+            <p data-i18n="logout_modal.body">
+              Are you sure you want to log out of your account?
+            </p>
           </div>
           <div class="modal-footer">
-            <button class="modal-btn modal-btn-cancel" id="cancelLogout">
+            <button class="modal-btn modal-btn-cancel" id="cancelLogout" data-i18n="common.cancel">
               Cancel
             </button>
-            <button class="modal-btn modal-btn-confirm" id="confirmLogout">
+            <button class="modal-btn modal-btn-confirm" id="confirmLogout" data-i18n="logout_modal.confirm">
               Yes, log out
             </button>
           </div>
@@ -172,14 +188,15 @@
                     class="login-logo__image"
                   />
                 </div>
-                <h1 class="login-title">Confidently Routine</h1>
-                <p class="login-description">Enter your login credentials</p>
+                <h1 class="login-title" data-i18n="header.brand">Confidently Routine</h1>
+                <p class="login-description" data-i18n="login.subtitle">Enter your login credentials</p>
               </div>
               <div
                 class="login-avatar"
                 role="button"
                 tabindex="0"
                 aria-label="Select main avatar"
+                data-i18n-aria-label="login.select_main_avatar"
                 id="mainAvatarSelector"
               >
                 <img
@@ -198,12 +215,15 @@
                 class="avatar-list"
                 role="group"
                 aria-label="Available avatars"
+                data-i18n-aria-label="login.available_avatars"
               >
                 <div
                   class="avatar avatar--1"
                   role="button"
                   tabindex="0"
                   aria-label="Select avatar 1"
+                  data-i18n-aria-label="login.select_avatar"
+                  data-i18n-vars='{"n":1}'
                   data-avatar="1"
                 >
                   <img
@@ -216,6 +236,8 @@
                   role="button"
                   tabindex="0"
                   aria-label="Select avatar 2"
+                  data-i18n-aria-label="login.select_avatar"
+                  data-i18n-vars='{"n":2}'
                   data-avatar="2"
                 >
                   <img
@@ -228,6 +250,8 @@
                   role="button"
                   tabindex="0"
                   aria-label="Select avatar 3"
+                  data-i18n-aria-label="login.select_avatar"
+                  data-i18n-vars='{"n":3}'
                   data-avatar="3"
                 >
                   <img
@@ -240,6 +264,8 @@
                   role="button"
                   tabindex="0"
                   aria-label="Select avatar 4"
+                  data-i18n-aria-label="login.select_avatar"
+                  data-i18n-vars='{"n":4}'
                   data-avatar="4"
                 >
                   <img
@@ -252,6 +278,7 @@
                   role="button"
                   tabindex="0"
                   aria-label="Add new avatar"
+                  data-i18n-aria-label="login.add_new_avatar"
                   id="addAvatarBtn"
                 >
                   <i class="fa-solid fa-plus" aria-hidden="true"></i>
@@ -271,7 +298,7 @@
                 <div class="form-fields">
                   <!-- Username Field -->
                   <div class="form-group">
-                    <label for="username" class="form-label">Username</label>
+                    <label for="username" class="form-label" data-i18n="login.username_label">Username</label>
                     <div class="input-wrapper">
                       <i
                         class="fa-solid fa-user input-icon"
@@ -282,6 +309,7 @@
                         id="username"
                         class="input-field input-field--username"
                         placeholder="Enter your Username"
+                        data-i18n-placeholder="login.username_placeholder"
                         required
                       />
                     </div>
@@ -289,7 +317,7 @@
 
                   <!-- Password Field -->
                   <div class="form-group form-group--password">
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label" data-i18n="login.password_label">Password</label>
                     <div class="input-password-wrapper">
                       <span class="input-password-icon" aria-hidden="true">
                         <i class="fa-solid fa-lock"></i>
@@ -299,12 +327,14 @@
                         id="password"
                         class="input-field input-field--password"
                         placeholder="Enter your Password"
+                        data-i18n-placeholder="login.password_placeholder"
                         required
                       />
                       <button
                         type="button"
                         class="password-toggle"
                         aria-label="Toggle password visibility"
+                        data-i18n-aria-label="login.toggle_password"
                       >
                         <i
                           class="fa-regular fa-eye-slash"
@@ -322,14 +352,14 @@
                     id="remember-me"
                     class="checkbox-input"
                   />
-                  <label for="remember-me" class="checkbox-label">
+                  <label for="remember-me" class="checkbox-label" data-i18n="login.remember_me">
                     Remember me
                   </label>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="submit-wrapper">
-                  <button type="submit" class="button button--submit">
+                  <button type="submit" class="button button--submit" data-i18n="login.submit">
                     Submit
                   </button>
                 </div>
@@ -340,6 +370,9 @@
       </section>
     </div>
 
+    <!-- Language dictionary + i18n runtime (must load before anything that translates) -->
+    <script src="/assets/js/utils/translations.js"></script>
+    <script src="/assets/js/utils/i18n.js"></script>
     <!-- Main app script -->
     <script src="dist/js/bundle.js" type="module"></script>
     <!-- Shared DOM helpers (custom selects, flatpickr config, confirm modals) -->
