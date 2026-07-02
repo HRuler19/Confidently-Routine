@@ -1,0 +1,293 @@
+/* Dashboard */
+.dashboard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.dashboard-card {
+  width: 100%;
+  padding: 30px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: white;
+  box-sizing: border-box;
+}
+
+.dashboard-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard-card-title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.dashboard-range-select {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.dashboard-range-select .select-trigger {
+  height: 38px;
+  font-size: 13px;
+}
+
+.dashboard-empty-hint {
+  font-size: 13px;
+  color: #9ca3af;
+  font-family: "DM Sans", sans-serif;
+  margin: 0;
+}
+
+.dashboard-empty-hint.is-hidden,
+.dashboard-flex-row.is-hidden {
+  display: none;
+}
+
+/* Generic flexible stats row shared by the Tasks/Notes/Sleep cards */
+.dashboard-flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.dashboard-chart-caption {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Progress ring column */
+.dashboard-ring-col {
+  flex: 0 0 auto;
+  width: 120px;
+  text-align: center;
+}
+
+.progress-ring-svg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Stat badges column */
+.dashboard-stat-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+/* Bar chart columns */
+.dashboard-bar-col {
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+.dashboard-bar-col--wide {
+  flex: 2 1 320px;
+}
+
+.dashboard-bar-svg {
+  width: 100%;
+  height: 140px;
+  display: block;
+}
+
+/* Chart primitives (drawn by assets/js/utils/charts.js) */
+.chart-bar {
+  transition: opacity 0.2s ease;
+}
+
+.chart-value-label {
+  font-size: 10px;
+  font-weight: 600;
+  fill: #4b5563;
+  font-family: "DM Sans", sans-serif;
+}
+
+.chart-axis-label {
+  font-size: 9px;
+  fill: #9ca3af;
+  font-family: "DM Sans", sans-serif;
+}
+
+.chart-empty-label {
+  font-size: 12px;
+  fill: #9ca3af;
+  font-family: "DM Sans", sans-serif;
+}
+
+.chart-ring-track {
+  stroke: #e5e7eb;
+}
+
+.chart-ring-label {
+  font-weight: 700;
+  fill: #111827;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Habits filters row */
+.dashboard-habits-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.dashboard-habits-filters .filter-group {
+  flex: 1 1 160px;
+  min-width: 140px;
+  max-width: 220px;
+}
+
+/* Habit cards grid */
+.dashboard-habits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.habit-stat-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px;
+  background-color: #fbfbfb;
+}
+
+.habit-stat-header {
+  margin-bottom: 12px;
+}
+
+.habit-stat-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  font-family: "DM Sans", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.habit-stat-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.habit-stat-ring {
+  width: 64px;
+  aspect-ratio: 1 / 1;
+  display: block;
+  flex-shrink: 0;
+}
+
+.habit-stat-chart {
+  width: 100%;
+  height: 100px;
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Sleep card */
+.dashboard-sleep-avg-col {
+  flex: 0 0 auto;
+  text-align: center;
+  min-width: 120px;
+}
+
+.dashboard-sleep-avg-value {
+  display: block;
+  font-size: 30px;
+  font-weight: 700;
+  color: #0e5e0a;
+  font-family: "DM Sans", sans-serif;
+  margin-bottom: 6px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .dashboard-page {
+    gap: 16px;
+  }
+
+  .dashboard-card {
+    padding: 20px;
+  }
+
+  .dashboard-card-title {
+    font-size: 16px;
+  }
+
+  .dashboard-range-select {
+    width: 100%;
+  }
+
+  .dashboard-ring-col {
+    width: 100px;
+  }
+
+  .dashboard-bar-svg {
+    height: 120px;
+  }
+
+  .dashboard-habits-filters .filter-group {
+    flex: 1 1 130px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-card {
+    padding: 16px;
+  }
+
+  .dashboard-flex-row {
+    gap: 20px;
+  }
+
+  .dashboard-stat-badges {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .dashboard-stat-badges .stat-badge {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .dashboard-habits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .habit-stat-body {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .habit-stat-ring {
+    width: 56px;
+    align-self: center;
+  }
+}
