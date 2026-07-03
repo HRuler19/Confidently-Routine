@@ -1,58 +1,166 @@
-/* Mobile Bottom Navigation */
+/* Mobile Bottom Navigation
+   Fully curved: an inline SVG paints the bar body with a concave (valley) top
+   edge and two parallel curved lines (the top arch + the hairline). The icon
+   row, the active tab's glow bar and its underline all follow the same arc,
+   so everything reads as parallel curves - like the reference. The area above
+   the concave edge is transparent, so page content shows through (no dome). */
 .mobile-bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 60px;
-  background: #ffffff;
-  border-top: 1px solid #e5e7eb;
   display: none;
+  flex-direction: column;
+  z-index: 998;
+  background: transparent;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* SVG body + curved lines, stretched to fill the bar. */
+.mobile-nav-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  filter: drop-shadow(0 -3px 12px var(--shadow-color));
+}
+
+.mobile-nav-bg-fill {
+  fill: var(--bg-surface);
+}
+
+.mobile-nav-bg-line {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 1;
+  /* keep the stroke a hairline despite the non-uniform SVG stretch */
+  vector-effect: non-scaling-stroke;
+}
+
+:root[data-theme="dark"] .mobile-nav-bg-line {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+/* Icon row - each icon is nudged down to sit on the arc (centre lowest,
+   sides highest), parallel to the curved lines. */
+.mobile-nav-items {
+  position: relative;
+  z-index: 1;
+  display: flex;
   justify-content: space-around;
   align-items: center;
-  z-index: 998;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  height: 82px;
 }
 
 .mobile-nav-item {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
-  color: #6b7280;
-  font-size: 12px;
-  gap: 4px;
-  transition: color 0.2s ease;
-  padding: 8px 0;
-  flex: 1;
+  color: var(--text-tertiary);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Offsets follow the same parabola as the SVG curves (y = 4·dip·f(1-f),
+   dip ≈ 12): sides raised, centre lowest, so the five icons trace the arc. */
+.mobile-nav-item:nth-child(1),
+.mobile-nav-item:nth-child(5) {
+  transform: translateY(4px);
+}
+
+.mobile-nav-item:nth-child(2),
+.mobile-nav-item:nth-child(4) {
+  transform: translateY(10px);
+}
+
+.mobile-nav-item:nth-child(3) {
+  transform: translateY(12px);
 }
 
 .mobile-nav-item i {
-  font-size: 20px;
-  color: #6b7280;
+  font-size: 22px;
+  color: var(--text-tertiary);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.mobile-nav-item span {
-  font-family: "DM Sans", sans-serif;
-  font-size: 11px;
+/* The per-item label is kept only as the data source for the centred active
+   label + as an accessible name; it is visually hidden here. */
+.mobile-nav-item-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-.mobile-nav-item.active {
-  color: #0e5e0a;
+/* Active icon: brand green + a subtle lift */
+.mobile-nav-item.active,
+.mobile-nav-item.active i {
+  color: var(--accent-green);
 }
 
 .mobile-nav-item.active i {
-  color: #0e5e0a;
+  transform: translateY(-2px) scale(1.06);
 }
 
-/* Mobile show*/
+/* Glowing green bar sitting on the curved hairline, under the active icon;
+   because the item is already shifted onto the arc, the bar rides the curve
+   too. Its glow spills down past the line just like the reference. */
+.mobile-nav-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--accent-green);
+  box-shadow:
+    0 0 10px 1px var(--accent-green),
+    0 2px 18px 2px var(--accent-green);
+}
+
+/* Centred name of the active tab */
+.mobile-nav-active-label {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--text-secondary);
+  padding: 12px 0 12px;
+  min-height: 20px;
+}
+
+/* Mobile show */
 @media (max-width: 768px) {
   .mobile-bottom-nav {
     display: flex;
   }
 
-  /* Content bottom padding for mobile nav */
+  /* Content bottom padding so the fixed bar never overlaps page content. */
   #content {
-    margin-bottom: 60px;
+    margin-bottom: calc(94px + env(safe-area-inset-bottom, 0));
+  }
+}
+
+/* Very narrow phones */
+@media (max-width: 360px) {
+  .mobile-nav-item i {
+    font-size: 20px;
   }
 }

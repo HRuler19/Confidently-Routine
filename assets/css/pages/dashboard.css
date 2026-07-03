@@ -9,9 +9,9 @@
 .dashboard-card {
   width: 100%;
   padding: 30px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background-color: white;
+  background-color: var(--bg-surface);
   box-sizing: border-box;
 }
 
@@ -28,7 +28,7 @@
   font-family: "DM Sans", sans-serif;
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -44,7 +44,7 @@
 
 .dashboard-empty-hint {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-family: "DM Sans", sans-serif;
   margin: 0;
 }
@@ -66,7 +66,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--text-secondary);
   margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -119,30 +119,42 @@
 .chart-value-label {
   font-size: 10px;
   font-weight: 600;
-  fill: #4b5563;
+  fill: var(--text-secondary);
   font-family: "DM Sans", sans-serif;
 }
 
 .chart-axis-label {
   font-size: 9px;
-  fill: #9ca3af;
+  fill: var(--text-muted);
   font-family: "DM Sans", sans-serif;
 }
 
 .chart-empty-label {
   font-size: 12px;
-  fill: #9ca3af;
+  fill: var(--text-muted);
   font-family: "DM Sans", sans-serif;
 }
 
 .chart-ring-track {
-  stroke: #e5e7eb;
+  stroke: var(--border-color);
 }
 
 .chart-ring-label {
   font-weight: 700;
-  fill: #111827;
+  fill: var(--text-primary);
   font-family: "DM Sans", sans-serif;
+}
+
+.chart-grid-line {
+  stroke: var(--border-color);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 /* Habits filters row */
@@ -159,18 +171,18 @@
   max-width: 220px;
 }
 
-/* Habit cards grid */
+/* Habit rows - one full-width row per habit, like the Sleep chart */
 .dashboard-habits-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.habit-stat-card {
-  border: 1px solid #e5e7eb;
+.habit-stat-row {
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 18px;
-  background-color: #fbfbfb;
+  background-color: var(--bg-surface-subtle);
 }
 
 .habit-stat-header {
@@ -180,7 +192,7 @@
 .habit-stat-name {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   font-family: "DM Sans", sans-serif;
   white-space: nowrap;
   overflow: hidden;
@@ -203,7 +215,7 @@
 
 .habit-stat-chart {
   width: 100%;
-  height: 100px;
+  height: 130px;
   display: block;
   flex: 1;
   min-width: 0;
@@ -220,15 +232,23 @@
   display: block;
   font-size: 30px;
   font-weight: 700;
-  color: #0e5e0a;
+  color: var(--accent-green);
   font-family: "DM Sans", sans-serif;
   margin-bottom: 6px;
 }
 
 /* Mobile */
 @media (max-width: 768px) {
+  /* .dashboard-page is a <section>, so it inherits the generic section card
+     chrome (padding/bg/shadow/radius). That "card wrapping the cards" wastes
+     a lot of width on mobile - strip it so each dashboard-card gets the full
+     screen width. Desktop keeps the subtle wrapper. */
   .dashboard-page {
     gap: 16px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   .dashboard-card {
@@ -262,23 +282,36 @@
     padding: 16px;
   }
 
+  /* Stack the ring / badges / bar-chart columns vertically so each gets the
+     full card width instead of being squeezed side-by-side on narrow
+     phones. */
   .dashboard-flex-row {
+    flex-direction: column;
+    align-items: stretch;
     gap: 20px;
+  }
+
+  .dashboard-ring-col {
+    align-self: center;
   }
 
   .dashboard-stat-badges {
     flex-direction: row;
     flex-wrap: wrap;
     width: 100%;
+    gap: 8px;
   }
 
+  /* Three equal badges on one tidy full-width row instead of an unbalanced
+     2 + 1 wrap; min-width:0 lets them shrink to fit even on the narrowest
+     phones. */
   .dashboard-stat-badges .stat-badge {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     justify-content: center;
-  }
-
-  .dashboard-habits-grid {
-    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 6px 6px;
+    font-size: 12px;
   }
 
   .habit-stat-body {
@@ -289,5 +322,9 @@
   .habit-stat-ring {
     width: 56px;
     align-self: center;
+  }
+
+  .habit-stat-chart {
+    height: 110px;
   }
 }

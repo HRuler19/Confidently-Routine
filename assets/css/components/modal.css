@@ -18,12 +18,12 @@
 }
 
 .modal-content {
-  background: #ffffff;
+  background: var(--bg-surface);
   border-radius: 24px;
   width: 90%;
   max-width: 360px;
   padding: 32px 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px var(--shadow-color-strong);
   animation: modalFadeIn 0.3s ease;
   text-align: center;
 }
@@ -46,7 +46,11 @@
 .modal-icon-wrapper {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(220, 38, 38, 0.14) 0%,
+    rgba(220, 38, 38, 0.24) 100%
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -56,21 +60,21 @@
 
 .modal-icon-wrapper i {
   font-size: 28px;
-  color: #dc2626;
+  color: var(--danger);
 }
 
 .modal-body h2 {
   font-family: "DM Sans", sans-serif;
   font-size: 20px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .modal-body p {
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-tertiary);
   line-height: 1.5;
   margin: 0 0 8px 0;
 }
@@ -78,11 +82,11 @@
 .modal-task-title,
 .modal-note-title {
   font-weight: 600;
-  color: #111827 !important;
-  background-color: #f9fafb;
+  color: var(--text-primary) !important;
+  background-color: var(--bg-surface-alt);
   padding: 8px 12px;
   border-radius: 8px;
-  border-left: 3px solid #dc2626;
+  border-left: 3px solid var(--danger);
   margin-top: 8px !important;
 }
 
@@ -105,22 +109,22 @@
 }
 
 .modal-btn-cancel {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
 }
 
 .modal-btn-cancel:hover {
-  background: #e5e7eb;
+  background: var(--border-color);
 }
 
 .modal-btn-confirm {
-  background: #dc2626;
+  background: var(--danger);
   color: white;
   box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
 }
 
 .modal-btn-confirm:hover {
-  background: #b91c1c;
+  background: var(--danger-hover);
   transform: translateY(-1px);
   box-shadow: 0 6px 8px -1px rgba(220, 38, 38, 0.3);
 }

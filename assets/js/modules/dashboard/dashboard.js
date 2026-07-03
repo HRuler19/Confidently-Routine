@@ -1,7 +1,19 @@
 (function () {
   "use strict";
 
-  const HABIT_COLORS = ["#0e5e0a", "#0066ff", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2"];
+  // Chart colors tuned for a white background look muddy on the dark
+  // surfaces from Settings -> Choose theme, so pick from a softer palette
+  // instead when dark mode is active. Light mode always gets the original
+  // literal color, unchanged.
+  function themeColor(light, dark) {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? dark : light;
+  }
+
+  function habitColors() {
+    return document.documentElement.getAttribute("data-theme") === "dark"
+      ? ["#2d9b27", "#58a6ff", "#d29922", "#f87171", "#a371f7", "#56d4dd"]
+      : ["#0e5e0a", "#0066ff", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2"];
+  }
 
   let tasksRange = "all";
   let notesRange = "all";
@@ -16,6 +28,11 @@
   });
 
   window.addEventListener("languageChange", function () {
+    if (!document.querySelector(".dashboard-page")) return;
+    renderAll();
+  });
+
+  window.addEventListener("themeChange", function () {
     if (!document.querySelector(".dashboard-page")) return;
     renderAll();
   });
@@ -39,10 +56,21 @@
   }
 
   function renderAll() {
-    renderTasksSection();
-    renderNotesSection();
-    renderHabitsSection();
-    renderSleepSection();
+    // Each section is isolated: a data issue in one (e.g. a malformed task
+    // saved by an older version of the app) must not stop the others from
+    // rendering.
+    safeRender(renderTasksSection);
+    safeRender(renderNotesSection);
+    safeRender(renderHabitsSection);
+    safeRender(renderSleepSection);
+  }
+
+  function safeRender(renderFn) {
+    try {
+      renderFn();
+    } catch (e) {
+      console.error("Dashboard section failed to render:", e);
+    }
   }
 
   // ---------- Shared date helpers ----------
@@ -105,7 +133,7 @@
     const categoryKeys = ["personal", "work", "shopping", "other"];
     const byCategory = categoryKeys.map((key) => ({
       label: I18n.t("routines.category_" + key),
-      value: filtered.filter((t) => t.category.toLowerCase() === key).length,
+      value: filtered.filter((t) => (t.category || "").toLowerCase() === key).length,
     }));
 
     const priorityKeys = ["low", "medium", "high", "hard"];
@@ -139,21 +167,21 @@
 
     Charts.renderProgressRing(document.getElementById("tasksCompletionRing"), {
       percent: stats.completionRate,
-      color: "#0e5e0a",
+      color: themeColor("#0e5e0a", "#2d9b27"),
       centerLabel: `${stats.completionRate}%`,
     });
 
     Charts.renderBarChart(document.getElementById("tasksCategoryChart"), {
       labels: stats.byCategory.map((c) => c.label),
       values: stats.byCategory.map((c) => c.value),
-      color: "#0066ff",
+      color: themeColor("#0066ff", "#58a6ff"),
       emptyMessage: noDataMsg,
     });
 
     Charts.renderBarChart(document.getElementById("tasksPriorityChart"), {
       labels: stats.byPriority.map((p) => p.label),
       values: stats.byPriority.map((p) => p.value),
-      color: "#f59e0b",
+      color: themeColor("#f59e0b", "#d29922"),
       emptyMessage: noDataMsg,
     });
   }
@@ -221,14 +249,14 @@
     Charts.renderBarChart(document.getElementById("notesCategoryChart"), {
       labels: stats.byCategory.map((c) => c.label),
       values: stats.byCategory.map((c) => c.value),
-      color: "#7c3aed",
+      color: themeColor("#7c3aed", "#a371f7"),
       emptyMessage: noDataMsg,
     });
 
     Charts.renderBarChart(document.getElementById("notesTrendChart"), {
       labels: stats.trend.map((t) => t.label),
       values: stats.trend.map((t) => t.value),
-      color: "#0e5e0a",
+      color: themeColor("#0e5e0a", "#2d9b27"),
       emptyMessage: noDataMsg,
     });
   }
@@ -407,13 +435,13 @@
     grid.innerHTML = habits
       .map(
         (habit) => `
-      <div class="habit-stat-card">
+      <div class="habit-stat-row">
         <div class="habit-stat-header">
           <span class="habit-stat-name">${DomHelpers.escapeHtml(habit.name)}</span>
         </div>
         <div class="habit-stat-body">
           <svg class="progress-ring-svg habit-stat-ring" id="habitRing-${habit.id}"></svg>
-          <svg class="dashboard-bar-svg habit-stat-chart" id="habitChart-${habit.id}"></svg>
+          <svg class="habit-stat-chart" id="habitChart-${habit.id}"></svg>
         </div>
       </div>
     `,
@@ -422,9 +450,10 @@
 
     const noDataMsg = I18n.t("dashboard.chart_no_data");
 
+    const colors = habitColors();
     habits.forEach((habit, i) => {
       const stats = computeHabitStats(habit, habitsGranularity, habitsYear, habitsMonth);
-      const color = HABIT_COLORS[i % HABIT_COLORS.length];
+      const color = colors[i % colors.length];
 
       Charts.renderProgressRing(document.getElementById(`habitRing-${habit.id}`), {
         percent: stats.completionRate,
@@ -432,10 +461,11 @@
         centerLabel: `${stats.completionRate}%`,
       });
 
-      Charts.renderBarChart(document.getElementById(`habitChart-${habit.id}`), {
+      Charts.renderLineChart(document.getElementById(`habitChart-${habit.id}`), {
         labels: stats.labels,
         values: stats.values,
         color,
+        skipEmptyValues: false,
         emptyMessage: noDataMsg,
       });
     });
@@ -484,10 +514,10 @@
     const avg = count > 0 ? (sum / count).toFixed(1) : "0";
     document.getElementById("sleepAvgValue").textContent = `${avg}${I18n.t("dashboard.hours_unit")}`;
 
-    Charts.renderBarChart(document.getElementById("sleepTrendChart"), {
+    Charts.renderLineChart(document.getElementById("sleepTrendChart"), {
       labels,
       values,
-      color: "#dc2626",
+      color: themeColor("#dc2626", "#f87171"),
       emptyMessage: I18n.t("dashboard.chart_no_data"),
     });
   }

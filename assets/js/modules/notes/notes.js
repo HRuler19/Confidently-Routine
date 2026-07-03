@@ -3,7 +3,6 @@
 
   let notes = [];
   let noteToDelete = null;
-  let isInitialized = false;
 
   // Only use pageLoaded event - app.js handles initial page load
   window.addEventListener("pageLoaded", function (e) {
@@ -25,11 +24,12 @@
 
     console.log("Notes initialized with", notes.length, "notes");
 
-    // Only attach events once
-    if (!isInitialized) {
-      attachEventDelegation();
-      isInitialized = true;
-    }
+    // Re-attach on every page load: the SPA replaces #content's innerHTML
+    // when navigating, so the previous .notes-list element (and its
+    // delegated click listener) is destroyed on each visit. attachEvent-
+    // Delegation removes any stale listener before adding, so this is safe
+    // to call repeatedly.
+    attachEventDelegation();
 
     initAddNoteButton();
     initModalEvents();
@@ -106,10 +106,10 @@
       </div>
       <div class="note-actions">
         <button class="edit-btn" data-id="${note.id}" title="${I18n.t("notes.edit_tooltip")}">
-          <i class="fa-solid fa-pen"></i>
+          <i class="fa-solid fa-pen"></i><span class="note-action-label">${DomHelpers.escapeHtml(I18n.t("common.edit"))}</span>
         </button>
         <button class="delete-btn" data-id="${note.id}" title="${I18n.t("notes.delete_tooltip")}">
-          <i class="fa-solid fa-trash"></i>
+          <i class="fa-solid fa-trash"></i><span class="note-action-label">${DomHelpers.escapeHtml(I18n.t("common.delete"))}</span>
         </button>
       </div>
     `;

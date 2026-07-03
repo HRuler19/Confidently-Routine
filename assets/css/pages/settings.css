@@ -11,15 +11,15 @@
 }
 
 .settings-card {
-  background: white;
+  background: var(--bg-surface);
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 30px;
   position: relative;
 }
 
 .settings-title {
-  color: #5d5d5d;
+  color: var(--text-header);
   font-size: 20px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
@@ -47,7 +47,7 @@
 }
 
 .settings-avatar-label {
-  color: #5d5d5d;
+  color: var(--text-header);
   font-size: 16px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
@@ -58,7 +58,7 @@
   height: 125px;
   border-radius: 50%;
   overflow: hidden;
-  border: 1px solid #3c8116;
+  border: 1px solid var(--accent-green-alt);
 }
 
 .settings-current-avatar img {
@@ -85,7 +85,7 @@
   height: 50px;
   border-radius: 50%;
   overflow: hidden;
-  border: 1px solid #3c8116;
+  border: 1px solid var(--accent-green-alt);
   cursor: pointer;
   transition:
     transform 0.2s,
@@ -111,12 +111,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f3f3;
-  border: 1px dashed #3c8116;
+  background: var(--bg-hover);
+  border: 1px dashed var(--accent-green-alt);
 }
 
 .settings-avatar-upload i {
-  color: #3c8116;
+  color: var(--accent-green-alt);
   font-size: 20px;
 }
 
@@ -136,7 +136,7 @@
 }
 
 .settings-form-group label {
-  color: #5d5d5d;
+  color: var(--text-header);
   font-size: 16px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
@@ -148,26 +148,29 @@
   height: 30px;
   width: 275px;
   border-radius: 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   padding: 0 10px;
   font-size: 14px;
   font-family: "DM Sans", sans-serif;
-  color: #5d5d5d;
+  color: var(--text-header);
+  background: var(--bg-surface);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .settings-form-group input:focus {
-  border-color: #3c8116;
+  border-color: var(--accent-green-alt);
 }
 
 .settings-form-group input[readonly] {
-  background: #f9fafb;
+  /* background-color (not the `background` shorthand) so it doesn't reset
+     the icon's background-image / no-repeat set on mobile. */
+  background-color: var(--bg-surface-alt);
   cursor: default;
 }
 
 .settings-form-group input::placeholder {
-  color: #b4b4b4;
+  color: var(--text-placeholder);
   font-size: 14px;
   font-family: "DM Sans", sans-serif;
 }
@@ -176,7 +179,7 @@
 .settings-save-btn {
   width: 152px;
   height: 40px;
-  background: #0e5e0a;
+  background: var(--accent-green);
   border: none;
   border-radius: 10px;
   color: white;
@@ -194,7 +197,7 @@
 }
 
 .settings-save-btn:hover {
-  background: #0a4a08;
+  background: var(--accent-green-hover);
 }
 
 .settings-save-btn i {
@@ -216,7 +219,7 @@
 }
 
 .settings-option-group label {
-  color: #5d5d5d;
+  color: var(--text-header);
   font-size: 16px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
@@ -227,9 +230,9 @@
   width: 400px;
   height: 30px;
   border-radius: 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   position: relative;
-  background: white;
+  background: var(--bg-surface);
 }
 
 .settings-custom-select::before,
@@ -252,13 +255,13 @@
 }
 
 .settings-custom-select .select-trigger span {
-  color: #5d5d5d;
+  color: var(--text-header);
   font-size: 14px;
   font-family: "DM Sans", sans-serif;
 }
 
 .settings-custom-select .select-trigger i {
-  color: #b4b4b4;
+  color: var(--text-placeholder);
   font-size: 12px;
 }
 
@@ -267,13 +270,13 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #d1d5db;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color-input);
   border-radius: 10px;
   margin-top: 4px;
   z-index: 100;
   display: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-color-strong);
 }
 
 .settings-custom-select.open .select-options {
@@ -285,12 +288,12 @@
   cursor: pointer;
   font-size: 14px;
   font-family: "DM Sans", sans-serif;
-  color: #5d5d5d;
+  color: var(--text-header);
   transition: background 0.2s;
 }
 
 .settings-custom-select .option:hover {
-  background: #f3f3f3;
+  background: var(--bg-hover);
 }
 
 .settings-custom-select .option:first-child {
@@ -404,139 +407,216 @@
 
 /* Responsive - Mobil (768px altı) */
 @media (max-width: 768px) {
+  /* Strip the inherited <section> card chrome from this multi-card wrapper
+     so each settings-card uses the full screen width (see the same note in
+     dashboard.css). Desktop keeps the subtle wrapper. */
   .settings-page {
-    padding: 15px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   .settings-card {
-    padding: 20px;
+    padding: 22px 18px;
   }
 
   .settings-title {
     font-size: 18px;
-    margin-bottom: 20px;
+    font-weight: 600;
+    margin-bottom: 22px;
+    text-align: center;
   }
 
-  /* Mobil */
+  /* Mobil: a centered, profile-style layout */
   .settings-profile-content {
     flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
+    align-items: center;
+    gap: 22px;
   }
 
+  /* Current avatar centered and prominent, with a glowing brand ring */
   .settings-avatar-section {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
   }
 
   .settings-current-avatar {
-    width: 100px;
-    height: 100px;
+    width: 104px;
+    height: 104px;
     align-self: center;
+    border: 3px solid var(--accent-green);
+    box-shadow: 0 4px 14px rgba(14, 94, 10, 0.18);
   }
 
+  /* Avatar picker: centered row of slightly larger, clearer options */
   .settings-avatar-choose {
-    align-items: flex-start;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
   }
 
   .settings-avatar-grid {
-    gap: 10px;
-    justify-content: flex-start;
+    gap: 12px;
+    justify-content: center;
   }
 
   .settings-avatar-option {
-    width: 45px;
-    height: 45px;
+    width: 52px;
+    height: 52px;
+    border: 2px solid var(--border-color);
+  }
+
+  .settings-avatar-option.selected {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(14, 94, 10, 0.25);
   }
 
   .settings-avatar-label {
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-tertiary);
+    text-align: center;
   }
 
-  /* Mobil: Form full width */
+  /* Mobil: Form full width with roomy, icon-adorned inputs */
   .settings-form-section {
     width: 100%;
+    align-items: stretch;
+    gap: 16px;
   }
 
   .settings-form-group {
     flex-direction: column;
     align-items: flex-start;
-    gap: 5px;
+    gap: 7px;
     width: 100%;
   }
 
   .settings-form-group label {
     text-align: left;
     min-width: auto;
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-tertiary);
   }
 
   .settings-form-group input {
     width: 100%;
+    height: 46px;
     box-sizing: border-box;
+    border-radius: 12px;
+    font-size: 15px;
+    padding: 0 14px 0 42px;
+    background-repeat: no-repeat;
+    background-position: 14px center;
+    background-size: 17px;
   }
 
-  /* Mobil: Save button full width */
+  /* Icons inside the inputs (person for usernames, lock for passwords). */
+  .settings-form-group input[type="text"] {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/><circle cx='12' cy='7' r='4'/></svg>");
+  }
+
+  .settings-form-group input[type="password"] {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='11' width='18' height='11' rx='2' ry='2'/><path d='M7 11V7a5 5 0 0 1 10 0v4'/></svg>");
+  }
+
+  /* Mobil: Save button full width, taller, with a soft brand shadow */
   .settings-save-btn {
     width: 100%;
+    height: 48px;
     box-sizing: border-box;
+    font-size: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(14, 94, 10, 0.22);
+    margin-top: 4px;
+  }
+
+  /* Theme + language: full-width, taller, comfortable controls */
+  .settings-options-row {
+    gap: 18px;
+  }
+
+  .settings-option-group {
+    gap: 8px;
+    width: 100%;
+  }
+
+  .settings-option-group label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-tertiary);
+  }
+
+  .settings-custom-select {
+    width: 100%;
+    height: 46px;
+    border-radius: 12px;
+  }
+
+  .settings-custom-select .select-trigger {
+    padding: 0 14px;
+  }
+
+  .settings-custom-select .select-trigger span {
+    font-size: 15px;
+  }
+
+  .settings-custom-select .option {
+    padding: 12px 14px;
+    font-size: 15px;
   }
 }
 
 /* Responsive (480px) */
 @media (max-width: 480px) {
   .settings-page {
-    padding: 10px;
+    padding: 0;
     gap: 15px;
   }
 
   .settings-card {
-    padding: 15px;
+    padding: 20px 16px;
   }
 
   .settings-title {
-    font-size: 16px;
-    margin-bottom: 15px;
+    font-size: 17px;
+    margin-bottom: 20px;
+  }
+
+  .settings-avatar-grid {
+    gap: 10px;
+  }
+
+  .settings-avatar-option {
+    width: 48px;
+    height: 48px;
+  }
+
+  .settings-current-avatar {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+/* Very narrow phones: shrink the avatar picker a touch so all five options
+   still sit on one row. */
+@media (max-width: 360px) {
+  .settings-avatar-option {
+    width: 44px;
+    height: 44px;
   }
 
   .settings-avatar-grid {
     gap: 8px;
-  }
-
-  .settings-avatar-option {
-    width: 40px;
-    height: 40px;
-  }
-
-  .settings-current-avatar {
-    width: 80px;
-    height: 80px;
-  }
-
-  .settings-form-group label {
-    font-size: 14px;
-  }
-
-  .settings-form-group input {
-    font-size: 13px;
-    height: 28px;
-  }
-
-  .settings-save-btn {
-    height: 36px;
-    font-size: 14px;
-  }
-
-  .settings-option-group label {
-    font-size: 14px;
-  }
-
-  .settings-custom-select {
-    height: 28px;
-  }
-
-  .settings-custom-select .select-trigger span {
-    font-size: 14px;
   }
 }

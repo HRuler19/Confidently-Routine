@@ -5,9 +5,9 @@
   left: 0;
   bottom: 0;
   width: 250px;
-  background: #ffffff;
+  background: var(--bg-surface);
   padding: 20px 0;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--border-color);
   box-sizing: border-box;
   font-family: "DM Sans", sans-serif;
   overflow-y: auto;
@@ -39,7 +39,7 @@
 
 /* Icons */
 #sidebar .menu-item i {
-  color: #0e5e0a;
+  color: var(--accent-green);
   font-size: 20px;
   min-width: 24px;
   text-align: center;
@@ -49,42 +49,42 @@
 #sidebar .menu-item div:last-child {
   font-size: 16px;
   font-weight: 500;
-  color: #111827;
+  color: var(--text-primary);
   font-family: "DM Sans", sans-serif;
 }
 
 /* Hover effect */
 #sidebar .menu-item:hover {
-  background: #f3f3f3;
+  background: var(--bg-hover);
 }
 
 /* Active menu item */
 #sidebar .menu-item.active {
-  background: #f3f3f3;
+  background: var(--bg-hover);
 }
 
 #sidebar .menu-item.active i,
 #sidebar .menu-item.active div:last-child {
-  color: #0e5e0a;
+  color: var(--accent-green);
 }
 
 /* Logout button  */
 #logoutBtn {
   margin-top: auto;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
   padding-top: 10px;
 }
 
 #logoutBtn .menu-item {
-  color: #dc3545;
+  color: var(--danger);
 }
 
 #logoutBtn .menu-item i {
-  color: #dc3545;
+  color: var(--danger);
 }
 
 #logoutBtn .menu-item:hover {
-  background: #f8d7da;
+  background: rgba(220, 38, 38, 0.12);
 }
 
 /* Desktop Sidebar */

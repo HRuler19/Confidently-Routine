@@ -9,15 +9,15 @@
 .myroutine-card {
   width: 100%;
   padding: 30px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background-color: white;
+  background-color: var(--bg-surface);
   box-sizing: border-box;
 }
 
 .myroutine-card hr {
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
   margin: 30px 0;
 }
 
@@ -25,7 +25,7 @@
   font-family: "DM Sans", sans-serif;
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 20px 0;
 }
 
@@ -40,18 +40,20 @@
   flex: 1;
   height: 40px;
   min-height: 40px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 10px;
   padding: 0 15px;
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
   outline: none;
+  color: var(--text-secondary);
+  background-color: var(--bg-surface);
 }
 
 .myroutine-add-habit-row button {
   width: 152px;
   height: 40px;
-  background-color: #0e5e0a;
+  background-color: var(--accent-green);
   color: white;
   border: none;
   border-radius: 10px;
@@ -66,7 +68,7 @@
 }
 
 .myroutine-add-habit-row button:hover:not(:disabled) {
-  background-color: #0a4707;
+  background-color: var(--accent-green-hover);
 }
 
 .myroutine-add-habit-row button:disabled {
@@ -78,7 +80,7 @@
 /* Habit table */
 .habit-table-hint {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 0 0 16px 0;
   font-family: "DM Sans", sans-serif;
 }
@@ -102,15 +104,15 @@
 
 .habit-table th,
 .habit-table td {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   padding: 10px 12px;
   text-align: center;
   white-space: nowrap;
 }
 
 .habit-table thead th {
-  background-color: #f9fafb;
-  color: #374151;
+  background-color: var(--bg-surface-alt);
+  color: var(--text-secondary-alt);
   font-weight: 600;
   font-size: 12px;
   text-transform: uppercase;
@@ -132,13 +134,13 @@
 
 .habit-day-col {
   min-width: 56px;
-  background-color: #f9fafb;
+  background-color: var(--bg-surface-alt);
 }
 
 .habit-day-cell {
   font-weight: 600;
-  color: #4b5563;
-  background-color: #f9fafb;
+  color: var(--text-secondary);
+  background-color: var(--bg-surface-alt);
 }
 
 .habit-col-header {
@@ -154,7 +156,7 @@
   height: 18px;
   border: none;
   background: transparent;
-  color: #9ca3af;
+  color: var(--text-muted);
   cursor: pointer;
   font-size: 11px;
   display: flex;
@@ -166,27 +168,27 @@
 }
 
 .habit-col-edit:hover {
-  color: #0e5e0a;
-  background-color: #f0fdf4;
+  color: var(--accent-green);
+  background-color: rgba(14, 94, 10, 0.12);
 }
 
 .habit-col-delete:hover {
-  color: #dc2626;
-  background-color: #fef2f2;
+  color: var(--danger);
+  background-color: rgba(220, 38, 38, 0.12);
 }
 
 .habit-col-rename-input {
   width: 100%;
   min-width: 60px;
   height: 26px;
-  border: 1px solid #0e5e0a;
+  border: 1px solid var(--accent-green);
   border-radius: 6px;
   padding: 0 6px;
   font-family: "DM Sans", sans-serif;
   font-size: 12px;
   font-weight: 600;
   text-transform: none;
-  color: #111827;
+  color: var(--text-primary);
   outline: none;
   box-sizing: border-box;
   text-align: center;
@@ -199,17 +201,17 @@
 }
 
 .habit-cell:hover {
-  background-color: #f3f3f3;
+  background-color: var(--bg-hover);
 }
 
 .habit-cell-plus {
-  color: #0e5e0a;
+  color: var(--accent-green);
   font-weight: 700;
   font-size: 15px;
 }
 
 .habit-cell-x {
-  color: #dc2626;
+  color: var(--danger);
   font-weight: 700;
   font-size: 15px;
 }
@@ -237,9 +239,9 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: 2px solid #d1d5db;
-  background-color: white;
-  color: #9ca3af;
+  border: 2px solid var(--border-color-input);
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -253,14 +255,14 @@
 }
 
 .habit-toggle-plus.active {
-  background-color: #0e5e0a;
-  border-color: #0e5e0a;
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
   color: white;
 }
 
 .habit-toggle-x.active {
-  background-color: #dc2626;
-  border-color: #dc2626;
+  background-color: var(--danger);
+  border-color: var(--danger);
   color: white;
 }
 
@@ -273,7 +275,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--text-secondary);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -282,13 +284,14 @@
 .habit-entry-count-field input {
   width: 100%;
   height: 40px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 8px;
   padding: 0 12px;
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
   outline: none;
   color: #0066ff;
+  background-color: var(--bg-surface);
   font-weight: 600;
   box-sizing: border-box;
   transition: all 0.2s ease;
@@ -307,15 +310,15 @@
 }
 
 .habit-entry-count-field input:disabled {
-  background-color: #f3f4f6;
-  color: #9ca3af;
+  background-color: var(--bg-hover);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .habit-entry-clear-btn {
   border: none;
   background: transparent;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 13px;
   cursor: pointer;
   display: flex;
@@ -329,8 +332,8 @@
 }
 
 .habit-entry-clear-btn:hover {
-  color: #dc2626;
-  background-color: #fef2f2;
+  color: var(--danger);
+  background-color: rgba(220, 38, 38, 0.12);
 }
 
 .habit-entry-actions {
@@ -342,9 +345,9 @@
 /* Sleep tracker */
 .sleep-chart-wrapper {
   width: 100%;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background-color: #fbfbfb;
+  background-color: var(--bg-surface-subtle);
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -357,23 +360,23 @@
 
 .sleep-chart .sleep-chart-line {
   fill: none;
-  stroke: #dc2626;
+  stroke: var(--danger);
   stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 .sleep-chart .sleep-chart-point {
-  fill: #dc2626;
+  fill: var(--danger);
 }
 
 .sleep-chart .sleep-chart-grid {
-  stroke: #e5e7eb;
+  stroke: var(--border-color);
   stroke-width: 1;
 }
 
 .sleep-chart .sleep-chart-label {
-  fill: #9ca3af;
+  fill: var(--text-muted);
   font-size: 10px;
   font-family: "DM Sans", sans-serif;
 }
@@ -383,7 +386,7 @@
   overflow-x: auto;
   overflow-y: auto;
   max-height: 320px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   -webkit-overflow-scrolling: touch;
 }
@@ -397,14 +400,14 @@
 
 .sleep-table th,
 .sleep-table td {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
   padding: 8px 12px;
   text-align: center;
 }
 
 .sleep-table thead th {
-  background-color: #f9fafb;
-  color: #374151;
+  background-color: var(--bg-surface-alt);
+  color: var(--text-secondary-alt);
   font-weight: 600;
   font-size: 12px;
   text-transform: uppercase;
@@ -416,14 +419,14 @@
 .sleep-table input[type="number"] {
   width: 90px;
   height: 34px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 8px;
   padding: 0 8px;
   font-family: "DM Sans", sans-serif;
   font-size: 13px;
   outline: none;
-  color: #4b5563;
-  background-color: white;
+  color: var(--text-secondary);
+  background-color: var(--bg-surface);
   text-align: center;
   box-sizing: border-box;
   -moz-appearance: textfield;
@@ -437,13 +440,20 @@
 }
 
 .sleep-table input[type="number"]:focus {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
 /* Mobile */
 @media (max-width: 768px) {
+  /* Strip the inherited <section> card chrome from this multi-card wrapper
+     so each myroutine-card uses the full screen width (see the same note in
+     dashboard.css). Desktop keeps the subtle wrapper. */
   .my-routine-page {
     gap: 16px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   .myroutine-card {

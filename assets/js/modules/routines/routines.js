@@ -15,6 +15,7 @@
     if (!document.querySelector(".tasks-container")) return;
     renderTasks();
     updateStats();
+    initDatePicker();
   });
 
   function initRoutines() {
@@ -83,8 +84,8 @@
         </div>
 
         <div class="task-actions">
-          <button class="icon-btn edit-btn" data-id="${task.id}"><i class="fa-solid fa-pen"></i></button>
-          <button class="icon-btn delete-btn" data-id="${task.id}"><i class="fa-solid fa-trash-can"></i></button>
+          <button class="icon-btn edit-btn" data-id="${task.id}"><i class="fa-solid fa-pen"></i><span class="icon-btn-label">${DomHelpers.escapeHtml(I18n.t("common.edit"))}</span></button>
+          <button class="icon-btn delete-btn" data-id="${task.id}"><i class="fa-solid fa-trash-can"></i><span class="icon-btn-label">${DomHelpers.escapeHtml(I18n.t("common.delete"))}</span></button>
         </div>
       </div>
     `;

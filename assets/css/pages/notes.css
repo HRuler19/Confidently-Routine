@@ -3,9 +3,9 @@
   width: 100%;
   margin: 0 auto;
   padding: 30px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background-color: white;
+  background-color: var(--bg-surface);
   box-sizing: border-box;
 }
 
@@ -23,23 +23,24 @@
 .notes-textarea-container textarea {
   width: 100%;
   height: 202px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 10px;
   padding: 15px;
   font-family: "DM Sans", sans-serif;
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   resize: none;
   box-sizing: border-box;
 }
 
 .notes-textarea-container textarea::placeholder {
-  color: #b4b4b4;
+  color: var(--text-placeholder);
 }
 
 .notes-textarea-container textarea:focus {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
 .notes-form-sidebar {
@@ -53,7 +54,7 @@
 .btn-add-note {
   width: 152px;
   height: 40px;
-  background-color: #0e5e0a;
+  background-color: var(--accent-green);
   color: white;
   border: none;
   border-radius: 10px;
@@ -69,7 +70,7 @@
 }
 
 .btn-add-note:hover {
-  background-color: #0a4a07;
+  background-color: var(--accent-green-hover);
 }
 
 .btn-add-note:disabled {
@@ -88,7 +89,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--text-secondary);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -104,47 +105,48 @@
 .input-with-icon .flatpickr-input {
   width: 100% !important;
   height: 40px !important;
-  border: 1px solid #d1d5db !important;
+  border: 1px solid var(--border-color-input) !important;
   border-radius: 10px !important;
   padding: 0 35px 0 12px !important;
   font-family: "DM Sans", sans-serif !important;
   font-size: 14px !important;
-  color: #333 !important;
+  color: var(--text-primary) !important;
   outline: none !important;
   cursor: pointer !important;
-  background-color: white !important;
+  background-color: var(--bg-surface) !important;
   box-sizing: border-box !important;
 }
 
 .input-with-icon .flatpickr-input:focus {
-  border-color: #0e5e0a !important;
+  border-color: var(--accent-green) !important;
 }
 
 .input-with-icon input {
   width: 100%;
   height: 40px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 10px;
   padding: 0 35px 0 12px;
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
-  color: #333;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
 }
 
 .input-with-icon input::placeholder {
-  color: #b4b4b4;
+  color: var(--text-placeholder);
 }
 
 .input-with-icon input:focus {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
 .input-with-icon i {
   position: absolute;
   right: 12px;
-  color: #b4b4b4;
+  color: var(--text-placeholder);
   font-size: 14px;
   pointer-events: none;
 }
@@ -170,7 +172,7 @@
 .filter-label {
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary-alt);
   white-space: nowrap;
 }
 
@@ -227,7 +229,7 @@
 }
 
 .stat-badge .stat-label {
-  color: #6b7280;
+  color: var(--text-tertiary);
   font-weight: 400;
 }
 
@@ -241,7 +243,7 @@
 }
 
 .stat-number.total {
-  background-color: #0e5e0a;
+  background-color: var(--accent-green);
 }
 
 /* Notes List */
@@ -256,9 +258,9 @@
 .note-card {
   width: 100%;
   padding: 20px 30px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 10px;
-  background-color: white;
+  background-color: var(--bg-surface);
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;
@@ -282,11 +284,11 @@
 }
 
 .note-title {
-  color: #000;
+  color: var(--text-primary);
   font-size: 16px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
-  line-height: 24px;
+  line-height: 1.5;
   word-wrap: break-word;
   max-height: 24px;
   overflow: hidden;
@@ -294,18 +296,24 @@
   white-space: nowrap;
   flex: 1;
   min-width: 200px;
+  max-width: 400px;
 }
 
 .note-card.editing .note-title {
   max-height: none;
+  max-width: none;
   white-space: normal;
+}
+
+.note-card.editing .note-actions {
+  display: none;
 }
 
 .note-meta {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 20px;
   flex-shrink: 0;
 }
 
@@ -321,28 +329,30 @@
 }
 
 .note-category {
-  padding: 4px 0;
-  background: #0e5e0a;
-  border-radius: 6px;
+  padding: 2px 23px;
+  background: var(--accent-green);
+  border-radius: 5px;
   width: 100px;
   min-width: 100px;
   max-width: 100px;
   box-sizing: border-box;
+  outline: 1px var(--accent-green) solid;
+  outline-offset: -1px;
 }
 
 .note-category span {
   color: white;
-  font-size: 13px;
+  font-size: 12px;
   font-family: "DM Sans", sans-serif;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .note-date {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  color: #6b7280;
+  gap: 10px;
+  color: var(--text-tertiary);
   font-size: 13px;
   white-space: nowrap;
   width: 100px;
@@ -352,12 +362,12 @@
 
 .note-date i {
   font-size: 14px;
-  color: #0e5e0a;
+  color: var(--text-tertiary);
 }
 
 .note-date span {
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--text-header);
+  font-size: 12px;
   font-family: "DM Sans", sans-serif;
   font-weight: 400;
 }
@@ -373,7 +383,7 @@
   height: 30px;
   border-radius: 5px;
   border: 1px solid #8b8b8b;
-  background: white;
+  background: var(--bg-surface);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -387,7 +397,7 @@
 }
 
 .note-actions button:hover {
-  background: #f3f3f3;
+  background: var(--bg-hover);
 }
 
 .note-actions button.delete-btn {
@@ -399,20 +409,37 @@
 }
 
 .note-actions button.delete-btn:hover {
-  background: #fff5f5;
+  background: rgba(233, 0, 0, 0.12);
+}
+
+/* Label next to the icon - hidden on the compact desktop squares, shown on
+   the roomy full-width mobile buttons (see the responsive block below). */
+.note-action-label {
+  display: none;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.note-actions button.edit-btn .note-action-label {
+  color: #8b8b8b;
+}
+
+.note-actions button.delete-btn .note-action-label {
+  color: #e90000;
 }
 
 /* Empty State */
 .notes-empty {
   text-align: center;
   padding: 60px 20px;
-  color: #b4b4b4;
+  color: var(--text-placeholder);
 }
 
 .notes-empty i {
   font-size: 48px;
   margin-bottom: 20px;
-  color: #d1d5db;
+  color: var(--border-color-input);
 }
 
 .notes-empty p {
@@ -462,151 +489,61 @@
     gap: 15px;
   }
 
-  .note-actions {
-    align-self: flex-end;
+  .note-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
   }
-}
 
-/* Notes List - Outside section */
-.notes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
-}
+  .note-title {
+    width: 100%;
+    max-width: none;
+  }
 
-/* Note Card */
-.note-card {
-  width: 100%;
-  padding: 20px 30px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  background-color: white;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 25px;
-  transition: box-shadow 0.2s ease;
-}
+  .note-meta {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 
-.note-card:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
+  .note-meta > * {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
 
-.note-content {
-  flex: 1;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
-}
+  .note-category {
+    padding: 4px 14px;
+  }
 
-.note-title {
-  color: #000;
-  font-size: 16px;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 400;
-  line-height: 1.5;
-  word-wrap: break-word;
-  max-width: 400px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  /* Full-width labelled action buttons on mobile, matching the Daily Tasks
+     cards so both lists feel like one system. */
+  .note-actions {
+    width: 100%;
+    gap: 10px;
+  }
 
-.note-card.editing .note-title {
-  max-width: none;
-  white-space: normal;
-}
+  .note-actions button {
+    flex: 1;
+    width: auto;
+    height: 44px;
+    border-radius: 10px;
+    gap: 8px;
+  }
 
-.note-card.editing .note-actions {
-  display: none;
-}
+  .note-actions button i {
+    font-size: 14px;
+  }
 
-.note-meta {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  flex-shrink: 0;
-}
-
-.note-category {
-  padding: 2px 23px;
-  background: #0e5e0a;
-  border-radius: 5px;
-  outline: 1px #0e5e0a solid;
-  outline-offset: -1px;
-}
-
-.note-category span {
-  color: white;
-  font-size: 12px;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 400;
-}
-
-.note-date {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.note-date i {
-  color: #727272;
-  font-size: 14px;
-}
-
-.note-date span {
-  color: #5d5d5d;
-  font-size: 12px;
-  font-family: "DM Sans", sans-serif;
-  font-weight: 400;
-}
-
-.note-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.note-actions button {
-  width: 30px;
-  height: 30px;
-  border-radius: 5px;
-  border: 1px solid #8b8b8b;
-  background: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.note-actions button i {
-  color: #8b8b8b;
-  font-size: 12px;
-}
-
-.note-actions button:hover {
-  background: #f3f3f3;
-}
-
-.note-actions button.delete-btn {
-  border-color: #e90000;
-}
-
-.note-actions button.delete-btn i {
-  color: #e90000;
-}
-
-.note-actions button.delete-btn:hover {
-  background: #fff5f5;
+  .note-action-label {
+    display: inline;
+  }
 }
 
 /* Edit Mode */
 .note-card.editing {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
 .note-card.editing .note-title {
@@ -621,21 +558,22 @@
   display: none;
   width: 100%;
   min-height: 80px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 8px;
   padding: 10px;
   font-family: "DM Sans", sans-serif;
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
   resize: vertical;
   outline: none;
 }
 
 .edit-textarea:focus {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
-.edit-actions {
+.note-card .edit-actions {
   display: none;
   gap: 10px;
   margin-top: 10px;
@@ -647,7 +585,7 @@
 
 .btn-save {
   padding: 8px 20px;
-  background: #0e5e0a;
+  background: var(--accent-green);
   color: white;
   border: none;
   border-radius: 8px;
@@ -658,7 +596,7 @@
 }
 
 .btn-save:hover {
-  background: #0a4a07;
+  background: var(--accent-green-hover);
 }
 
 .btn-cancel {
@@ -675,24 +613,6 @@
 
 .btn-cancel:hover {
   background: #a0a0a0;
-}
-
-/* Empty State */
-.notes-empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: #b4b4b4;
-}
-
-.notes-empty i {
-  font-size: 48px;
-  margin-bottom: 20px;
-  color: #d1d5db;
-}
-
-.notes-empty p {
-  font-size: 16px;
-  font-family: "DM Sans", sans-serif;
 }
 
 /* Note Edit Form - Same layout as Add Note Section */
@@ -715,23 +635,24 @@
 .note-edit-form .edit-textarea-container textarea {
   width: 100%;
   height: 202px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 10px;
   padding: 15px;
   font-family: "DM Sans", sans-serif;
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   resize: none;
   box-sizing: border-box;
 }
 
 .note-edit-form .edit-textarea-container textarea::placeholder {
-  color: #b4b4b4;
+  color: var(--text-placeholder);
 }
 
 .note-edit-form .edit-textarea-container textarea:focus {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
 .note-edit-form .edit-sidebar {
@@ -763,12 +684,12 @@
 }
 
 .note-edit-form .edit-save-btn {
-  background-color: #0e5e0a;
+  background-color: var(--accent-green);
   color: white;
 }
 
 .note-edit-form .edit-save-btn:hover {
-  background-color: #0a4707;
+  background-color: var(--accent-green-hover);
 }
 
 .note-edit-form .edit-cancel-btn {
@@ -790,7 +711,7 @@
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--text-secondary);
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -800,18 +721,19 @@
 .note-edit-form .edit-field input[type="text"] {
   width: 100%;
   height: 40px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color-input);
   border-radius: 10px;
   padding: 0 35px 0 12px;
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
-  color: #333;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
   outline: none;
   box-sizing: border-box;
 }
 
 .note-edit-form .edit-field input:focus {
-  border-color: #0e5e0a;
+  border-color: var(--accent-green);
 }
 
 .note-edit-form .edit-field .custom-select {
@@ -822,8 +744,8 @@
   height: 40px;
   border-radius: 10px;
   font-size: 14px;
-  background: white;
-  border: 1px solid #d1d5db;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color-input);
 }
 
 .note-edit-form .edit-field .custom-select .select-options {
@@ -850,197 +772,9 @@
   }
 }
 
-/* Flatpickr Calendar - Same as Routines */
-.flatpickr-calendar {
-  background: #ffffff;
-  border-radius: 20px !important;
-  box-shadow:
-    0 30px 50px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(0, 0, 0, 0.05) !important;
-  font-family:
-    "DM Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif !important;
-  width: 320px !important;
-  overflow: hidden !important;
-  margin-top: 8px !important;
-  border: none !important;
-  padding-bottom: 5px !important;
-}
-
-.flatpickr-calendar.open {
-  z-index: 3000 !important;
-}
-
-.flatpickr-months {
-  background: #f8f8f8 !important;
-  padding: 16px 0 8px 0 !important;
-  border-bottom: 1px solid #e0e0e0 !important;
-  border-radius: 20px 20px 0 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  position: relative !important;
-}
-
-.flatpickr-current-month {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 4px !important;
-  padding: 8px 12px !important;
-  background: #e6e6e6 !important;
-  border-radius: 10px !important;
-  border: 1px solid #d0d0d0 !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: auto !important;
-  min-width: 180px !important;
-  position: absolute !important;
-  pointer-events: auto !important;
-  z-index: 10 !important;
-}
-
-.flatpickr-monthDropdown-months {
-  background: transparent !important;
-  border: none !important;
-  padding: 4px 20px 4px 12px !important;
-  font-size: 17px !important;
-  font-weight: 600 !important;
-  color: #333 !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  cursor: pointer !important;
-  border-radius: 20px !important;
-  pointer-events: auto !important;
-}
-
-.numInputWrapper {
-  background: transparent !important;
-  border: none !important;
-  border-radius: 8px !important;
-  padding: 2px 4px !important;
-}
-
-.numInputWrapper span {
-  border: none !important;
-  background: transparent !important;
-  color: #333 !important;
-  font-weight: 600 !important;
-  font-size: 17px !important;
-}
-
-.numInputWrapper span:hover {
-  background: transparent !important;
-}
-
-.numInputWrapper input {
-  font-size: 17px !important;
-  font-weight: 600 !important;
-  color: #333 !important;
-  width: 55px !important;
-}
-
-.flatpickr-prev-month,
-.flatpickr-next-month {
-  padding: 12px !important;
-  color: #333 !important;
-}
-
-.flatpickr-prev-month:hover,
-.flatpickr-next-month:hover {
-  color: #0e5e0a !important;
-}
-
-.flatpickr-prev-month svg,
-.flatpickr-next-month svg {
-  fill: #333 !important;
-}
-
-.flatpickr-prev-month:hover svg,
-.flatpickr-next-month:hover svg {
-  fill: #0e5e0a !important;
-}
-
-.flatpickr-day {
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  color: #333 !important;
-  border-radius: 50% !important;
-  line-height: 38px !important;
-  height: 38px !important;
-  width: 38px !important;
-  margin: 2px !important;
-}
-
-.flatpickr-day:hover {
-  background: #f0f0f0 !important;
-  border-color: #f0f0f0 !important;
-}
-
-.flatpickr-day.today {
-  border-color: #0e5e0a !important;
-  background: #0e5e0a !important;
-  color: white !important;
-}
-
-.flatpickr-day.today:hover {
-  background: #0a4a07 !important;
-  border-color: #0a4a07 !important;
-}
-
-.flatpickr-day.selected {
-  background: #0e5e0a !important;
-  border-color: #0e5e0a !important;
-  color: white !important;
-}
-
-.flatpickr-day.selected:hover {
-  background: #0a4a07 !important;
-  border-color: #0a4a07 !important;
-}
-
-.flatpickr-day.prevMonthDay,
-.flatpickr-day.nextMonthDay {
-  color: #ccc !important;
-}
-
-.flatpickr-day.prevMonthDay:hover,
-.flatpickr-day.nextMonthDay:hover {
-  background: #f5f5f5 !important;
-  color: #999 !important;
-}
-
-.flatpickr-weekdays {
-  background: #f8f8f8 !important;
-  padding: 8px 0 !important;
-}
-
-span.flatpickr-weekday {
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: #999 !important;
-  text-transform: uppercase !important;
-}
-
-.flatpickr-innerContainer {
-  padding: 8px !important;
-}
-
-.flatpickr-rContainer {
-  padding: 0 !important;
-}
-
-.flatpickr-days {
-  padding: 0 !important;
-}
-
-.dayContainer {
-  padding: 0 !important;
-  min-width: 320px !important;
-  max-width: 320px !important;
-}
+/* Flatpickr calendar styling lives in pages/routine.css (loaded once,
+   shared by every page - the calendar popup is a single global element,
+   not scoped per page). */
 
 /* Responsive */
 @media (max-width: 768px) {

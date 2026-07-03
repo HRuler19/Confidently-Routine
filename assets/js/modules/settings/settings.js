@@ -19,6 +19,38 @@
     attachAvatarEvents();
     attachSaveButton();
     initLanguageSelect();
+    initThemeSelect();
+  }
+
+  function initThemeSelect() {
+    const themeSelect = document.getElementById("themeSelect");
+    if (!themeSelect || !window.Theme) return;
+
+    syncThemeSelectDisplay();
+
+    themeSelect.querySelectorAll(".option").forEach((option) => {
+      option.addEventListener("click", () => {
+        window.Theme.setTheme(option.dataset.value);
+      });
+    });
+
+    window.removeEventListener("themeChange", syncThemeSelectDisplay);
+    window.addEventListener("themeChange", syncThemeSelectDisplay);
+  }
+
+  function syncThemeSelectDisplay() {
+    const themeSelect = document.getElementById("themeSelect");
+    if (!themeSelect || !window.Theme) return;
+
+    const currentTheme = window.Theme.getTheme();
+    const currentOption = themeSelect.querySelector(
+      `.option[data-value="${currentTheme}"]`,
+    );
+    if (!currentOption) return;
+
+    themeSelect.dataset.value = currentTheme;
+    const triggerSpan = themeSelect.querySelector(".select-trigger span");
+    if (triggerSpan) triggerSpan.textContent = currentOption.textContent;
   }
 
   function initLanguageSelect() {
@@ -208,7 +240,7 @@
       const originalText = saveBtn.innerHTML;
       const savedText = window.I18n ? window.I18n.t("settings.save_success") : "Saved!";
       saveBtn.innerHTML = `<i class="fa-solid fa-check"></i><span>${DomHelpers.escapeHtml(savedText)}</span>`;
-      saveBtn.style.background = "#0a4a08";
+      saveBtn.style.background = "var(--accent-green-hover)";
       
       setTimeout(() => {
         saveBtn.innerHTML = originalText;
