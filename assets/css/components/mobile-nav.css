@@ -42,6 +42,32 @@
   stroke: rgba(255, 255, 255, 0.1);
 }
 
+/* Active-tab indicator: a short, glowing green arc riding exactly on the
+   hairline curve above (see the seg-0..seg-4 <path> elements in index.html,
+   each an exact segment of that same curve under one tab). All five start
+   hidden; mobile-nav.js sets data-active-index on .mobile-bottom-nav, and
+   only the matching segment is lit - so the "underline" is always parallel
+   to the curve instead of a straight bar sitting on a curved line. */
+.mobile-nav-bg-active {
+  fill: none;
+  stroke: var(--accent-green);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px var(--accent-green))
+    drop-shadow(0 0 8px var(--accent-green));
+  transition: opacity 0.25s ease;
+}
+
+.mobile-bottom-nav[data-active-index="0"] .seg-0,
+.mobile-bottom-nav[data-active-index="1"] .seg-1,
+.mobile-bottom-nav[data-active-index="2"] .seg-2,
+.mobile-bottom-nav[data-active-index="3"] .seg-3,
+.mobile-bottom-nav[data-active-index="4"] .seg-4 {
+  opacity: 1;
+}
+
 /* Icon row - each icon is nudged down to sit on the arc (centre lowest,
    sides highest), parallel to the curved lines. */
 .mobile-nav-items {
@@ -112,24 +138,6 @@
 
 .mobile-nav-item.active i {
   transform: translateY(-2px) scale(1.06);
-}
-
-/* Glowing green bar sitting on the curved hairline, under the active icon;
-   because the item is already shifted onto the arc, the bar rides the curve
-   too. Its glow spills down past the line just like the reference. */
-.mobile-nav-item.active::after {
-  content: "";
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 34px;
-  height: 4px;
-  border-radius: 4px;
-  background: var(--accent-green);
-  box-shadow:
-    0 0 10px 1px var(--accent-green),
-    0 2px 18px 2px var(--accent-green);
 }
 
 /* Centred name of the active tab */
