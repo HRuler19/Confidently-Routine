@@ -219,6 +219,55 @@ Framework-less rendering demonstrates understanding of browser APIs and performa
 - **CSV export for external analysis**
 - **Calendar integration interfaces**
 
+## Packaging for Desktop & Mobile
+
+The app ships as a browser page unmodified, and is also wrapped for native
+distribution. All platforms load the exact same `index.html`/`assets/` —
+nothing platform-specific lives in the app code itself.
+
+| Platform | Tooling | Command | Requires |
+|---|---|---|---|
+| Windows | Electron + electron-builder | `npm run dist:win` | Windows |
+| macOS | Electron + electron-builder | `npm run dist:mac` | a Mac |
+| Android | Capacitor + Gradle | `npm run dist:android` | Android SDK + JDK 21 |
+| iOS | Capacitor + Xcode | `npm run sync:ios`, then build in Xcode | a Mac with Xcode |
+| Browser | — | just open `index.html` via any static server | — |
+
+Output lands in `release/` (desktop) or `android/app/build/outputs/apk/`
+(Android); both are gitignored build artifacts, not source.
+
+**Windows note:** `electron-builder` normally needs a code-signing vendor
+package (`winCodeSign`) that includes two macOS-only symlinked files 7-Zip
+can't extract without `SeCreateSymbolicLinkPrivilege` (Developer Mode or an
+elevated shell). `node_modules/7zip-bin/win/x64/7za.exe` is swapped for a
+thin wrapper (source in `scripts/7za-wrapper/main.go`) that excludes the
+irrelevant `darwin/` folder during extraction, so this works from a
+normal, non-elevated terminal. A fresh `npm install` restores the stock
+`7za.exe`, so re-run `node scripts/install-7za-wrapper.js` (requires
+[Go](https://go.dev)) after installing dependencies before `npm run
+dist:win`.
+
+**Android note:** requires a JDK (17 fails on this Capacitor version's
+`compileDebugJavaWithJavac` step with "invalid source release: 21" — use
+JDK 21) and the Android SDK's `platform-tools`, `platforms;android-34`,
+and `build-tools;34.0.0` packages. `android/local.properties` must point
+`sdk.dir` at the SDK using forward slashes — backslash-escaped Windows
+paths there fail SDK path validation with a cryptic
+"filename, directory name, or volume label syntax is incorrect" error.
+
+**iOS/macOS note:** Apple's toolchain (Xcode, code signing, the simulator)
+only runs on macOS — there is no way around this from Windows or Linux.
+The `ios/` Capacitor project and its icons/splash screens are already
+generated and committed, so on a Mac the remaining steps are just
+`npm install`, `npx cap sync ios`, then open `ios/App/App.xcworkspace` in
+Xcode to build, sign, and run.
+
+To regenerate app icons/splash screens for Android or iOS from the brand
+logo, edit `appicon-src/logo.png` and re-run:
+```
+npx capacitor-assets generate --assetPath appicon-src --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff' --splashBackgroundColor '#ffffff' --splashBackgroundColorDark '#121212'
+```
+
 ---
 
 <div align="center">
