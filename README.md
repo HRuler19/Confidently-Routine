@@ -62,11 +62,15 @@ A privacy-first productivity suite for habits, daily tasks, and notes — engine
 
 [![Download Android APK](https://img.shields.io/badge/⬇_Download-Android_APK-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v1.0.0/Confidently-Routine-1.0.0.apk)
 
-### 🍎 macOS &nbsp;·&nbsp; 📱 iOS
+### 🍎 macOS
 
-![macOS coming soon](https://img.shields.io/badge/macOS-coming_soon-999999?style=for-the-badge&logo=apple&logoColor=white)
+[![Download macOS (Apple Silicon)](https://img.shields.io/badge/⬇_Download-macOS_Apple_Silicon_(.dmg)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v1.0.0/Confidently-Routine-1.0.0-arm64.dmg)
 &nbsp;
-![iOS coming soon](https://img.shields.io/badge/iOS-coming_soon-999999?style=for-the-badge&logo=apple&logoColor=white)
+[![Download macOS (Intel)](https://img.shields.io/badge/⬇_Download-macOS_Intel_(.dmg)-5E5E5E?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v1.0.0/Confidently-Routine-1.0.0-x64.dmg)
+
+### 📱 iOS
+
+![iOS build from source](https://img.shields.io/badge/iOS-build_from_source-999999?style=for-the-badge&logo=apple&logoColor=white)
 
 </div>
 
@@ -77,10 +81,12 @@ A privacy-first productivity suite for habits, daily tasks, and notes — engine
 | **Windows (Installer)** | `Confidently-Routine-Setup-1.0.0.exe` | Run the installer, choose an install location, and it adds Start-menu + desktop shortcuts. Recommended for most users. |
 | **Windows (Portable)** | `Confidently-Routine-Portable-1.0.0.exe` | No installation — double-click to launch. Ideal for a USB stick or a locked-down machine. |
 | **Android** | `Confidently-Routine-1.0.0.apk` | Enable **Settings → Apps → Install unknown apps** for your browser/file manager, then open the `.apk` to sideload. |
-| **macOS / iOS** | — | Builds are pending Apple hardware (see [Building from source](#-building-from-source)); the projects are fully configured and ready to compile on a Mac. |
+| **macOS (Apple Silicon)** | `Confidently-Routine-1.0.0-arm64.dmg` | Open the `.dmg`, drag the app into **Applications**. For M1/M2/M3/M4 Macs. |
+| **macOS (Intel)** | `Confidently-Routine-1.0.0-x64.dmg` | Same as above, for Intel-based Macs. |
+| **iOS** | — | Apple doesn't allow installing an unsigned `.ipa` on a device without a paid Developer Program account, so there's no direct download yet. Build and run it yourself from Xcode — see [Building from source](#-building-from-source). |
 | **Browser** | — | Serve the repo folder with any static server (e.g. `python -m http.server`) and open `index.html`. |
 
-> ℹ️ **Windows SmartScreen / Android Play Protect** may warn that the app is unsigned — the binaries are not yet code-signed with a paid certificate. Choose **More info → Run anyway** (Windows) or **Install anyway** (Android) to proceed.
+> ℹ️ **Windows SmartScreen / Android Play Protect / macOS Gatekeeper** may warn that the app is unsigned — the binaries are not yet code-signed with a paid certificate. Choose **More info → Run anyway** (Windows), **Install anyway** (Android), or **right-click → Open** (macOS) to proceed.
 
 <br />
 
@@ -275,9 +281,9 @@ npm start                 # launches the Electron shell
 | Target | Command | Requirements | Output |
 |---|---|---|---|
 | 🪟 **Windows** | `npm run dist:win` | Windows | `release/*.exe` (installer + portable) |
-| 🍎 **macOS** | `npm run dist:mac` | a Mac | `release/*.dmg`, `release/*.zip` |
+| 🍎 **macOS** | `npm run dist:mac` | a Mac | `release/*.dmg`, `release/*.zip` (arm64 + x64) |
 | 🤖 **Android** | `npm run dist:android` | Android SDK + JDK 21 | `android/app/build/outputs/apk/…` |
-| 📱 **iOS** | `npm run sync:ios` → build in Xcode | a Mac with Xcode | `.ipa` via Xcode |
+| 📱 **iOS** | `npm run sync:ios` → build in Xcode | a Mac with Xcode | Runs on the Simulator or a registered device |
 
 <details>
 <summary><strong>🪟 Windows build notes</strong></summary>
@@ -314,15 +320,17 @@ sdk.dir=C:/Users/you/AppData/Local/Android/Sdk
 
 <br />
 
-Apple's toolchain (Xcode, code signing, the simulator) **only runs on macOS** — this is an Apple platform restriction, not a limitation of this project. The `ios/` Capacitor project and its icons/splash screens are already generated and committed. On a Mac:
+Apple's toolchain (Xcode, code signing, the simulator) **only runs on macOS** — this is an Apple platform restriction, not a limitation of this project. The `ios/` Capacitor project and its icons/splash screens are already generated and committed. The iOS project uses **Swift Package Manager**, not CocoaPods, so there's no `.xcworkspace` / `pod install` step — just open the `.xcodeproj` directly:
 
 ```bash
 npm install --legacy-peer-deps
-npx cap sync ios
-open ios/App/App.xcworkspace   # build, sign & run in Xcode
+npm run sync:ios
+open ios/App/App.xcodeproj   # build, sign & run in Xcode
 ```
 
-For macOS desktop, `npm run dist:mac` produces `.dmg` and `.zip` artifacts.
+In Xcode, under the **App** target's **Signing & Capabilities** tab, sign in with your Apple ID and pick it as the **Team** (a free personal account is enough to run on the Simulator or your own device — no paid Developer Program needed for that). Select an iOS Simulator as the run destination and hit **Cmd+R**.
+
+For macOS desktop, `npm run dist:mac` produces `.dmg` and `.zip` artifacts for both Apple Silicon and Intel. Without a paid "Developer ID Application" certificate, electron-builder skips signing entirely, which leaves the app's embedded frameworks with an incomplete signature that Apple Silicon's kernel refuses to run at all. A `build/afterSignAdhoc.js` hook (wired up via `afterSign` in `package.json`) fixes this by ad-hoc signing every nested binary, deepest first, with the entitlements Electron needs (JIT, unsigned executable memory, disabled library validation) — no paid certificate required, just a build step.
 </details>
 
 <details>
@@ -359,12 +367,12 @@ The entire UI is translated through a single dictionary (`assets/js/utils/transl
 
 - [x] Windows desktop app (Electron)
 - [x] Android app (Capacitor)
+- [x] macOS `.dmg` build (Apple Silicon & Intel)
 - [x] Dark mode & full responsive mobile layout
 - [x] Multi-language support (EN / TR / TK / RU)
 - [x] Real dashboard analytics
-- [ ] macOS `.dmg` build
-- [ ] iOS build & App Store submission
-- [ ] Signed Windows & Play Store releases
+- [ ] iOS App Store submission (requires a paid Apple Developer account)
+- [ ] Signed Windows, macOS & Play Store releases
 - [ ] Offline-first Service Worker (installable PWA)
 - [ ] Optional cloud sync via an adapter layer
 - [ ] CSV / calendar export

@@ -274,7 +274,10 @@
   border: 1px solid var(--border-color-input);
   border-radius: 10px;
   margin-top: 4px;
-  z-index: 100;
+  /* Above .mobile-bottom-nav (z-index: 998) so the open list - the language
+     select in particular, whose last option sits right where the bottom
+     nav bar is - never renders underneath it on mobile. */
+  z-index: 1200;
   display: none;
   box-shadow: 0 4px 12px var(--shadow-color-strong);
 }
@@ -574,6 +577,12 @@
   .settings-custom-select .option {
     padding: 12px 14px;
     font-size: 15px;
+  }
+
+  /* Breathing room below the theme/language card so its select isn't flush
+     against the bottom nav bar. */
+  .settings-page {
+    padding-bottom: 20px;
   }
 }
 

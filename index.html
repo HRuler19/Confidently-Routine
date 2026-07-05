@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Confidently-Routine</title>
 
     <script>
@@ -136,75 +136,77 @@
 
       <!-- Mobile Bottom Navigation -->
       <div class="mobile-bottom-nav" id="mobileBottomNav">
-        <svg
-          class="mobile-nav-bg"
-          viewBox="0 0 100 92"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path
-            class="mobile-nav-bg-fill"
-            d="M0,7 Q50,31 100,7 L100,92 L0,92 Z"
-          />
-          <path class="mobile-nav-bg-line" d="M0,7 Q50,31 100,7" />
-          <path class="mobile-nav-bg-line" d="M0,52 Q50,76 100,52" />
-          <!-- Active-tab indicator: five exact segments of the hairline
-               parabola above (one per tab); CSS shows only the active one,
-               so the green bar always rides the curved line. -->
-          <path class="mobile-nav-bg-active seg-0" d="M5.5,54.49 Q10,56.42 14.5,57.95" />
-          <path class="mobile-nav-bg-active seg-1" d="M25.5,61.12 Q30,62.18 34.5,62.85" />
-          <path class="mobile-nav-bg-active seg-2" d="M45.5,63.9 Q50,64.1 54.5,63.9" />
-          <path class="mobile-nav-bg-active seg-3" d="M65.5,62.85 Q70,62.18 74.5,61.12" />
-          <path class="mobile-nav-bg-active seg-4" d="M85.5,57.95 Q90,56.42 94.5,54.49" />
-        </svg>
-        <div class="mobile-nav-items">
-          <a
-            href="#"
-            data-page="dashboard"
-            class="mobile-nav-item"
-            data-i18n-aria-label="nav.dashboard"
+        <div class="mobile-nav-bar">
+          <svg
+            class="mobile-nav-bg"
+            viewBox="0 0 100 92"
+            preserveAspectRatio="none"
+            aria-hidden="true"
           >
-            <i class="fa-solid fa-house"></i>
-            <span class="mobile-nav-item-label" data-i18n="nav.dashboard">Dashboard</span>
-          </a>
-          <a
-            href="#"
-            data-page="my-routine"
-            class="mobile-nav-item"
-            data-i18n-aria-label="nav.my_routine"
-          >
-            <i class="fa-solid fa-list-check"></i>
-            <span class="mobile-nav-item-label" data-i18n="nav.my_routine">My routine</span>
-          </a>
-          <a
-            href="#"
-            data-page="routines"
-            class="mobile-nav-item"
-            data-i18n-aria-label="nav.routine_short"
-          >
-            <i class="fa-regular fa-calendar"></i>
-            <span class="mobile-nav-item-label" data-i18n="nav.routine_short">Routine</span>
-          </a>
-          <a
-            href="#"
-            data-page="notes"
-            class="mobile-nav-item"
-            data-i18n-aria-label="nav.notes"
-          >
-            <i class="fa-regular fa-pen-to-square"></i>
-            <span class="mobile-nav-item-label" data-i18n="nav.notes">Notes</span>
-          </a>
-          <a
-            href="#"
-            data-page="settings"
-            class="mobile-nav-item"
-            data-i18n-aria-label="nav.settings"
-          >
-            <i class="fa-solid fa-gear"></i>
-            <span class="mobile-nav-item-label" data-i18n="nav.settings">Settings</span>
-          </a>
+            <path
+              class="mobile-nav-bg-fill"
+              d="M0,7 Q50,31 100,7 L100,92 L0,92 Z"
+            />
+            <path class="mobile-nav-bg-line" d="M0,7 Q50,31 100,7" />
+            <path class="mobile-nav-bg-line" d="M0,52 Q50,76 100,52" />
+            <!-- Active-tab indicator: five exact segments of the hairline
+                 parabola above (one per tab); CSS shows only the active one,
+                 so the green bar always rides the curved line. -->
+            <path class="mobile-nav-bg-active seg-0" d="M5.5,54.49 Q10,56.42 14.5,57.95" />
+            <path class="mobile-nav-bg-active seg-1" d="M25.5,61.12 Q30,62.18 34.5,62.85" />
+            <path class="mobile-nav-bg-active seg-2" d="M45.5,63.9 Q50,64.1 54.5,63.9" />
+            <path class="mobile-nav-bg-active seg-3" d="M65.5,62.85 Q70,62.18 74.5,61.12" />
+            <path class="mobile-nav-bg-active seg-4" d="M85.5,57.95 Q90,56.42 94.5,54.49" />
+          </svg>
+          <div class="mobile-nav-items">
+            <a
+              href="#"
+              data-page="dashboard"
+              class="mobile-nav-item"
+              data-i18n-aria-label="nav.dashboard"
+            >
+              <i class="fa-solid fa-house"></i>
+              <span class="mobile-nav-item-label" data-i18n="nav.dashboard">Dashboard</span>
+            </a>
+            <a
+              href="#"
+              data-page="my-routine"
+              class="mobile-nav-item"
+              data-i18n-aria-label="nav.my_routine"
+            >
+              <i class="fa-solid fa-list-check"></i>
+              <span class="mobile-nav-item-label" data-i18n="nav.my_routine">My routine</span>
+            </a>
+            <a
+              href="#"
+              data-page="routines"
+              class="mobile-nav-item"
+              data-i18n-aria-label="nav.routine_short"
+            >
+              <i class="fa-regular fa-calendar"></i>
+              <span class="mobile-nav-item-label" data-i18n="nav.daily_tasks">Daily tasks</span>
+            </a>
+            <a
+              href="#"
+              data-page="notes"
+              class="mobile-nav-item"
+              data-i18n-aria-label="nav.notes"
+            >
+              <i class="fa-regular fa-pen-to-square"></i>
+              <span class="mobile-nav-item-label" data-i18n="nav.notes">Notes</span>
+            </a>
+            <a
+              href="#"
+              data-page="settings"
+              class="mobile-nav-item"
+              data-i18n-aria-label="nav.settings"
+            >
+              <i class="fa-solid fa-gear"></i>
+              <span class="mobile-nav-item-label" data-i18n="nav.settings">Settings</span>
+            </a>
+          </div>
+          <div class="mobile-nav-active-label" id="mobileNavActiveLabel"></div>
         </div>
-        <div class="mobile-nav-active-label" id="mobileNavActiveLabel"></div>
       </div>
 
       <!-- Page Content -->

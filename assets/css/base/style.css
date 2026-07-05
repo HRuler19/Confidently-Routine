@@ -5,6 +5,17 @@
   box-sizing: border-box;
 }
 
+/* iOS (WKWebView/Safari) draws its own inset chrome on text-like inputs -
+   extra padding, rounded corners, a subtle shadow - on top of whatever
+   height/border/radius the CSS below sets, so the same input renders taller
+   and differently-shaped than on Android. Stripping the native appearance
+   makes text fields render identically on both platforms. */
+input[type="text"],
+input[type="password"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 html {
   background: var(--bg-page);
 }
@@ -28,9 +39,9 @@ body {
 #content {
   position: relative;
   margin-left: 250px;
-  margin-top: 60px;
+  margin-top: calc(60px + env(safe-area-inset-top, 0px));
   padding: 30px;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px - env(safe-area-inset-top, 0px));
   background: var(--bg-page);
   box-sizing: border-box;
   overflow-y: auto;

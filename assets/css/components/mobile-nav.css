@@ -10,10 +10,25 @@
   left: 0;
   right: 0;
   display: none;
-  flex-direction: column;
   z-index: 998;
-  background: transparent;
+  /* Filled with the same tone as the bar itself so the safe-area spacer
+     below reads as part of the bar instead of a gap back to the page
+     background. The curved top edge is still transparent above the arc
+     because the fill only starts where the SVG (inside .mobile-nav-bar)
+     paints it - this rule only affects the flat strip beneath it. */
+  background: var(--bg-surface);
+  /* Pure spacer for the home indicator - kept outside .mobile-nav-bar so it
+     never stretches the SVG curves (see below). */
   padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Fixed-shape bar: SVG curves + icon row + active label. Its own height is
+   just the intrinsic content height, so the safe-area spacer above can't
+   stretch the SVG and drag the active-tab arc away from the label text. */
+.mobile-nav-bar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* SVG body + curved lines, stretched to fill the bar. */
@@ -158,6 +173,7 @@
 @media (max-width: 768px) {
   .mobile-bottom-nav {
     display: flex;
+    flex-direction: column;
   }
 
   /* Content bottom padding so the fixed bar never overlaps page content. */
