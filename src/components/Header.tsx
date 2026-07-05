@@ -14,7 +14,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <header class="fixed inset-x-0 top-0 z-1000 flex h-15 items-center justify-between border-b border-line bg-surface px-7.5 max-[576px]:px-4">
+    <header class="fixed inset-x-0 top-0 z-1000 flex h-[calc(60px+env(safe-area-inset-top,0px))] items-center justify-between border-b border-line bg-surface px-7.5 pt-[env(safe-area-inset-top,0px)] max-[576px]:px-4">
       <div class="flex items-center gap-2.5">
         <img
           src="/images/Logo Confidently Routine.svg"

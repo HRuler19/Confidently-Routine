@@ -14,7 +14,7 @@ export default function Sidebar(props: { onLogout: () => void }) {
   const location = useLocation();
 
   return (
-    <aside class="fixed bottom-0 left-0 top-15 z-999 flex w-62.5 flex-col overflow-y-auto border-r border-line bg-surface py-5 max-[768px]:hidden">
+    <aside class="fixed bottom-0 left-0 top-[calc(60px+env(safe-area-inset-top,0px))] z-999 flex w-62.5 flex-col overflow-y-auto border-r border-line bg-surface py-5 max-[768px]:hidden">
       <For each={NAV_ITEMS}>
         {(item) => (
           <A href={item.path} class="block no-underline">

@@ -7,11 +7,11 @@ import { A, useLocation } from "@solidjs/router";
 import { t } from "../lib/i18n";
 import { NAV_ITEMS } from "./Sidebar";
 
-// The center tab shows a shorter label on the curved bar.
+// Tab labels match the desktop sidebar (incl. "Daily tasks" for tab 3).
 const MOBILE_LABEL_KEYS = [
   "nav.dashboard",
   "nav.my_routine",
-  "nav.routine_short",
+  "nav.daily_tasks",
   "nav.notes",
   "nav.settings",
 ] as const;
@@ -22,6 +22,9 @@ export default function MobileNav() {
 
   return (
     <nav class="mobile-bottom-nav" data-active-index={activeIndex()}>
+      {/* Fixed-height inner bar so the safe-area spacer on the nav container
+          never stretches the SVG curves (iOS home-indicator inset). */}
+      <div class="mobile-nav-bar">
       <svg class="mobile-nav-bg" viewBox="0 0 100 92" preserveAspectRatio="none" aria-hidden="true">
         <path class="mobile-nav-bg-fill" d="M0,7 Q50,31 100,7 L100,92 L0,92 Z" />
         <path class="mobile-nav-bg-line" d="M0,7 Q50,31 100,7" />
@@ -52,6 +55,7 @@ export default function MobileNav() {
       </div>
       <div class="mobile-nav-active-label">
         {activeIndex() >= 0 ? t(MOBILE_LABEL_KEYS[activeIndex()]) : ""}
+      </div>
       </div>
     </nav>
   );

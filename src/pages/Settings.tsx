@@ -57,7 +57,7 @@ export default function Settings() {
   }
 
   return (
-    <section class="flex flex-col gap-5">
+    <section class="flex flex-col gap-5 max-[768px]:pb-5">
       {/* Edit profile */}
       <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
         <h2 class="mb-6 text-lg font-semibold text-primary">{t("settings.edit_profile_title")}</h2>

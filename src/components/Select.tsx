@@ -51,7 +51,9 @@ export default function Select(props: SelectProps) {
         />
       </button>
       <Show when={open()}>
-        <div class="absolute left-0 top-full z-50 mt-1 w-full min-w-max overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-lg shadow-(color:--shadow-color-strong)">
+        {/* z-1200: above the mobile bottom nav (998) and header (1000) so an
+            open list near the bottom of the screen is never covered. */}
+        <div class="absolute left-0 top-full z-1200 mt-1 w-full min-w-max overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-lg shadow-(color:--shadow-color-strong)">
           <For each={props.options}>
             {(opt) => (
               <div
