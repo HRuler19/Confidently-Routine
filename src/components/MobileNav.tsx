@@ -3,6 +3,7 @@
 // bespoke styling lives in styles/app.css (.mobile-nav-* rules) because
 // non-uniformly-stretched SVG strokes have no Tailwind-utility equivalent.
 import { For } from "solid-js";
+import { Dynamic } from "solid-js/web";
 import { A, useLocation } from "@solidjs/router";
 import { t } from "../lib/i18n";
 import { NAV_ITEMS } from "./Sidebar";
@@ -47,7 +48,7 @@ export default function MobileNav() {
               classList={{ active: activeIndex() === i() }}
               aria-label={t(MOBILE_LABEL_KEYS[i()])}
             >
-              <i class={item.icon} />
+              <Dynamic component={item.icon} size={22} class="mobile-nav-icon" />
               <span class="mobile-nav-item-label">{t(MOBILE_LABEL_KEYS[i()])}</span>
             </A>
           )}

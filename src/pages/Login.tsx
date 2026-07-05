@@ -2,6 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { saveUser } from "../lib/stores";
 import { t } from "../lib/i18n";
+import { Plus, User, Lock, Eye, EyeOff } from "lucide-solid";
 
 const AVATARS = [
   "/images/Boy image 1.svg",
@@ -104,7 +105,7 @@ export default function Login() {
               }}
               onClick={() => fileInput?.click()}
             >
-              <i class="fa-solid fa-plus text-xl text-accent-alt" />
+              <Plus size={20} class="text-accent-alt" />
             </div>
             <input ref={fileInput} type="file" accept="image/*" class="hidden" onChange={onUpload} />
           </div>
@@ -116,7 +117,7 @@ export default function Login() {
                 {t("login.username_label")}
               </label>
               <div class="relative w-full">
-                <i class="fa-solid fa-user absolute left-2.5 top-1/2 z-[1] -translate-y-1/2 text-base text-accent-alt" />
+                <User size={16} class="absolute left-2.5 top-1/2 z-[1] -translate-y-1/2 text-accent-alt" />
                 <input
                   type="text"
                   id="username"
@@ -137,7 +138,7 @@ export default function Login() {
               </label>
               <div class="flex h-10 w-full items-center rounded-[5px] border border-line-input bg-surface px-2.5 focus-within:border-accent">
                 <span class="mr-2.5 flex items-center justify-center text-base text-accent-alt">
-                  <i class="fa-solid fa-lock" />
+                  <Lock size={16} />
                 </span>
                 <input
                   type={showPassword() ? "text" : "password"}
@@ -153,7 +154,7 @@ export default function Login() {
                   aria-label={t("login.toggle_password")}
                   onClick={() => setShowPassword(!showPassword())}
                 >
-                  <i class={showPassword() ? "fa-regular fa-eye" : "fa-regular fa-eye-slash"} />
+                  {showPassword() ? <Eye size={14} /> : <EyeOff size={14} />}
                 </button>
               </div>
               <Show when={passwordError()}>

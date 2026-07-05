@@ -4,6 +4,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import MobileNav from "./MobileNav";
 import ConfirmModal from "./ConfirmModal";
+import { LogOut } from "lucide-solid";
 import { logout } from "../lib/stores";
 import { t } from "../lib/i18n";
 
@@ -22,7 +23,7 @@ export default function Layout(props: ParentProps) {
 
       <ConfirmModal
         open={showLogout()}
-        icon="fa-solid fa-arrow-right-from-bracket"
+        icon={LogOut}
         title={t("logout_modal.title")}
         body={<p>{t("logout_modal.body")}</p>}
         cancelText={t("common.cancel")}

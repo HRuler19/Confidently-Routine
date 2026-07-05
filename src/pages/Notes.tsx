@@ -6,15 +6,13 @@ import { notes, addNote, updateNote, deleteNote, type Note } from "../lib/stores
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
+import { todayStr } from "../lib/dates";
+import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
 
 const NOTE_CATEGORIES = ["study", "work", "personal", "learning"] as const;
 
 function noteCategoryOptions() {
   return NOTE_CATEGORIES.map((c) => ({ value: c, label: () => t(`notes.category_${c}`) }));
-}
-
-function todayStr() {
-  return new Date().toISOString().split("T")[0];
 }
 
 /** Inline edit form for a note card. */
@@ -53,7 +51,7 @@ function NoteEditForm(props: {
             props.onSave({ content: text, category: category(), date: date() });
           }}
         >
-          <i class="fa-solid fa-check mr-1.5" />
+          <Check size={15} class="mr-1.5 inline-block align-[-2px]" />
           {t("common.save")}
         </button>
         <button
@@ -61,7 +59,7 @@ function NoteEditForm(props: {
           class="cursor-pointer rounded-lg border border-line bg-surface px-5 py-2.5 text-sm font-medium text-secondary transition-colors hover:bg-hover"
           onClick={props.onCancel}
         >
-          <i class="fa-solid fa-xmark mr-1.5" />
+          <X size={15} class="mr-1.5 inline-block align-[-2px]" />
           {t("common.cancel")}
         </button>
       </div>
@@ -123,7 +121,7 @@ export default function Notes() {
               class="h-11 cursor-pointer rounded-lg bg-accent px-6 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
               onClick={submitNewNote}
             >
-              <i class="fa-solid fa-plus mr-2" />
+              <Plus size={16} class="mr-2 inline-block align-[-3px]" />
               {t("notes.add_button")}
             </button>
             <div class="flex flex-col gap-1.5">
@@ -200,7 +198,7 @@ export default function Notes() {
                             {t(`notes.category_${note.category}`)}
                           </span>
                           <span class="flex items-center gap-1.5 text-sm text-tertiary">
-                            <i class="fa-regular fa-calendar" />
+                            <Calendar size={14} />
                             {note.date}
                           </span>
                         </div>
@@ -212,7 +210,7 @@ export default function Notes() {
                           class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm text-secondary transition-colors hover:border-accent hover:text-accent max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setEditingId(note.id)}
                         >
-                          <i class="fa-solid fa-pen" />
+                          <Pencil size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.edit")}</span>
                         </button>
                         <button
@@ -221,7 +219,7 @@ export default function Notes() {
                           class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger/40 bg-surface px-3 text-sm text-danger transition-colors hover:border-danger hover:bg-danger/10 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setPendingDelete(note)}
                         >
-                          <i class="fa-solid fa-trash" />
+                          <Trash2 size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.delete")}</span>
                         </button>
                       </div>
@@ -245,7 +243,7 @@ export default function Notes() {
 
       <ConfirmModal
         open={pendingDelete() !== null}
-        icon="fa-solid fa-trash-can"
+        icon={Trash2}
         title={t("notes.delete_modal_title")}
         body={
           <>

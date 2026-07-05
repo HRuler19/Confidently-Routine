@@ -12,6 +12,8 @@ import {
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
+import { todayStr, formatDisplayDate } from "../lib/dates";
+import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
 
 const CATEGORY_VALUES = ["personal", "work", "shopping", "other"] as const;
 const PRIORITY_VALUES = ["low", "medium", "high", "hard"] as const;
@@ -22,25 +24,6 @@ function categoryOptions() {
 
 function priorityOptions() {
   return PRIORITY_VALUES.map((p) => ({ value: p, label: () => t(`routines.priority_${p}`) }));
-}
-
-function todayStr() {
-  return new Date().toISOString().split("T")[0];
-}
-
-function formatDisplayDate(dateStr: string): string {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const dueDate = new Date(dateStr);
-  dueDate.setHours(0, 0, 0, 0);
-  const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / 86_400_000);
-
-  if (diffDays === 0) return t("routines.date_today");
-  if (diffDays === 1) return t("routines.date_tomorrow");
-  if (diffDays === -1) return t("routines.date_yesterday");
-  if (diffDays < -1) return t("routines.date_days_ago", { n: Math.abs(diffDays) });
-  if (diffDays > 1) return t("routines.date_in_days", { n: diffDays });
-  return dateStr.split("-").reverse().join("/");
 }
 
 /** Inline edit form shown in place of a task row. */
@@ -101,7 +84,7 @@ function TaskEditForm(props: {
             });
           }}
         >
-          <i class="fa-solid fa-check mr-1.5" />
+          <Check size={15} class="mr-1.5 inline-block align-[-2px]" />
           {t("common.save")}
         </button>
         <button
@@ -109,7 +92,7 @@ function TaskEditForm(props: {
           class="cursor-pointer rounded-lg border border-line bg-surface px-5 py-2.5 text-sm font-medium text-secondary transition-colors hover:bg-hover"
           onClick={props.onCancel}
         >
-          <i class="fa-solid fa-xmark mr-1.5" />
+          <X size={15} class="mr-1.5 inline-block align-[-2px]" />
           {t("common.cancel")}
         </button>
       </div>
@@ -180,7 +163,7 @@ export default function Tasks() {
             class="h-11 cursor-pointer rounded-lg bg-accent px-6 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             onClick={submitNewTask}
           >
-            <i class="fa-solid fa-plus mr-2" />
+            <Plus size={16} class="mr-2 inline-block align-[-3px]" />
             {t("routines.add_button")}
           </button>
         </div>
@@ -315,7 +298,7 @@ export default function Tasks() {
                           {t(`routines.priority_${task.priority}`)}
                         </span>
                         <span class="flex items-center gap-1.5 text-sm text-tertiary">
-                          <i class="fa-regular fa-calendar" />
+                          <Calendar size={14} />
                           {formatDisplayDate(task.dueDate)}
                         </span>
                       </div>
@@ -326,7 +309,7 @@ export default function Tasks() {
                           class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm text-secondary transition-colors hover:border-accent hover:text-accent max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setEditingId(task.id)}
                         >
-                          <i class="fa-solid fa-pen" />
+                          <Pencil size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.edit")}</span>
                         </button>
                         <button
@@ -334,7 +317,7 @@ export default function Tasks() {
                           class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger/40 bg-surface px-3 text-sm text-danger transition-colors hover:border-danger hover:bg-danger/10 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setPendingDelete(task)}
                         >
-                          <i class="fa-solid fa-trash-can" />
+                          <Trash2 size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.delete")}</span>
                         </button>
                       </div>
@@ -358,7 +341,7 @@ export default function Tasks() {
 
       <ConfirmModal
         open={pendingDelete() !== null}
-        icon="fa-solid fa-trash-can"
+        icon={Trash2}
         title={t("routines.delete_modal_title")}
         body={
           <>

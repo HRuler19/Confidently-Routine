@@ -1,0 +1,113 @@
+// End-to-end smoke: the core user journey through every page.
+import { test, expect, type Page } from "@playwright/test";
+
+async function login(page: Page, username = "E2E User") {
+  await page.goto("/login");
+  await page.fill("#username", username);
+  await page.fill("#password", "secret123");
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL(/\/$/);
+}
+
+test("login validates and reaches the dashboard", async ({ page }) => {
+  await page.goto("/login");
+  // short password should be rejected
+  await page.fill("#username", "E2E User");
+  await page.fill("#password", "123");
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL(/\/login/);
+
+  await page.fill("#password", "secret123");
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator("header")).toContainText("E2E User");
+});
+
+test("task lifecycle: add, complete, filter, delete", async ({ page }) => {
+  await login(page);
+  await page.goto("/routines");
+
+  await page.fill('input[placeholder="Add new task"]', "Buy groceries");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Buy groceries")).toBeVisible();
+
+  // complete it
+  await page.locator(".task-check").first().check();
+
+  // filter to Active -> task disappears
+  await page.getByRole("combobox").filter({ hasText: "All Tasks" }).click();
+  await page.getByRole("option", { name: "Active" }).click();
+  await expect(page.getByText("Buy groceries")).toHaveCount(0);
+
+  // back to All -> delete via modal
+  await page.getByRole("combobox").filter({ hasText: "Active" }).first().click();
+  await page.getByRole("option", { name: "All Tasks" }).click();
+  await page.locator("button:has(svg.lucide-trash-2)").first().click();
+  await page.getByRole("button", { name: /Yes, delete/i }).click();
+  await expect(page.getByText("Buy groceries")).toHaveCount(0);
+});
+
+test("notes: add and edit", async ({ page }) => {
+  await login(page);
+  await page.goto("/notes");
+
+  await page.fill("textarea", "First e2e note");
+  await page.locator("section button", { hasText: "Add Note" }).click();
+  await expect(page.getByText("First e2e note")).toBeVisible();
+
+  await page.locator("button:has(svg.lucide-pencil)").first().click();
+  await page.locator("textarea").last().fill("Edited e2e note");
+  await page.getByRole("button", { name: /Save/i }).click();
+  await expect(page.getByText("Edited e2e note")).toBeVisible();
+});
+
+test("habits: add habit and log an entry", async ({ page }) => {
+  await login(page);
+  await page.goto("/my-routine");
+
+  await page.fill('input[placeholder="Add new habit"]', "Stretch");
+  await page.keyboard.press("Enter");
+  await expect(page.locator("th", { hasText: "Stretch" })).toBeVisible();
+
+  // open the day-1 cell, mark done
+  await page.locator("tbody td").nth(1).click();
+  const modal = page.locator("div.fixed");
+  await modal.locator("button:has(svg.lucide-plus)").first().click();
+  await modal.getByRole("button", { name: /Save/i }).click();
+  await expect(page.locator("tbody td svg.lucide-plus").first()).toBeVisible();
+});
+
+test("dashboard renders analytics and settings switches theme + language", async ({ page }) => {
+  await login(page);
+
+  // seed one task so the dashboard has data
+  await page.goto("/routines");
+  await page.fill('input[placeholder="Add new task"]', "Dashboard seed");
+  await page.keyboard.press("Enter");
+
+  await page.goto("/");
+  await expect(page.getByText("Daily Tasks Overview")).toBeVisible();
+  await expect(page.locator("svg circle").first()).toBeVisible(); // completion ring
+
+  // settings: dark theme
+  await page.goto("/settings");
+  await page.getByRole("combobox").filter({ hasText: "Light mode" }).click();
+  await page.getByRole("option", { name: "Dark mode" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+  // settings: switch language to Turkish and back
+  await page.getByRole("combobox").filter({ hasText: "English" }).click();
+  await page.getByRole("option", { name: "Türkçe" }).click();
+  await expect(page.locator("aside")).not.toContainText("Settings");
+});
+
+test("logout returns to login and guards routes", async ({ page }) => {
+  await login(page);
+  await page.locator("aside a", { hasText: /Logout/i }).click();
+  await page.getByRole("button", { name: /Yes, log out/i }).click();
+  await expect(page).toHaveURL(/\/login/);
+
+  // guarded route bounces back to login
+  await page.goto("/notes");
+  await expect(page).toHaveURL(/\/login/);
+});

@@ -1,10 +1,12 @@
 // Shared confirmation modal — same design as the vanilla app's modal.css:
 // blurred backdrop, rounded card, tinted round icon, cancel/confirm row.
-import { Show, type JSX } from "solid-js";
+import { Show, type Component, type JSX } from "solid-js";
+import { Dynamic } from "solid-js/web";
+import type { LucideProps } from "lucide-solid";
 
 interface ConfirmModalProps {
   open: boolean;
-  icon: string; // Font Awesome classes, e.g. "fa-solid fa-trash"
+  icon: Component<LucideProps>; // Lucide icon component, e.g. Trash2
   title: string;
   body: JSX.Element;
   cancelText: string;
@@ -24,7 +26,7 @@ export default function ConfirmModal(props: ConfirmModalProps) {
       >
         <div class="w-[90%] max-w-90 animate-[modalFadeIn_0.3s_ease] rounded-3xl bg-surface p-6 pt-8 text-center shadow-2xl shadow-(color:--shadow-color-strong)">
           <div class="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-linear-135 from-danger/14 to-danger/24">
-            <i class={`${props.icon} text-[28px] text-danger`} />
+            <Dynamic component={props.icon} size={28} class="text-danger" />
           </div>
           <h2 class="mb-2 text-xl font-semibold text-primary">{props.title}</h2>
           <div class="text-sm leading-relaxed text-tertiary">{props.body}</div>

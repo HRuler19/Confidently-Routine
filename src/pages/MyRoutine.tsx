@@ -20,6 +20,7 @@ import {
 import { t, calendarNames } from "../lib/i18n";
 import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
+import { Plus, Check, X, Pencil, Eraser, Trash2 } from "lucide-solid";
 
 const YEARS = ["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"];
 
@@ -214,7 +215,7 @@ export default function MyRoutine() {
             class="h-11 cursor-pointer rounded-lg bg-accent px-6 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             onClick={submitNewHabit}
           >
-            <i class="fa-solid fa-plus mr-2" />
+            <Plus size={16} class="mr-2 inline-block align-[-3px]" />
             {t("myroutine.add_habit_button")}
           </button>
         </div>
@@ -246,7 +247,7 @@ export default function MyRoutine() {
                               class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-accent"
                               onClick={() => setRenamingId(habit.id)}
                             >
-                              <i class="fa-solid fa-pen" />
+                              <Pencil size={13} />
                             </button>
                             <button
                               type="button"
@@ -254,7 +255,7 @@ export default function MyRoutine() {
                               class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-danger"
                               onClick={() => setPendingDelete(habit)}
                             >
-                              <i class="fa-solid fa-xmark" />
+                              <X size={18} />
                             </button>
                           </div>
                         }
@@ -299,13 +300,11 @@ export default function MyRoutine() {
                               <Show
                                 when={e().type === "count"}
                                 fallback={
-                                  <i
-                                    class={
-                                      e().type === "plus"
-                                        ? "fa-solid fa-plus text-[15px] text-accent"
-                                        : "fa-solid fa-xmark text-[15px] text-danger"
-                                    }
-                                  />
+                                  e().type === "plus" ? (
+                                    <Plus size={16} class="inline-block text-accent" />
+                                  ) : (
+                                    <X size={16} class="inline-block text-danger" />
+                                  )
                                 }
                               >
                                 <span class="text-info">
@@ -467,7 +466,7 @@ export default function MyRoutine() {
                     if (!active) setCount("");
                   }}
                 >
-                  <i class="fa-solid fa-plus" />
+                  <Plus size={18} />
                 </button>
                 <button
                   type="button"
@@ -482,7 +481,7 @@ export default function MyRoutine() {
                     if (!active) setCount("");
                   }}
                 >
-                  <i class="fa-solid fa-xmark" />
+                  <X size={18} />
                 </button>
               </div>
 
@@ -512,7 +511,7 @@ export default function MyRoutine() {
                   setEntryCtx(null);
                 }}
               >
-                <i class="fa-solid fa-eraser mr-1.5" />
+                <Eraser size={14} class="mr-1.5 inline-block align-[-2px]" />
                 {t("myroutine.clear_entry")}
               </button>
 
@@ -522,7 +521,7 @@ export default function MyRoutine() {
                   class="flex-1 cursor-pointer rounded-xl bg-hover px-4 py-3 text-sm font-medium text-secondary transition-colors hover:bg-line"
                   onClick={() => setEntryCtx(null)}
                 >
-                  <i class="fa-solid fa-xmark mr-1.5" />
+                  <X size={15} class="mr-1.5 inline-block align-[-2px]" />
                   {t("common.cancel")}
                 </button>
                 <button
@@ -530,7 +529,7 @@ export default function MyRoutine() {
                   class="flex-1 cursor-pointer rounded-xl bg-accent px-4 py-3 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover"
                   onClick={saveEntry}
                 >
-                  <i class="fa-solid fa-check mr-1.5" />
+                  <Check size={15} class="mr-1.5 inline-block align-[-2px]" />
                   {t("common.save")}
                 </button>
               </div>
@@ -542,7 +541,7 @@ export default function MyRoutine() {
       {/* Delete habit modal */}
       <ConfirmModal
         open={pendingDelete() !== null}
-        icon="fa-solid fa-trash-can"
+        icon={Trash2}
         title={t("myroutine.delete_habit_title")}
         body={
           <>

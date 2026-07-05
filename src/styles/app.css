@@ -1,3 +1,6 @@
+/* DM Sans bundled locally (variable font) so desktop/mobile builds render
+   correctly offline - no Google Fonts request at runtime. */
+@import "@fontsource-variable/dm-sans";
 @import "tailwindcss";
 
 /* Dark mode is driven by the persisted data-theme attribute (set before
@@ -125,7 +128,7 @@
 }
 
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans Variable", "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -315,8 +318,7 @@ input[type="password"] {
   transform: translateY(12px);
 }
 
-.mobile-nav-item i {
-  font-size: 22px;
+.mobile-nav-item .mobile-nav-icon {
   color: var(--text-tertiary);
   transition:
     color 0.2s ease,
@@ -338,11 +340,11 @@ input[type="password"] {
 }
 
 .mobile-nav-item.active,
-.mobile-nav-item.active i {
+.mobile-nav-item.active .mobile-nav-icon {
   color: var(--accent-green);
 }
 
-.mobile-nav-item.active i {
+.mobile-nav-item.active .mobile-nav-icon {
   transform: translateY(-2px) scale(1.06);
 }
 
@@ -366,7 +368,8 @@ input[type="password"] {
 }
 
 @media (max-width: 360px) {
-  .mobile-nav-item i {
-    font-size: 20px;
+  .mobile-nav-item .mobile-nav-icon {
+    width: 20px;
+    height: 20px;
   }
 }

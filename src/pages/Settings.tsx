@@ -6,6 +6,7 @@ import { user, updateUser } from "../lib/stores";
 import { t, language, setLanguage, type Language } from "../lib/i18n";
 import { theme, setTheme, type Theme } from "../lib/theme";
 import Select from "../components/Select";
+import { Plus, Check } from "lucide-solid";
 
 const AVATARS = [
   "/images/Boy image 1.svg",
@@ -103,7 +104,7 @@ export default function Settings() {
                 class="flex size-13 cursor-pointer items-center justify-center rounded-full border-2 border-dashed border-line text-accent transition-all hover:scale-105 hover:border-accent"
                 onClick={() => fileInput?.click()}
               >
-                <i class="fa-solid fa-plus" />
+                <Plus size={18} />
               </div>
               <input
                 ref={fileInput}
@@ -172,7 +173,7 @@ export default function Settings() {
               }}
               onClick={save}
             >
-              <i class="fa-solid fa-check mr-2" />
+              <Check size={16} class="mr-2 inline-block align-[-3px]" />
               <Show when={justSaved()} fallback={t("common.save")}>
                 {t("settings.save_success")}
               </Show>
