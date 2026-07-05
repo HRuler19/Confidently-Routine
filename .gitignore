@@ -19,3 +19,6 @@ release/
 # OS/editor cruft
 .DS_Store
 Thumbs.db
+
+# Android release signing (machine-local secret - never commit)
+src-tauri/gen/android/keystore.properties
