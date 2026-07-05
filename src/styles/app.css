@@ -1,0 +1,345 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by the persisted data-theme attribute (set before
+   first paint by the inline script in index.html), not the OS setting —
+   same behavior as the original app. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── Semantic design tokens ─────────────────────────────────────────────
+   Ported verbatim from the old assets/css/base/theme.css so the rewrite
+   is pixel-faithful: light values on :root, Spotify-style near-black
+   palette under [data-theme="dark"]. */
+:root {
+  --bg-page: #ffffff;
+  --bg-page-alt: #f5f5f5;
+  --bg-surface: #ffffff;
+  --bg-surface-subtle: #fbfbfb;
+  --bg-surface-alt: #f9fafb;
+  --bg-hover: #f3f3f3;
+  --border-color: #e5e7eb;
+  --border-color-input: #d1d5db;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-secondary-alt: #374151;
+  --text-tertiary: #6b7280;
+  --text-muted: #9ca3af;
+  --text-header: #5d5d5d;
+  --text-placeholder: #b4b4b4;
+  --accent-green: #0e5e0a;
+  --accent-green-hover: #0a4707;
+  --accent-green-alt: #3c8116;
+  --accent-fill-text: #ffffff;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --accent-blue: #0066ff;
+  --accent-amber: #f59e0b;
+  --accent-purple: #7c3aed;
+  --accent-pink: #db2777;
+  --shadow-color: rgba(0, 0, 0, 0.05);
+  --shadow-color-strong: rgba(0, 0, 0, 0.1);
+  /* Task category / priority / stat-dot colors (light) */
+  --cat-personal: #35a800;
+  --cat-work: #0066ff;
+  --cat-shopping: #ff1f50;
+  --cat-other: #999999;
+  --prio-low: #10b981;
+  --prio-medium: #f59e0b;
+  --prio-high: #ef4444;
+  --prio-hard: #7f1d1d;
+  --stat-total: #3373d3;
+  --stat-completed: #35a800;
+  --stat-active: #d90505;
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #121212;
+  --bg-page-alt: #000000;
+  --bg-surface: #181818;
+  --bg-surface-subtle: #1a1a1a;
+  --bg-surface-alt: #202020;
+  --bg-hover: #282828;
+  --border-color: #2a2a2a;
+  --border-color-input: #3e3e3e;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-secondary-alt: #cccccc;
+  --text-tertiary: #a7a7a7;
+  --text-muted: #6a6a6a;
+  --text-header: #b3b3b3;
+  --text-placeholder: #6a6a6a;
+  --accent-green: #2d9b27;
+  --accent-green-hover: #237a1f;
+  --accent-green-alt: #38c431;
+  --accent-fill-text: #121212;
+  --danger: #f87171;
+  --danger-hover: #dc2626;
+  --accent-blue: #58a6ff;
+  --accent-amber: #d29922;
+  --accent-purple: #a371f7;
+  --accent-pink: #f778ba;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-color-strong: rgba(0, 0, 0, 0.6);
+  /* Task category / priority / stat-dot colors, tuned for dark surfaces */
+  --cat-personal: #2d9b27;
+  --cat-work: #58a6ff;
+  --cat-shopping: #f778ba;
+  --cat-other: #a7a7a7;
+  --prio-low: #2d9b27;
+  --prio-medium: #d29922;
+  --prio-high: #f87171;
+  --prio-hard: #dc2626;
+  --stat-total: #58a6ff;
+  --stat-completed: #2d9b27;
+  --stat-active: #f87171;
+}
+
+/* Expose the tokens to Tailwind as utility colors (bg-surface, text-primary,
+   border-line, text-accent, …). `inline` keeps them pointing at the runtime
+   CSS variables above so utilities flip automatically with the theme. */
+@theme inline {
+  --color-page: var(--bg-page);
+  --color-page-alt: var(--bg-page-alt);
+  --color-surface: var(--bg-surface);
+  --color-surface-subtle: var(--bg-surface-subtle);
+  --color-surface-alt: var(--bg-surface-alt);
+  --color-hover: var(--bg-hover);
+  --color-line: var(--border-color);
+  --color-line-input: var(--border-color-input);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-secondary-alt: var(--text-secondary-alt);
+  --color-tertiary: var(--text-tertiary);
+  --color-muted: var(--text-muted);
+  --color-header: var(--text-header);
+  --color-placeholder: var(--text-placeholder);
+  --color-accent: var(--accent-green);
+  --color-accent-hover: var(--accent-green-hover);
+  --color-accent-alt: var(--accent-green-alt);
+  --color-accent-fill-text: var(--accent-fill-text);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-info: var(--accent-blue);
+  --color-warn: var(--accent-amber);
+  --color-violet: var(--accent-purple);
+  --color-rose: var(--accent-pink);
+}
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-page-alt font-sans text-primary antialiased;
+}
+
+/* Native date inputs: keep the picker icon legible in dark mode */
+:root[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Round-rect brand checkbox (ported from the old .task-checkbox styles). */
+.task-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border: 2px solid var(--border-color-input);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.task-check:hover,
+.task-check:focus-visible {
+  border-color: var(--accent-green);
+}
+
+.task-check:checked {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+.task-check:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--accent-fill-text);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Curved mobile bottom navigation ────────────────────────────────────
+   Ported verbatim from the vanilla app's mobile-nav.css. An inline SVG
+   paints the bar body with a concave (valley) top edge and two parallel
+   curved lines; the icon row, active glow arc and centred label all ride
+   the same parabola. Bespoke CSS because non-uniformly-stretched SVG
+   strokes and per-icon parabola offsets have no utility equivalent. */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 998;
+  background: transparent;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.mobile-nav-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  filter: drop-shadow(0 -3px 12px var(--shadow-color));
+}
+
+.mobile-nav-bg-fill {
+  fill: var(--bg-surface);
+}
+
+.mobile-nav-bg-line {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 1;
+  /* keep the stroke a hairline despite the non-uniform SVG stretch */
+  vector-effect: non-scaling-stroke;
+}
+
+:root[data-theme="dark"] .mobile-nav-bg-line {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+/* Active-tab indicator: a short, glowing green arc riding exactly on the
+   hairline curve (seg-0..seg-4 are exact segments of that curve, one per
+   tab); only the segment matching data-active-index is lit. */
+.mobile-nav-bg-active {
+  fill: none;
+  stroke: var(--accent-green);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px var(--accent-green))
+    drop-shadow(0 0 8px var(--accent-green));
+  transition: opacity 0.25s ease;
+}
+
+.mobile-bottom-nav[data-active-index="0"] .seg-0,
+.mobile-bottom-nav[data-active-index="1"] .seg-1,
+.mobile-bottom-nav[data-active-index="2"] .seg-2,
+.mobile-bottom-nav[data-active-index="3"] .seg-3,
+.mobile-bottom-nav[data-active-index="4"] .seg-4 {
+  opacity: 1;
+}
+
+.mobile-nav-items {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 82px;
+}
+
+.mobile-nav-item {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text-tertiary);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Offsets follow the same parabola as the SVG curves (sides raised,
+   centre lowest), so the five icons trace the arc. */
+.mobile-nav-item:nth-child(1),
+.mobile-nav-item:nth-child(5) {
+  transform: translateY(4px);
+}
+
+.mobile-nav-item:nth-child(2),
+.mobile-nav-item:nth-child(4) {
+  transform: translateY(10px);
+}
+
+.mobile-nav-item:nth-child(3) {
+  transform: translateY(12px);
+}
+
+.mobile-nav-item i {
+  font-size: 22px;
+  color: var(--text-tertiary);
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* The per-item label is only an accessible name + data source for the
+   centred active label; visually hidden. */
+.mobile-nav-item-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.mobile-nav-item.active,
+.mobile-nav-item.active i {
+  color: var(--accent-green);
+}
+
+.mobile-nav-item.active i {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.mobile-nav-active-label {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--text-secondary);
+  padding: 12px 0 12px;
+  min-height: 20px;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobile-nav-item i {
+    font-size: 20px;
+  }
+}

@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Confidently Routine</string>
-    <string name="title_activity_main">Confidently Routine</string>
-    <string name="package_name">com.millihasap.confidentlyroutine</string>
-    <string name="custom_url_scheme">com.millihasap.confidentlyroutine</string>
-</resources>

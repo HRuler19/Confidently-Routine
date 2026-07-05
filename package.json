@@ -1,94 +1,30 @@
 {
   "name": "confidently-routine",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Confidently Routine - habit, task and notes tracker",
-  "main": "main.js",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "build:js": "rollup -c",
-    "start": "electron .",
-    "dist:win": "electron-builder --win",
-    "dist:mac": "electron-builder --mac",
-    "sync:android": "node scripts/copy-www.js && npx cap sync android",
-    "dist:android": "npm run sync:android && cd android && gradlew.bat assembleDebug",
-    "sync:ios": "node scripts/copy-www.js && npx cap sync ios"
-  },
-  "devDependencies": {
-    "@babel/core": "^8.0.1",
-    "@babel/preset-env": "^8.0.2",
-    "@capacitor/assets": "^3.0.5",
-    "@rollup/plugin-babel": "^7.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "electron": "^31.7.7",
-    "electron-builder": "^24.13.3",
-    "rollup": "^4.62.2",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-terser": "^7.0.2"
-  },
-  "build": {
-    "appId": "com.millihasap.confidentlyroutine",
-    "productName": "Confidently Routine",
-    "afterSign": "build/afterSignAdhoc.js",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "main.js",
-      "index.html",
-      "assets/**/*",
-      "views/**/*",
-      "dist/**/*",
-      "!assets/**/*.map"
-    ],
-    "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        },
-        {
-          "target": "portable",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "build/icon.png"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    },
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "icon": "build/icon.png",
-      "category": "public.app-category.productivity",
-      "gatekeeperAssess": false
-    }
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "tauri": "tauri",
+    "dist:win": "tauri build",
+    "dist:mac": "tauri build",
+    "dist:android": "tauri android build --apk"
   },
   "dependencies": {
-    "@capacitor/android": "^8.4.1",
-    "@capacitor/cli": "^8.4.1",
-    "@capacitor/core": "^8.4.1",
-    "@capacitor/ios": "^8.4.1"
+    "@solidjs/router": "^0.16.1",
+    "@tauri-apps/api": "^2.11.1",
+    "solid-js": "^1.9.14"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
+    "@tauri-apps/cli": "^2.11.4",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.3",
+    "vite-plugin-solid": "^2.11.12"
   }
 }

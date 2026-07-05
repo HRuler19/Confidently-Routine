@@ -6,13 +6,15 @@
 
 ### Build habits. Track tasks. Capture ideas. Everywhere.
 
-A privacy-first productivity suite for habits, daily tasks, and notes — engineered in **vanilla JavaScript** and packaged as a native app for **Windows, macOS, Android, and iOS**, while still running as a plain web page in any browser.
+A privacy-first productivity suite for habits, daily tasks, and notes — built with **SolidJS + Tailwind CSS v4** and packaged with **Tauri v2 (Rust)** as a native app for **Windows, macOS, Android, and iOS**, while still running as a plain web page in any browser.
 
 <br />
 
 [![Version](https://img.shields.io/badge/version-1.0.0-0e5e0a?style=for-the-badge)](https://github.com/HRuler19/Confidently-Routine/releases/latest)
 [![Platforms](https://img.shields.io/badge/platforms-Windows_·_macOS_·_Android_·_iOS_·_Web-3c8116?style=for-the-badge)](#-download--install)
-[![Made with Vanilla JS](https://img.shields.io/badge/made_with-Vanilla_JS-f7df1e?style=for-the-badge&logo=javascript&logoColor=black)](#-tech-stack)
+[![SolidJS](https://img.shields.io/badge/SolidJS-2C4F7C?style=for-the-badge&logo=solid&logoColor=white)](#-tech-stack)
+[![Tauri v2](https://img.shields.io/badge/Tauri_v2-24C8D8?style=for-the-badge&logo=tauri&logoColor=white)](#-tech-stack)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)](#-tech-stack)
 [![License](https://img.shields.io/badge/license-MIT-6b7280?style=for-the-badge)](#-license)
 
 <br />
@@ -33,7 +35,7 @@ A privacy-first productivity suite for habits, daily tasks, and notes — engine
 
 ## 📖 Overview
 
-**Confidently Routine** is a self-contained personal-productivity application that unifies three everyday tools — a **habit tracker**, a **daily task manager**, and a **notes board** — behind a single analytics **dashboard**. It is built with zero front-end frameworks, stores all data locally on the device, and ships to every major platform from a single shared codebase.
+**Confidently Routine** is a self-contained personal-productivity application that unifies three everyday tools — a **habit tracker**, a **daily task manager**, and a **notes board** — behind a single analytics **dashboard**. It is built on SolidJS's fine-grained reactivity with a Rust-powered Tauri shell, stores all data locally on the device, and ships to every major platform from a single shared codebase — with a desktop installer around **5 MB**.
 
 | | |
 |---|---|
@@ -84,7 +86,7 @@ A privacy-first productivity suite for habits, daily tasks, and notes — engine
 | **macOS (Apple Silicon)** | `Confidently-Routine-1.0.0-arm64.dmg` | Open the `.dmg`, drag the app into **Applications**. For M1/M2/M3/M4 Macs. |
 | **macOS (Intel)** | `Confidently-Routine-1.0.0-x64.dmg` | Same as above, for Intel-based Macs. |
 | **iOS** | — | Apple doesn't allow installing an unsigned `.ipa` on a device without a paid Developer Program account, so there's no direct download yet. Build and run it yourself from Xcode — see [Building from source](#-building-from-source). |
-| **Browser** | — | Serve the repo folder with any static server (e.g. `python -m http.server`) and open `index.html`. |
+| **Browser** | — | `bun install && bun run build`, then host the generated `dist/` folder on any static server. |
 
 > ℹ️ **Windows SmartScreen / Android Play Protect / macOS Gatekeeper** may warn that the app is unsigned — the binaries are not yet code-signed with a paid certificate. Choose **More info → Run anyway** (Windows), **Install anyway** (Android), or **right-click → Open** (macOS) to proceed.
 
@@ -176,46 +178,46 @@ A privacy-first productivity suite for habits, daily tasks, and notes — engine
 
 | Layer | Technology | Notes |
 |---|---|---|
-| **Language** | JavaScript (ES6+), HTML5, CSS3 | No front-end framework — deliberate architectural choice. |
-| **Charts** | Custom SVG renderer (`assets/js/utils/charts.js`) | Dependency-free, responsive, theme-aware. |
-| **Date picker** | [flatpickr](https://flatpickr.js.org/) | Localized to the active UI language. |
-| **Icons / Fonts** | Font Awesome 7, DM Sans | Loaded via CDN in the browser build. |
-| **Persistence** | `localStorage` | Versioned schema; storage layer abstracted for future migration. |
-| **Bundling** | [Rollup](https://rollupjs.org/) + Babel + Terser | Bundles the core module graph into `dist/js/bundle.js`. |
-| **Desktop shell** | [Electron](https://www.electronjs.org/) + [electron-builder](https://www.electron.build/) | Wraps the web app; a tiny embedded HTTP server serves it locally. |
-| **Mobile shell** | [Capacitor](https://capacitorjs.com/) | Native Android & iOS wrappers around the same web assets. |
+| **UI framework** | [SolidJS](https://www.solidjs.com/) + [Solid Router](https://github.com/solidjs/solid-router) | Fine-grained reactivity — no virtual DOM, surgical updates. |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) | Design tokens exposed as utilities; light/dark themes flip via CSS variables. |
+| **Language** | TypeScript | Strict mode across the whole `src/` tree. |
+| **Runtime / PM** | [Bun](https://bun.sh/) | Package manager + script runner. |
+| **Bundling** | [Vite](https://vite.dev/) | Dev server + production build (~38 KB gzipped JS). |
+| **Charts** | Custom SVG components (`src/components/charts.tsx`) | Dependency-free, responsive, theme-aware. |
+| **Persistence** | `localStorage` | Reactive store layer (`src/lib/stores.ts`); v1 data keys are fully compatible. |
+| **Desktop shell** | [Tauri v2](https://v2.tauri.app/) (Rust) | Native WebView — the installer is **~5 MB** (vs ~80 MB with Electron). |
+| **Mobile shell** | [Tauri v2 Mobile](https://v2.tauri.app/) | Native Android & iOS wrappers around the same frontend. |
+| **Icons / Fonts** | Font Awesome 7, DM Sans | Loaded via CDN. |
 
 <br />
 
 ## 🏗 Architecture
 
-The application is organized into clean, single-responsibility layers with an event-bus bridge between feature modules.
+The application is organized into clean, single-responsibility layers driven by Solid's fine-grained reactivity — data signals flow from the store layer straight into components, so there is no event bus and no manual re-rendering.
 
 ```
 ┌─────────────────────────────────────┐
-│              UI Layer                │  DOM rendering & event capture
+│           Pages & Components         │  SolidJS + Solid Router (login guard, 5 pages)
 ├─────────────────────────────────────┤
-│          Application Layer           │  Auth · Routines · Dashboard · Notes · Settings
+│          Reactive Signals            │  i18n · theme · store signals (auto re-render)
 ├─────────────────────────────────────┤
-│              Event Bus               │  Cross-module communication bridge
+│             Data Layer               │  localStorage-backed reactive stores
 ├─────────────────────────────────────┤
-│             Data Layer               │  LocalStorage · versioned JSON schema
-├─────────────────────────────────────┤
-│         Visualization Layer          │  Dependency-free SVG charts
+│         Visualization Layer          │  Dependency-free SVG chart components
 └─────────────────────────────────────┘
 ```
 
-**How native packaging works:** the exact same `index.html` + `assets/` power every target. The app uses root-relative asset paths, so both shells serve those assets over a local origin:
+**How native packaging works:** one Vite-built frontend (`dist/`) powers every target. Tauri embeds it in the platform's native WebView with a Rust core — no bundled browser engine, which is why the binaries stay tiny:
 
 ```
                          ┌────────────────────────────┐
-   Shared web app  ──▶   │  index.html + assets/ +    │
-   (no per-platform code)│  views/ + dist/            │
+   Shared frontend  ──▶  │   SolidJS + Tailwind v4    │
+   (no per-platform code)│   Vite build → dist/       │
                          └──────────────┬─────────────┘
                     ┌───────────────────┼───────────────────┐
                     ▼                   ▼                   ▼
             ┌──────────────┐   ┌────────────────┐   ┌──────────────┐
-            │   Electron   │   │   Capacitor    │   │   Browser    │
+            │  Tauri v2    │   │ Tauri v2 Mobile│   │   Browser    │
             │ (Win / macOS)│   │ (Android / iOS)│   │  (any host)  │
             └──────────────┘   └────────────────┘   └──────────────┘
 ```
@@ -226,26 +228,26 @@ The application is organized into clean, single-responsibility layers with an ev
 
 ```
 Confidently-Routine/
-├─ index.html                 # App shell (loads all pages as SPA views)
-├─ main.js                    # Electron main process + embedded static server
-├─ capacitor.config.ts        # Capacitor (Android/iOS) configuration
-├─ rollup.config.js           # Bundler configuration
+├─ index.html                 # Vite entry (theme pre-paint script + fonts)
+├─ vite.config.ts             # Vite + Solid + Tailwind v4 plugins
+├─ tsconfig.json
 │
-├─ assets/
-│  ├─ css/                    # base · layouts · pages · components · themes
-│  ├─ js/
-│  │  ├─ modules/             # dashboard · my-routine · routines · notes · settings
-│  │  └─ utils/               # i18n · theme · charts · dom-helpers · translations · mobile-nav
-│  └─ images/                 # Logo & avatars
+├─ src/
+│  ├─ index.tsx               # App bootstrap
+│  ├─ App.tsx                 # Router + auth guard
+│  ├─ pages/                  # Login · Dashboard · MyRoutine · Tasks · Notes · Settings
+│  ├─ components/             # Layout · Header · Sidebar · MobileNav · Select · ConfirmModal · charts
+│  ├─ lib/                    # stores (reactive persistence) · i18n · theme · translations
+│  └─ styles/app.css          # Tailwind v4 theme tokens + bespoke curved-nav CSS
 │
-├─ views/                     # Per-page HTML fragments loaded into the shell
-├─ dist/                      # Rollup bundle output
+├─ src-tauri/                 # Tauri v2 (Rust) — desktop & mobile shells
+│  ├─ tauri.conf.json         # Window, bundle & identifier config
+│  ├─ src/                    # Rust entry points
+│  ├─ icons/                  # Generated app icons (all platforms)
+│  └─ gen/android/            # Generated Android (Gradle) project
 │
-├─ android/                   # Capacitor Android project (Gradle)
-├─ ios/                       # Capacitor iOS project (Xcode) — build on a Mac
-├─ build/                     # Desktop app icon
-├─ appicon-src/               # Source logo for mobile icon generation
-├─ scripts/                   # copy-www · 7za-wrapper · install-7za-wrapper
+├─ public/images/             # Logo & avatars
+├─ appicon-src/               # Source logo for icon generation
 └─ docs/                      # README assets (logo + screenshots)
 ```
 
@@ -254,51 +256,44 @@ Confidently-Routine/
 ## 🛠 Building from Source
 
 ### Prerequisites
-- **Node.js** 18+ and npm
+- **[Bun](https://bun.sh/)** (package manager & script runner)
+- **[Rust](https://rustup.rs/)** (stable) — required for the Tauri desktop/mobile shells
 - Platform-specific toolchains (see each section below)
 
 ### Setup
 ```bash
 git clone https://github.com/HRuler19/Confidently-Routine.git
 cd Confidently-Routine
-npm install --legacy-peer-deps
-npm run build:js          # bundle the core JS into dist/
+bun install
 ```
 
-### Run in a browser (no build)
+### Run in a browser (dev server)
 ```bash
-python -m http.server 8000
-# then open http://localhost:8000/index.html
+bun run dev               # Vite dev server at http://localhost:1420
 ```
 
-### Run the desktop app (dev)
+### Run the desktop app (dev, hot reload)
 ```bash
-npm start                 # launches the Electron shell
+bun run tauri dev
 ```
 
 ### Build targets
 
 | Target | Command | Requirements | Output |
 |---|---|---|---|
-| 🪟 **Windows** | `npm run dist:win` | Windows | `release/*.exe` (installer + portable) |
-| 🍎 **macOS** | `npm run dist:mac` | a Mac | `release/*.dmg`, `release/*.zip` (arm64 + x64) |
-| 🤖 **Android** | `npm run dist:android` | Android SDK + JDK 21 | `android/app/build/outputs/apk/…` |
-| 📱 **iOS** | `npm run sync:ios` → build in Xcode | a Mac with Xcode | Runs on the Simulator or a registered device |
+| 🪟 **Windows** | `bun run dist:win` | MSVC Build Tools + Windows SDK | `src-tauri/target/release/bundle/nsis/*.exe` (~5 MB) |
+| 🍎 **macOS** | `bun run dist:mac` | a Mac with Xcode CLT | `src-tauri/target/release/bundle/…` (`.dmg`/`.app`) |
+| 🤖 **Android** | `bun run dist:android` | Android SDK + NDK + JDK 21 | `src-tauri/gen/android/app/build/outputs/apk/…` |
+| 📱 **iOS** | `bun run tauri ios build` | a Mac with Xcode | `.ipa` via Xcode |
+| 🌐 **Browser** | `bun run build` | — | static `dist/` for any web host |
 
 <details>
 <summary><strong>🪟 Windows build notes</strong></summary>
 
 <br />
 
-`electron-builder` downloads a code-signing vendor package (`winCodeSign`) that bundles two macOS-only **symlinked** files. Extracting symlinks on Windows requires `SeCreateSymbolicLinkPrivilege`, which a normal (non-elevated) session lacks unless **Developer Mode** is on.
-
-To avoid needing elevation or Developer Mode, `node_modules/7zip-bin/win/x64/7za.exe` is replaced with a thin wrapper (source in [`scripts/7za-wrapper/main.go`](scripts/7za-wrapper/main.go)) that excludes the irrelevant `darwin/` folder during extraction. A fresh `npm install` restores the stock binary, so re-run:
-
-```bash
-node scripts/install-7za-wrapper.js   # requires Go (https://go.dev)
-```
-
-before `npm run dist:win`.
+- Requires the **Visual Studio Build Tools** C++ workload (MSVC + Windows SDK) for the Rust MSVC toolchain.
+- The NSIS installer is produced unsigned; SmartScreen will warn until a code-signing certificate is configured.
 </details>
 
 <details>
@@ -306,13 +301,14 @@ before `npm run dist:win`.
 
 <br />
 
-- Requires **JDK 21** (JDK 17 fails the `compileDebugJavaWithJavac` step with `invalid source release: 21`).
-- Requires the Android SDK packages: `platform-tools`, `platforms;android-34`, `build-tools;34.0.0`.
-- `android/local.properties` must set `sdk.dir` using **forward slashes** — backslash-escaped Windows paths fail SDK path validation with a cryptic *"filename, directory name, or volume label syntax is incorrect"* error.
+- Requires **JDK 21**, the Android SDK (`platform-tools`, `platforms;android-34`, `build-tools;34.0.0`) and the **NDK** (r27+), plus the Rust Android targets:
 
-```properties
-sdk.dir=C:/Users/you/AppData/Local/Android/Sdk
+```bash
+rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 ```
+
+- Set `JAVA_HOME`, `ANDROID_HOME` and `NDK_HOME` before building.
+- On Windows, Tauri links the built Rust library into the Gradle project via a **symlink**, which requires either **Developer Mode** or an elevated (administrator) terminal.
 </details>
 
 <details>
@@ -320,31 +316,28 @@ sdk.dir=C:/Users/you/AppData/Local/Android/Sdk
 
 <br />
 
-Apple's toolchain (Xcode, code signing, the simulator) **only runs on macOS** — this is an Apple platform restriction, not a limitation of this project. The `ios/` Capacitor project and its icons/splash screens are already generated and committed. The iOS project uses **Swift Package Manager**, not CocoaPods, so there's no `.xcworkspace` / `pod install` step — just open the `.xcodeproj` directly:
+Apple's toolchain (Xcode, code signing, the simulator) **only runs on macOS** — this is an Apple platform restriction, not a limitation of this project. On a Mac:
 
 ```bash
-npm install --legacy-peer-deps
-npm run sync:ios
-open ios/App/App.xcodeproj   # build, sign & run in Xcode
+bun install
+bun run tauri ios init    # generate the Xcode project (first time only)
+bun run tauri ios build   # or: bun run tauri ios dev
 ```
 
-In Xcode, under the **App** target's **Signing & Capabilities** tab, sign in with your Apple ID and pick it as the **Team** (a free personal account is enough to run on the Simulator or your own device — no paid Developer Program needed for that). Select an iOS Simulator as the run destination and hit **Cmd+R**.
+In Xcode, under the app target's **Signing & Capabilities** tab, sign in with your Apple ID and pick it as the **Team** (a free personal account is enough to run on the Simulator or your own device — no paid Developer Program needed for that).
 
-For macOS desktop, `npm run dist:mac` produces `.dmg` and `.zip` artifacts for both Apple Silicon and Intel. Without a paid "Developer ID Application" certificate, electron-builder skips signing entirely, which leaves the app's embedded frameworks with an incomplete signature that Apple Silicon's kernel refuses to run at all. A `build/afterSignAdhoc.js` hook (wired up via `afterSign` in `package.json`) fixes this by ad-hoc signing every nested binary, deepest first, with the entitlements Electron needs (JIT, unsigned executable memory, disabled library validation) — no paid certificate required, just a build step.
+For macOS desktop, `bun run dist:mac` produces the `.app`/`.dmg` bundles.
 </details>
 
 <details>
-<summary><strong>🎨 Regenerating app icons & splash screens</strong></summary>
+<summary><strong>🎨 Regenerating app icons</strong></summary>
 
 <br />
 
-Edit `appicon-src/logo.png`, then run:
+Edit `appicon-src/logo.png`, then regenerate every platform's icons in one shot:
 
 ```bash
-npx capacitor-assets generate \
-  --assetPath appicon-src \
-  --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff' \
-  --splashBackgroundColor '#ffffff' --splashBackgroundColorDark '#121212'
+bun run tauri icon appicon-src/logo.png
 ```
 </details>
 
@@ -352,7 +345,7 @@ npx capacitor-assets generate \
 
 ## 🌍 Internationalization
 
-The entire UI is translated through a single dictionary (`assets/js/utils/translations.js`) and applied by a lightweight i18n helper. Switching languages re-renders every page instantly and re-localizes the date picker.
+The entire UI is translated through a single dictionary (`src/lib/translations.ts`) and applied by a reactive i18n helper (`src/lib/i18n.ts`). Switching languages re-renders every page instantly.
 
 | Language | Code | Status |
 |---|---|---|
@@ -365,8 +358,8 @@ The entire UI is translated through a single dictionary (`assets/js/utils/transl
 
 ## 🗺 Roadmap
 
-- [x] Windows desktop app (Electron)
-- [x] Android app (Capacitor)
+- [x] Windows desktop app (Tauri v2 — ~5 MB installer)
+- [x] Android app (Tauri v2 Mobile)
 - [x] macOS `.dmg` build (Apple Silicon & Intel)
 - [x] Dark mode & full responsive mobile layout
 - [x] Multi-language support (EN / TR / TK / RU)
@@ -381,7 +374,7 @@ The entire UI is translated through a single dictionary (`assets/js/utils/transl
 
 ## 🤝 Contributing
 
-Contributions are welcome. Fork the repo, create a feature branch, and open a pull request. Please keep the framework-free, dependency-light spirit of the codebase and match the existing code style.
+Contributions are welcome. Fork the repo, create a feature branch, and open a pull request. Please keep the dependency-light spirit of the codebase and match the existing code style.
 
 <br />
 
@@ -397,7 +390,7 @@ Released under the **MIT License** — free to use, modify, and distribute.
 
 **Confidently Routine** — one app, every device.
 
-Built with vanilla JavaScript, Electron, and Capacitor.
+Built with SolidJS, Tailwind CSS v4, Tauri v2, and Bun.
 
 ⭐ Star this project if it helps you stay on track!
 
