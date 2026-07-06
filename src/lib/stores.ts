@@ -41,6 +41,9 @@ export interface Task {
   displayDate?: string;
   completed: boolean;
   recurrence?: Recurrence;
+  /** Set once this task's next occurrence has been spawned, so toggling
+      the checkbox off and back on doesn't spawn a duplicate. */
+  recurrenceSpawned?: boolean;
 }
 
 export interface Note {

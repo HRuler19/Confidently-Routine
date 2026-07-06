@@ -16,6 +16,7 @@ import DatePicker from "../components/DatePicker";
 import { Button, Input, Card, StatBadge } from "../components/ui";
 import { showToast } from "../lib/toast";
 import { todayStr, formatDisplayDate, nextDueDate, type Recurrence } from "../lib/dates";
+import { shouldSpawnNextOccurrence } from "../lib/tasks";
 import { Plus, Check, X, Calendar, Pencil, Trash2, Repeat, Search } from "lucide-solid";
 
 const CATEGORY_VALUES = ["personal", "work", "shopping", "other"] as const;
@@ -134,11 +135,19 @@ export default function Tasks() {
   }
 
   /** Completing a recurring task spawns its next instance instead of just
-      vanishing - the finished one stays in history like any other task. */
+      vanishing - the finished one stays in history like any other task.
+      recurrenceSpawned guards against a duplicate if the checkbox gets
+      unchecked and re-checked on the same task afterward. */
   function handleToggleComplete(task: Task, completed: boolean) {
-    updateTask(task.id, { completed });
-    if (!completed || !task.recurrence) return;
-    const dueDate = nextDueDate(task.dueDate, task.recurrence);
+    const spawn = shouldSpawnNextOccurrence({
+      completed,
+      recurrence: task.recurrence,
+      recurrenceSpawned: task.recurrenceSpawned,
+    });
+    updateTask(task.id, spawn ? { completed, recurrenceSpawned: true } : { completed });
+    if (!spawn) return;
+
+    const dueDate = nextDueDate(task.dueDate, task.recurrence!);
     addTask({
       id: Date.now(),
       title: task.title,

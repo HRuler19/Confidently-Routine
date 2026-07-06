@@ -118,10 +118,17 @@ test("recurring task spawns its next instance when completed", async ({ page }) 
   await expect(page.locator("svg.lucide-repeat")).toBeVisible();
 
   // completing it spawns tomorrow's instance instead of just disappearing
-  await page.locator(".task-check").first().check();
+  const checkbox = page.locator(".task-check").first();
+  await checkbox.check();
   await expect(page.getByText("Water plants", { exact: true })).toHaveCount(2);
   await expect(page.getByText("Today", { exact: true })).toBeVisible();
   await expect(page.getByText("Tomorrow", { exact: true })).toBeVisible();
+
+  // unchecking and re-checking the same (now-completed) task must not
+  // spawn a second duplicate of tomorrow's instance
+  await checkbox.uncheck();
+  await checkbox.check();
+  await expect(page.getByText("Water plants", { exact: true })).toHaveCount(2);
 });
 
 test("notes: add and edit", async ({ page }) => {
