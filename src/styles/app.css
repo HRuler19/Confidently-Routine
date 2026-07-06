@@ -199,6 +199,17 @@ input[type="password"] {
   }
 }
 
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ── Curved mobile bottom navigation ────────────────────────────────────
    Ported verbatim from the vanilla app's mobile-nav.css. An inline SVG
    paints the bar body with a concave (valley) top edge and two parallel

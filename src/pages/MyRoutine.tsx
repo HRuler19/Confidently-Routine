@@ -1,6 +1,11 @@
 // My Routine — port of the vanilla habit tracker: month grid (one column
-// per habit, one row per day), plus/x/count entry modal, inline rename,
-// delete-habit modal, and the sleep tracker (line chart + per-day table).
+// per habit, one row per day), inline rename, delete-habit modal, and
+// the sleep tracker (line chart + per-day table).
+//
+// Grid cells respond to two gestures: a quick tap cycles through the
+// common states (empty -> done -> missed -> empty) without any dialog,
+// since that covers the vast majority of check-ins; a long-press (or
+// right-click) opens the full entry modal for logging an exact count.
 import { createSignal, createMemo, For, Show, onCleanup } from "solid-js";
 import {
   habits,
@@ -18,9 +23,15 @@ import {
   type HabitEntry,
 } from "../lib/stores";
 import { t, calendarNames } from "../lib/i18n";
+import { theme } from "../lib/theme";
 import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
+import Heatmap from "../components/Heatmap";
+import { computeStreak } from "../lib/streaks";
+import { habitColor } from "../lib/colors";
 import { Plus, Check, X, Pencil, Eraser, Trash2 } from "lucide-solid";
+
+const LONG_PRESS_MS = 450;
 
 const YEARS = ["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"];
 
@@ -63,6 +74,42 @@ export default function MyRoutine() {
 
   function entryFor(habitId: number, day: number): HabitEntry | undefined {
     return habitEntries()[entryKey(habitId, dateKey(year(), month(), day))];
+  }
+
+  /** Quick tap: empty -> done -> missed -> empty, no dialog. */
+  function cycleEntry(habit: Habit, day: number) {
+    const dateStr = dateKey(year(), month(), day);
+    const current = entryFor(habit.id, day);
+    if (!current) setHabitEntry(habit.id, dateStr, { type: "plus" });
+    else if (current.type === "plus") setHabitEntry(habit.id, dateStr, { type: "x" });
+    else clearHabitEntry(habit.id, dateStr);
+  }
+
+  // A long-press (or right-click, for desktop mice) opens the full modal
+  // instead of cycling, so entering an exact count never needs more than
+  // one gesture. The `suppressClick` flag stops the click that always
+  // follows a pointerup from also cycling the entry it just opened.
+  let pressTimer: ReturnType<typeof setTimeout> | undefined;
+  let suppressClick = false;
+
+  function startPress(habit: Habit, day: number) {
+    suppressClick = false;
+    pressTimer = setTimeout(() => {
+      suppressClick = true;
+      openEntryModal(habit, day);
+    }, LONG_PRESS_MS);
+  }
+
+  function cancelPress() {
+    clearTimeout(pressTimer);
+  }
+
+  function handleCellClick(habit: Habit, day: number) {
+    if (suppressClick) {
+      suppressClick = false;
+      return;
+    }
+    cycleEntry(habit, day);
   }
 
   function openEntryModal(habit: Habit, day: number) {
@@ -234,29 +281,43 @@ export default function MyRoutine() {
                   {t("myroutine.day_col")}
                 </th>
                 <For each={habits()}>
-                  {(habit) => (
+                  {(habit) => {
+                    const streak = createMemo(() => computeStreak(habitEntries(), habit.id));
+                    return (
                     <th class="min-w-28 border border-line bg-surface-alt px-3 py-2 font-semibold text-secondary">
                       <Show
                         when={renamingId() === habit.id}
                         fallback={
-                          <div class="flex items-center justify-center gap-1.5">
-                            <span class="truncate">{habit.name}</span>
-                            <button
-                              type="button"
-                              title={t("myroutine.rename_tooltip")}
-                              class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-accent"
-                              onClick={() => setRenamingId(habit.id)}
-                            >
-                              <Pencil size={13} />
-                            </button>
-                            <button
-                              type="button"
-                              title={t("myroutine.delete_tooltip")}
-                              class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-danger"
-                              onClick={() => setPendingDelete(habit)}
-                            >
-                              <X size={18} />
-                            </button>
+                          <div class="flex flex-col items-center gap-0.5">
+                            <div class="flex items-center justify-center gap-1.5">
+                              <span class="truncate">{habit.name}</span>
+                              <button
+                                type="button"
+                                title={t("myroutine.rename_tooltip")}
+                                class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-accent"
+                                onClick={() => setRenamingId(habit.id)}
+                              >
+                                <Pencil size={13} />
+                              </button>
+                              <button
+                                type="button"
+                                title={t("myroutine.delete_tooltip")}
+                                class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-danger"
+                                onClick={() => setPendingDelete(habit)}
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+                            <Show when={streak().best > 0}>
+                              <span
+                                class="text-[10px] font-normal text-muted"
+                                title={`${t("myroutine.streak_best")}: ${streak().best} ${t("myroutine.streak_days")}`}
+                              >
+                                <Show when={streak().current > 0} fallback={`🏆 ${streak().best}`}>
+                                  🔥 {streak().current}
+                                </Show>
+                              </span>
+                            </Show>
                           </div>
                         }
                       >
@@ -278,7 +339,8 @@ export default function MyRoutine() {
                         />
                       </Show>
                     </th>
-                  )}
+                    );
+                  }}
                 </For>
               </tr>
             </thead>
@@ -292,8 +354,16 @@ export default function MyRoutine() {
                     <For each={habits()}>
                       {(habit) => (
                         <td
-                          class="h-9 cursor-pointer border border-line text-center align-middle font-semibold transition-colors hover:bg-hover"
-                          onClick={() => openEntryModal(habit, day)}
+                          class="h-9 cursor-pointer border border-line text-center align-middle font-semibold transition-colors select-none hover:bg-hover"
+                          onClick={() => handleCellClick(habit, day)}
+                          onPointerDown={() => startPress(habit, day)}
+                          onPointerUp={cancelPress}
+                          onPointerLeave={cancelPress}
+                          onPointerCancel={cancelPress}
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            openEntryModal(habit, day);
+                          }}
                         >
                           <Show when={entryFor(habit.id, day)}>
                             {(e) => (
@@ -323,6 +393,25 @@ export default function MyRoutine() {
           </table>
         </div>
       </div>
+
+      {/* Activity heatmap — a GitHub-style year view per habit */}
+      <Show when={habits().length > 0}>
+        <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+          <h3 class="mb-4 text-lg font-semibold text-primary">
+            {t("myroutine.heatmap_title")} · {year()}
+          </h3>
+          <div class="flex flex-col gap-5">
+            <For each={habits()}>
+              {(habit, i) => (
+                <div>
+                  <span class="mb-1.5 block text-sm font-medium text-secondary">{habit.name}</span>
+                  <Heatmap habitId={habit.id} year={year()} color={habitColor(i(), theme() === "dark")} />
+                </div>
+              )}
+            </For>
+          </div>
+        </div>
+      </Show>
 
       {/* Sleep tracker */}
       <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">

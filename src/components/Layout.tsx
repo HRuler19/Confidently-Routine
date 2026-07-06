@@ -4,6 +4,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import MobileNav from "./MobileNav";
 import ConfirmModal from "./ConfirmModal";
+import ToastHost from "./ToastHost";
 import { LogOut } from "lucide-solid";
 import { logout } from "../lib/stores";
 import { t } from "../lib/i18n";
@@ -35,6 +36,7 @@ export default function Layout(props: ParentProps) {
           navigate("/login");
         }}
       />
+      <ToastHost />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 // Daily Tasks — port of the vanilla routines module: add row with
-// category/priority/due-date, three filters, live stat badges, inline
-// edit form, and a delete confirmation modal. Same Task shape + storage.
+// category/priority/due-date, three filters, live stat badges, and
+// inline edit form. Deleting shows a toast with Undo instead of a
+// blocking confirmation - tasks are frequent, low-stakes items.
 import { createSignal, createMemo, For, Show } from "solid-js";
 import {
   tasks,
@@ -11,7 +12,7 @@ import {
 } from "../lib/stores";
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
-import ConfirmModal from "../components/ConfirmModal";
+import { showToast } from "../lib/toast";
 import { todayStr, formatDisplayDate } from "../lib/dates";
 import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
 
@@ -109,7 +110,15 @@ export default function Tasks() {
   const [categoryFilter, setCategoryFilter] = createSignal("all");
   const [priorityFilter, setPriorityFilter] = createSignal("all");
   const [editingId, setEditingId] = createSignal<number | null>(null);
-  const [pendingDelete, setPendingDelete] = createSignal<Task | null>(null);
+
+  function handleDelete(task: Task) {
+    deleteTask(task.id);
+    showToast({
+      message: t("routines.deleted_toast", { title: task.title }),
+      actionLabel: t("common.undo"),
+      onAction: () => addTask(task),
+    });
+  }
 
   const visibleTasks = createMemo(() =>
     tasks().filter((task) => {
@@ -315,7 +324,7 @@ export default function Tasks() {
                         <button
                           type="button"
                           class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger/40 bg-surface px-3 text-sm text-danger transition-colors hover:border-danger hover:bg-danger/10 max-[768px]:h-11 max-[768px]:flex-1"
-                          onClick={() => setPendingDelete(task)}
+                          onClick={() => handleDelete(task)}
                         >
                           <Trash2 size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.delete")}</span>
@@ -338,28 +347,6 @@ export default function Tasks() {
           </For>
         </Show>
       </div>
-
-      <ConfirmModal
-        open={pendingDelete() !== null}
-        icon={Trash2}
-        title={t("routines.delete_modal_title")}
-        body={
-          <>
-            <p>{t("routines.delete_modal_body")}</p>
-            <p class="mt-2 rounded-lg border-l-3 border-danger bg-surface-alt px-3 py-2 font-semibold text-primary">
-              "{pendingDelete()?.title}"
-            </p>
-          </>
-        }
-        cancelText={t("common.cancel")}
-        confirmText={t("common.confirm_delete")}
-        onCancel={() => setPendingDelete(null)}
-        onConfirm={() => {
-          const task = pendingDelete();
-          if (task) deleteTask(task.id);
-          setPendingDelete(null);
-        }}
-      />
     </>
   );
 }

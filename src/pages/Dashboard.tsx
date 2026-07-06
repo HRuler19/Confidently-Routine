@@ -4,19 +4,14 @@
 // week/day granularity), and the sleep overview. All charts re-render
 // reactively on data, language, and theme changes.
 import { createSignal, createMemo, For, Show, type JSX } from "solid-js";
-import {
-  tasks,
-  notes,
-  habits,
-  habitEntries,
-  sleepEntries,
-  entryKey,
-  type HabitEntry,
-} from "../lib/stores";
+import { tasks, notes, habits, habitEntries, sleepEntries, entryKey } from "../lib/stores";
 import { t, calendarNames } from "../lib/i18n";
 import { theme } from "../lib/theme";
 import Select from "../components/Select";
+import Heatmap from "../components/Heatmap";
 import { BarChart, LineChart, ProgressRing } from "../components/charts";
+import { isEntryDone, entryToValue, computeStreak } from "../lib/streaks";
+import { habitColor } from "../lib/colors";
 
 const YEARS = ["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"];
 
@@ -37,12 +32,6 @@ function themeColor(light: string, dark: string) {
   return theme() === "dark" ? dark : light;
 }
 
-function habitPalette() {
-  return theme() === "dark"
-    ? ["#2d9b27", "#58a6ff", "#d29922", "#f87171", "#a371f7", "#56d4dd"]
-    : ["#0e5e0a", "#0066ff", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2"];
-}
-
 type Range = "all" | "year" | "month";
 
 function inRange(dateValue: string | number, range: Range): boolean {
@@ -52,20 +41,6 @@ function inRange(dateValue: string | number, range: Range): boolean {
   const now = new Date();
   if (range === "year") return d.getFullYear() === now.getFullYear();
   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-}
-
-function entryToValue(entry: HabitEntry | undefined): number {
-  if (!entry) return 0;
-  if (entry.type === "plus") return 1;
-  if (entry.type === "count") return Number(entry.value) || 0;
-  return 0;
-}
-
-function isEntryDone(entry: HabitEntry | undefined): boolean {
-  if (!entry) return false;
-  if (entry.type === "plus") return true;
-  if (entry.type === "count") return Number(entry.value) > 0;
-  return false;
 }
 
 function rangeOptions() {
@@ -425,10 +400,23 @@ export default function Dashboard() {
             <For each={habits()}>
               {(habit, i) => {
                 const stats = createMemo(() => habitStats(habit.id));
-                const color = () => habitPalette()[i() % habitPalette().length];
+                const streak = createMemo(() => computeStreak(habitEntries(), habit.id));
+                const color = () => habitColor(i(), theme() === "dark");
                 return (
                   <div class="rounded-lg border border-line p-4">
-                    <div class="mb-3 font-medium text-primary">{habit.name}</div>
+                    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <span class="font-medium text-primary">{habit.name}</span>
+                      <Show when={streak().best > 0}>
+                        <span
+                          class="text-xs font-medium text-tertiary"
+                          title={`${t("myroutine.streak_best")}: ${streak().best} ${t("myroutine.streak_days")}`}
+                        >
+                          <Show when={streak().current > 0} fallback={`🏆 ${streak().best}`}>
+                            🔥 {streak().current} {t("myroutine.streak_days")}
+                          </Show>
+                        </span>
+                      </Show>
+                    </div>
                     <div class="flex items-center gap-6 max-[576px]:flex-col">
                       <ProgressRing
                         percent={stats().completionRate}
@@ -446,6 +434,12 @@ export default function Dashboard() {
                           height={150}
                         />
                       </div>
+                    </div>
+                    <div class="mt-4 border-t border-line pt-4">
+                      <span class="mb-2 block text-xs font-medium text-tertiary">
+                        {t("myroutine.heatmap_title")} · {habitsYear()}
+                      </span>
+                      <Heatmap habitId={habit.id} year={habitsYear()} color={color()} />
                     </div>
                   </div>
                 );

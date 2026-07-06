@@ -1,11 +1,11 @@
 // Notes — port of the vanilla notes module: textarea + date/category
-// sidebar, sort & category filters, count badge, inline editing, and a
-// delete confirmation modal. Same Note shape + storage key.
+// sidebar, sort & category filters, count badge, and inline editing.
+// Deleting shows a toast with Undo instead of a blocking confirmation.
 import { createSignal, createMemo, For, Show } from "solid-js";
 import { notes, addNote, updateNote, deleteNote, type Note } from "../lib/stores";
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
-import ConfirmModal from "../components/ConfirmModal";
+import { showToast } from "../lib/toast";
 import { todayStr } from "../lib/dates";
 import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
 
@@ -74,7 +74,15 @@ export default function Notes() {
   const [sortFilter, setSortFilter] = createSignal("all");
   const [categoryFilter, setCategoryFilter] = createSignal("all");
   const [editingId, setEditingId] = createSignal<number | null>(null);
-  const [pendingDelete, setPendingDelete] = createSignal<Note | null>(null);
+
+  function handleDelete(note: Note) {
+    deleteNote(note.id);
+    showToast({
+      message: t("notes.deleted_toast"),
+      actionLabel: t("common.undo"),
+      onAction: () => addNote(note),
+    });
+  }
 
   const visibleNotes = createMemo(() => {
     let filtered = [...notes()];
@@ -217,7 +225,7 @@ export default function Notes() {
                           type="button"
                           title={t("notes.delete_tooltip")}
                           class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger/40 bg-surface px-3 text-sm text-danger transition-colors hover:border-danger hover:bg-danger/10 max-[768px]:h-11 max-[768px]:flex-1"
-                          onClick={() => setPendingDelete(note)}
+                          onClick={() => handleDelete(note)}
                         >
                           <Trash2 size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.delete")}</span>
@@ -240,28 +248,6 @@ export default function Notes() {
           </For>
         </Show>
       </div>
-
-      <ConfirmModal
-        open={pendingDelete() !== null}
-        icon={Trash2}
-        title={t("notes.delete_modal_title")}
-        body={
-          <>
-            <p>{t("notes.delete_modal_body")}</p>
-            <p class="mt-2 truncate rounded-lg border-l-3 border-danger bg-surface-alt px-3 py-2 font-semibold text-primary">
-              "{pendingDelete()?.content.slice(0, 60)}"
-            </p>
-          </>
-        }
-        cancelText={t("common.cancel")}
-        confirmText={t("common.confirm_delete")}
-        onCancel={() => setPendingDelete(null)}
-        onConfirm={() => {
-          const note = pendingDelete();
-          if (note) deleteNote(note.id);
-          setPendingDelete(null);
-        }}
-      />
     </>
   );
 }

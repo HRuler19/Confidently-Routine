@@ -29,7 +29,7 @@ test("task lifecycle: add, complete, filter, delete", async ({ page }) => {
 
   await page.fill('input[placeholder="Add new task"]', "Buy groceries");
   await page.keyboard.press("Enter");
-  await expect(page.getByText("Buy groceries")).toBeVisible();
+  await expect(page.getByText("Buy groceries", { exact: true })).toBeVisible();
 
   // complete it
   await page.locator(".task-check").first().check();
@@ -37,14 +37,18 @@ test("task lifecycle: add, complete, filter, delete", async ({ page }) => {
   // filter to Active -> task disappears
   await page.getByRole("combobox").filter({ hasText: "All Tasks" }).click();
   await page.getByRole("option", { name: "Active" }).click();
-  await expect(page.getByText("Buy groceries")).toHaveCount(0);
+  await expect(page.getByText("Buy groceries", { exact: true })).toHaveCount(0);
 
-  // back to All -> delete via modal
+  // back to All -> delete (shows a toast with Undo, no blocking dialog)
   await page.getByRole("combobox").filter({ hasText: "Active" }).first().click();
   await page.getByRole("option", { name: "All Tasks" }).click();
   await page.locator("button:has(svg.lucide-trash-2)").first().click();
-  await page.getByRole("button", { name: /Yes, delete/i }).click();
-  await expect(page.getByText("Buy groceries")).toHaveCount(0);
+  await expect(page.getByText("Buy groceries", { exact: true })).toHaveCount(0);
+
+  const undo = page.getByRole("button", { name: /Undo/i });
+  await expect(undo).toBeVisible();
+  await undo.click();
+  await expect(page.getByText("Buy groceries", { exact: true })).toBeVisible();
 });
 
 test("notes: add and edit", async ({ page }) => {
@@ -61,7 +65,7 @@ test("notes: add and edit", async ({ page }) => {
   await expect(page.getByText("Edited e2e note")).toBeVisible();
 });
 
-test("habits: add habit and log an entry", async ({ page }) => {
+test("habits: add habit, cycle a cell, and log a count via the modal", async ({ page }) => {
   await login(page);
   await page.goto("/my-routine");
 
@@ -69,12 +73,22 @@ test("habits: add habit and log an entry", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.locator("th", { hasText: "Stretch" })).toBeVisible();
 
-  // open the day-1 cell, mark done
-  await page.locator("tbody td").nth(1).click();
+  const cell = page.locator("tbody td").nth(1);
+
+  // tap once -> done (plus), tap again -> missed (x), tap again -> empty
+  await cell.click();
+  await expect(cell.locator("svg.lucide-plus")).toBeVisible();
+  await cell.click();
+  await expect(cell.locator("svg.lucide-x")).toBeVisible();
+  await cell.click();
+  await expect(cell.locator("svg")).toHaveCount(0);
+
+  // right-click (long-press equivalent on desktop) opens the count modal
+  await cell.click({ button: "right" });
   const modal = page.locator("div.fixed");
-  await modal.locator("button:has(svg.lucide-plus)").first().click();
+  await modal.locator('input[type="number"]').fill("5");
   await modal.getByRole("button", { name: /Save/i }).click();
-  await expect(page.locator("tbody td svg.lucide-plus").first()).toBeVisible();
+  await expect(cell).toHaveText("5");
 });
 
 test("dashboard renders analytics and settings switches theme + language", async ({ page }) => {
