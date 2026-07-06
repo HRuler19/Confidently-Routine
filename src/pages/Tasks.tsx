@@ -12,6 +12,7 @@ import {
 } from "../lib/stores";
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
+import DatePicker from "../components/DatePicker";
 import { showToast } from "../lib/toast";
 import { todayStr, formatDisplayDate } from "../lib/dates";
 import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
@@ -61,11 +62,11 @@ function TaskEditForm(props: {
       </div>
       <div class="flex flex-col gap-1">
         <label class="text-xs font-medium text-tertiary">{t("routines.due_date_label")}</label>
-        <input
-          type="date"
-          class="h-10 w-fit rounded-lg border border-line-input bg-surface px-3 text-sm text-primary focus:border-accent focus:outline-none max-[576px]:w-full"
+        <DatePicker
+          class="w-fit max-[576px]:w-full"
           value={dueDate()}
-          onInput={(e) => setDueDate(e.currentTarget.value)}
+          onChange={setDueDate}
+          ariaLabel={t("routines.due_date_label")}
         />
       </div>
       <div class="flex gap-2.5 max-[768px]:flex-col">
@@ -190,12 +191,7 @@ export default function Tasks() {
           </div>
           <div class="flex min-w-40 flex-1 flex-col gap-1.5">
             <span class="text-xs font-medium text-tertiary">{t("routines.due_date_label")}</span>
-            <input
-              type="date"
-              class="h-10 rounded-lg border border-line-input bg-surface px-3 text-sm text-secondary focus:border-accent focus:outline-none"
-              value={newDate()}
-              onInput={(e) => setNewDate(e.currentTarget.value)}
-            />
+            <DatePicker value={newDate()} onChange={setNewDate} ariaLabel={t("routines.due_date_label")} />
           </div>
         </div>
       </section>

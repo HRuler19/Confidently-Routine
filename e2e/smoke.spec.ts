@@ -146,6 +146,44 @@ test("settings: export data, wipe, and restore it via import", async ({ page }) 
   await expect(page.getByText("Backup e2e task", { exact: true })).toBeVisible();
 });
 
+test("date picker: opens, navigates months, selects a day, and localizes", async ({ page }) => {
+  await login(page);
+  await page.goto("/routines");
+
+  const trigger = page.getByRole("combobox", { name: "Due Date" });
+  await trigger.click();
+
+  const panel = page.getByRole("dialog");
+  await expect(panel).toBeVisible();
+  // Monday-first week header, not the OS/browser locale's own ordering.
+  const weekdayHeaders = panel.locator("span.text-tertiary");
+  await expect(weekdayHeaders.first()).toHaveText("Mon");
+
+  const monthLabel = panel.locator("span.text-sm.font-medium");
+  const initialMonth = await monthLabel.textContent();
+  await panel.getByRole("button", { name: "Next month" }).click();
+  await expect(monthLabel).not.toHaveText(initialMonth ?? "");
+
+  // Jump back and pick the 15th of the currently displayed month.
+  await panel.getByRole("button", { name: "Previous month" }).click();
+  await panel.getByRole("button", { name: "15", exact: true }).click();
+  await expect(panel).toBeHidden();
+  await expect(trigger).toContainText("15");
+
+  // Switch the app language and confirm the picker's own strings follow -
+  // native <input type="date"> could never do this, it always used the
+  // OS locale regardless of the app's language setting.
+  await page.goto("/settings");
+  await page.getByRole("combobox").filter({ hasText: "English" }).click();
+  await page.getByRole("option", { name: "Türkçe" }).click();
+
+  await page.goto("/routines");
+  await page.getByRole("combobox", { name: "Son Tarih" }).click();
+  const trPanel = page.getByRole("dialog");
+  await expect(trPanel.locator("span.text-tertiary").first()).toHaveText("Pzt");
+  await expect(trPanel.getByRole("button", { name: "Bugün" })).toBeVisible();
+});
+
 test("logout returns to login and guards routes", async ({ page }) => {
   await login(page);
   await page.locator("aside a", { hasText: /Logout/i }).click();

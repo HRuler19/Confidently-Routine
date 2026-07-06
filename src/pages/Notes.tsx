@@ -5,6 +5,7 @@ import { createSignal, createMemo, For, Show } from "solid-js";
 import { notes, addNote, updateNote, deleteNote, type Note } from "../lib/stores";
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
+import DatePicker from "../components/DatePicker";
 import { showToast } from "../lib/toast";
 import { todayStr } from "../lib/dates";
 import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
@@ -33,12 +34,7 @@ function NoteEditForm(props: {
         onInput={(e) => setContent(e.currentTarget.value)}
       />
       <div class="flex flex-wrap gap-3">
-        <input
-          type="date"
-          class="h-10 rounded-lg border border-line-input bg-surface px-3 text-sm text-secondary focus:border-accent focus:outline-none"
-          value={date()}
-          onInput={(e) => setDate(e.currentTarget.value)}
-        />
+        <DatePicker class="w-fit" value={date()} onChange={setDate} ariaLabel={t("notes.date_label")} />
         <Select class="w-40" value={category()} options={noteCategoryOptions()} onChange={setCategory} />
       </div>
       <div class="flex gap-2.5 max-[768px]:flex-col">
@@ -134,12 +130,7 @@ export default function Notes() {
             </button>
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-medium text-tertiary">{t("notes.date_label")}</label>
-              <input
-                type="date"
-                class="h-10 rounded-lg border border-line-input bg-surface px-3 text-sm text-secondary focus:border-accent focus:outline-none"
-                value={newDate()}
-                onInput={(e) => setNewDate(e.currentTarget.value)}
-              />
+              <DatePicker value={newDate()} onChange={setNewDate} ariaLabel={t("notes.date_label")} />
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-medium text-tertiary">{t("notes.category_label")}</label>

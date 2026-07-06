@@ -10,6 +10,8 @@ export const dictionary: Record<string, any> = {
       edit: "Edit",
       delete: "Delete",
       clear: "Clear",
+      previous_month: "Previous month",
+      next_month: "Next month",
     },
     nav: {
       dashboard: "Dashboard",
@@ -212,6 +214,8 @@ export const dictionary: Record<string, any> = {
       edit: "Üýtget",
       delete: "Poz",
       clear: "Arassala",
+      previous_month: "Öňki aý",
+      next_month: "Indiki aý",
     },
     nav: {
       dashboard: "Panel",
@@ -414,6 +418,8 @@ export const dictionary: Record<string, any> = {
       edit: "Изменить",
       delete: "Удалить",
       clear: "Очистить",
+      previous_month: "Предыдущий месяц",
+      next_month: "Следующий месяц",
     },
     nav: {
       dashboard: "Панель",
@@ -616,6 +622,8 @@ export const dictionary: Record<string, any> = {
       edit: "Düzenle",
       delete: "Sil",
       clear: "Temizle",
+      previous_month: "Önceki ay",
+      next_month: "Sonraki ay",
     },
     nav: {
       dashboard: "Panel",

@@ -135,11 +135,6 @@ body {
   @apply bg-page-alt font-sans text-primary antialiased;
 }
 
-/* Native date inputs: keep the picker icon legible in dark mode */
-:root[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-}
-
 /* iOS (WKWebView/Safari) draws its own inset chrome on text-like inputs -
    extra padding, rounded corners, a subtle shadow - on top of whatever
    height/border/radius is set, so the same input renders taller and
@@ -149,6 +144,21 @@ input[type="text"],
 input[type="password"] {
   -webkit-appearance: none;
   appearance: none;
+}
+
+/* Hide the native up/down spinner buttons on number inputs (Chrome/Safari
+   use these webkit-only pseudo-elements; Firefox uses the appearance
+   property) - they look inconsistent across platforms and clash with our
+   own input styling. */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* Round-rect brand checkbox (ported from the old .task-checkbox styles). */
