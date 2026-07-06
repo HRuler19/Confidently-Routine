@@ -3,10 +3,13 @@
 // theme + language selectors, all persisting through the same stores.
 import { createSignal, For, Show } from "solid-js";
 import { user, updateUser } from "../lib/stores";
+import { exportBackupFile, importBackupFromFile } from "../lib/backup";
 import { t, language, setLanguage, type Language } from "../lib/i18n";
 import { theme, setTheme, type Theme } from "../lib/theme";
 import Select from "../components/Select";
-import { Plus, Check } from "lucide-solid";
+import ConfirmModal from "../components/ConfirmModal";
+import { showToast } from "../lib/toast";
+import { Plus, Check, Download, Upload, DatabaseBackup } from "lucide-solid";
 
 const AVATARS = [
   "/images/Boy image 1.svg",
@@ -27,7 +30,25 @@ export default function Settings() {
   const [newUsername, setNewUsername] = createSignal("");
   const [newPassword, setNewPassword] = createSignal("");
   const [justSaved, setJustSaved] = createSignal(false);
+  const [pendingImportFile, setPendingImportFile] = createSignal<File | null>(null);
   let fileInput: HTMLInputElement | undefined;
+  let importInput: HTMLInputElement | undefined;
+
+  function onImportFileChosen(e: Event) {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    (e.target as HTMLInputElement).value = ""; // allow re-choosing the same file later
+    if (file) setPendingImportFile(file);
+  }
+
+  async function confirmImport() {
+    const file = pendingImportFile();
+    setPendingImportFile(null);
+    if (!file) return;
+    const result = await importBackupFromFile(file);
+    showToast({
+      message: result.ok ? t("settings.import_success") : t("settings.import_error"),
+    });
+  }
 
   function onUpload(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -210,6 +231,49 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {/* Data export / import */}
+      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+        <h2 class="mb-2 text-lg font-semibold text-primary">{t("settings.data_title")}</h2>
+        <p class="mb-6 text-sm text-tertiary">{t("settings.data_hint")}</p>
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            type="button"
+            class="flex h-11 cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-5 text-sm font-medium text-secondary transition-colors hover:border-accent hover:text-accent"
+            onClick={exportBackupFile}
+          >
+            <Download size={16} />
+            {t("settings.export_button")}
+          </button>
+          <button
+            type="button"
+            class="flex h-11 cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-5 text-sm font-medium text-secondary transition-colors hover:border-accent hover:text-accent"
+            onClick={() => importInput?.click()}
+          >
+            <Upload size={16} />
+            {t("settings.import_button")}
+          </button>
+          <input
+            ref={importInput}
+            type="file"
+            accept="application/json"
+            class="hidden"
+            onChange={onImportFileChosen}
+          />
+        </div>
+      </div>
+
+      <ConfirmModal
+        open={pendingImportFile() !== null}
+        icon={DatabaseBackup}
+        title={t("settings.import_confirm_title")}
+        body={<p>{t("settings.import_confirm_body")}</p>}
+        cancelText={t("common.cancel")}
+        confirmText={t("settings.import_button")}
+        onCancel={() => setPendingImportFile(null)}
+        onConfirm={confirmImport}
+      />
     </section>
   );
 }

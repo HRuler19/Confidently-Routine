@@ -212,3 +212,56 @@ export function clearSleepEntry(dateStr: string) {
   delete entries[dateStr];
   writeSleepEntries(entries);
 }
+
+// ── Backup / restore ────────────────────────────────────────────────────
+// Deliberately excludes the user account (username/password/avatar) - a
+// restore should bring back your tasks and habits, not silently change
+// who you're logged in as or clobber a different profile's credentials.
+const BACKUP_VERSION = 1;
+
+export interface BackupData {
+  version: number;
+  exportedAt: string;
+  tasks: Task[];
+  notes: Note[];
+  habits: Habit[];
+  habitEntries: Record<string, HabitEntry>;
+  sleepEntries: Record<string, number>;
+}
+
+export function createBackup(): BackupData {
+  return {
+    version: BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    tasks: tasks(),
+    notes: notes(),
+    habits: habits(),
+    habitEntries: habitEntries(),
+    sleepEntries: sleepEntries(),
+  };
+}
+
+/** Structural check only - not a deep schema validation - good enough to
+    reject "wrong file" mistakes before they wipe real data. */
+export function isValidBackup(data: unknown): data is BackupData {
+  if (!data || typeof data !== "object") return false;
+  const d = data as Record<string, unknown>;
+  return (
+    typeof d.version === "number" &&
+    Array.isArray(d.tasks) &&
+    Array.isArray(d.notes) &&
+    Array.isArray(d.habits) &&
+    typeof d.habitEntries === "object" &&
+    d.habitEntries !== null &&
+    typeof d.sleepEntries === "object" &&
+    d.sleepEntries !== null
+  );
+}
+
+export function restoreBackup(data: BackupData): void {
+  writeTasks(data.tasks);
+  writeNotes(data.notes);
+  writeHabits(data.habits);
+  writeHabitEntries(data.habitEntries);
+  writeSleepEntries(data.sleepEntries);
+}

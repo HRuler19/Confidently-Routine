@@ -115,6 +115,37 @@ test("dashboard renders analytics and settings switches theme + language", async
   await expect(page.locator("aside")).not.toContainText("Settings");
 });
 
+test("settings: export data, wipe, and restore it via import", async ({ page }) => {
+  await login(page);
+
+  await page.goto("/routines");
+  await page.fill('input[placeholder="Add new task"]', "Backup e2e task");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Backup e2e task", { exact: true })).toBeVisible();
+
+  await page.goto("/settings");
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: /Export data/i }).click(),
+  ]);
+  const filePath = await download.path();
+  expect(filePath).toBeTruthy();
+
+  // wipe content data (session/login is untouched, since it lives in
+  // sessionStorage and the backup never includes the account anyway)
+  await page.evaluate(() => localStorage.clear());
+  await page.goto("/routines");
+  await expect(page.getByText("Backup e2e task", { exact: true })).toHaveCount(0);
+
+  await page.goto("/settings");
+  await page.setInputFiles('input[type="file"][accept="application/json"]', filePath!);
+  await page.getByRole("button", { name: /Import data/i }).last().click();
+  await expect(page.getByText(/imported successfully/i)).toBeVisible();
+
+  await page.goto("/routines");
+  await expect(page.getByText("Backup e2e task", { exact: true })).toBeVisible();
+});
+
 test("logout returns to login and guards routes", async ({ page }) => {
   await login(page);
   await page.locator("aside a", { hasText: /Logout/i }).click();

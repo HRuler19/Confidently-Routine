@@ -111,3 +111,52 @@ describe("sleep", () => {
     expect(stores.sleepEntries()["2026-07-06"]).toBeUndefined();
   });
 });
+
+describe("backup / restore", () => {
+  it("round-trips all content collections through export -> restore", async () => {
+    const stores = await freshStores();
+    stores.addTask({
+      id: 1,
+      title: "T1",
+      category: "Personal",
+      priority: "low",
+      dueDate: "2026-07-06",
+      completed: false,
+    });
+    stores.addNote({ id: 2, content: "N1", category: "study", date: "2026-07-06", createdAt: 1 });
+    const habit = stores.addHabit("Read");
+    stores.setHabitEntry(habit.id, "2026-07-06", { type: "plus" });
+    stores.setSleepEntry("2026-07-06", 8);
+
+    const backup = stores.createBackup();
+
+    // simulate a fresh device with nothing stored
+    localStorage.clear();
+    const fresh = await freshStores();
+    expect(fresh.tasks()).toHaveLength(0);
+
+    fresh.restoreBackup(backup);
+    expect(fresh.tasks()).toHaveLength(1);
+    expect(fresh.notes()).toHaveLength(1);
+    expect(fresh.habits()).toHaveLength(1);
+    expect(fresh.sleepEntries()["2026-07-06"]).toBe(8);
+  });
+
+  it("does not include the user account in the backup", async () => {
+    const stores = await freshStores();
+    stores.saveUser({ username: "Alex", avatar: "/a.svg" }, true);
+    const backup = stores.createBackup();
+    expect(backup).not.toHaveProperty("user");
+  });
+
+  it("validates backup shape before restoring", async () => {
+    const stores = await freshStores();
+    expect(stores.isValidBackup(stores.createBackup())).toBe(true);
+    expect(stores.isValidBackup(null)).toBe(false);
+    expect(stores.isValidBackup({})).toBe(false);
+    expect(stores.isValidBackup({ version: 1, tasks: "not-an-array" })).toBe(false);
+    expect(
+      stores.isValidBackup({ version: 1, tasks: [], notes: [], habits: [], habitEntries: {}, sleepEntries: {} }),
+    ).toBe(true);
+  });
+});
