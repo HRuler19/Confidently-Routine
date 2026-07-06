@@ -66,3 +66,32 @@ export function formatDisplayDate(dateStr: string): string {
   if (diffDays > 1) return t("routines.date_in_days", { n: diffDays });
   return dateStr.split("-").reverse().join("/");
 }
+
+export type DateRange = "all" | "year" | "month";
+
+/** Whether `dateValue` falls within the current year/month. Accepts either
+    a bare "YYYY-MM-DD" string (e.g. a task's due date - parsed as Y/M/D
+    components directly, never through `new Date(dateStr)`) or a numeric
+    timestamp (e.g. a note's createdAt, where `new Date(number)` is already
+    an exact instant and safe to convert to local time normally). */
+export function isInRange(dateValue: string | number, range: DateRange): boolean {
+  if (range === "all") return true;
+
+  let year: number;
+  let month: number; // 0-based, matching Date#getMonth()
+  if (typeof dateValue === "string") {
+    const [y, m] = dateValue.split("-").map(Number);
+    if (!y || !m) return false;
+    year = y;
+    month = m - 1;
+  } else {
+    const d = new Date(dateValue);
+    if (isNaN(d.getTime())) return false;
+    year = d.getFullYear();
+    month = d.getMonth();
+  }
+
+  const now = new Date();
+  if (range === "year") return year === now.getFullYear();
+  return year === now.getFullYear() && month === now.getMonth();
+}

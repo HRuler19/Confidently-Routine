@@ -5,6 +5,7 @@
 // reactively on data, language, and theme changes.
 import { createSignal, createMemo, For, Show } from "solid-js";
 import { tasks, notes, habits, habitEntries, sleepEntries, entryKey } from "../lib/stores";
+import { isInRange, type DateRange } from "../lib/dates";
 import { t, calendarNames } from "../lib/i18n";
 import { theme } from "../lib/theme";
 import Select from "../components/Select";
@@ -33,17 +34,6 @@ function themeColor(light: string, dark: string) {
   return theme() === "dark" ? dark : light;
 }
 
-type Range = "all" | "year" | "month";
-
-function inRange(dateValue: string | number, range: Range): boolean {
-  if (range === "all") return true;
-  const d = new Date(dateValue);
-  if (isNaN(d.getTime())) return false;
-  const now = new Date();
-  if (range === "year") return d.getFullYear() === now.getFullYear();
-  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-}
-
 function rangeOptions() {
   return [
     { value: "all", label: () => t("dashboard.range_all_time") },
@@ -54,15 +44,15 @@ function rangeOptions() {
 
 export default function Dashboard() {
   const now = new Date();
-  const [tasksRange, setTasksRange] = createSignal<Range>("all");
-  const [notesRange, setNotesRange] = createSignal<Range>("all");
+  const [tasksRange, setTasksRange] = createSignal<DateRange>("all");
+  const [notesRange, setNotesRange] = createSignal<DateRange>("all");
   const [granularity, setGranularity] = createSignal("month");
   const [habitsYear, setHabitsYear] = createSignal(now.getFullYear());
   const [habitsMonth, setHabitsMonth] = createSignal(now.getMonth() + 1);
 
   // ── Tasks ───────────────────────────────────────────────────────────
   const taskStats = createMemo(() => {
-    const filtered = tasks().filter((task) => inRange(task.dueDate, tasksRange()));
+    const filtered = tasks().filter((task) => isInRange(task.dueDate, tasksRange()));
     const total = filtered.length;
     const completed = filtered.filter((task) => task.completed).length;
     const byCategory = ["personal", "work", "shopping", "other"].map((key) => ({
@@ -86,7 +76,7 @@ export default function Dashboard() {
   // ── Notes ───────────────────────────────────────────────────────────
   const noteStats = createMemo(() => {
     const all = notes();
-    const filtered = all.filter((note) => inRange(note.createdAt, notesRange()));
+    const filtered = all.filter((note) => isInRange(note.createdAt, notesRange()));
     const byCategory = ["study", "work", "personal", "learning"].map((key) => ({
       label: t("notes.category_" + key),
       value: filtered.filter((note) => note.category === key).length,
@@ -230,7 +220,7 @@ export default function Dashboard() {
             class="w-36"
             value={tasksRange()}
             options={rangeOptions()}
-            onChange={(v) => setTasksRange(v as Range)}
+            onChange={(v) => setTasksRange(v as DateRange)}
           />
         }
       >
@@ -299,7 +289,7 @@ export default function Dashboard() {
             class="w-36"
             value={notesRange()}
             options={rangeOptions()}
-            onChange={(v) => setNotesRange(v as Range)}
+            onChange={(v) => setNotesRange(v as DateRange)}
           />
         }
       >

@@ -8,6 +8,7 @@ import {
   nextDueDate,
   daysBetween,
   todayStr,
+  isInRange,
 } from "./dates";
 import { setLanguage } from "./i18n";
 
@@ -83,6 +84,50 @@ describe("daysBetween", () => {
     withTz("America/Los_Angeles", () => {
       expect(daysBetween("2026-07-06", "2026-07-06")).toBe(0);
       expect(daysBetween("2026-07-06", "2026-07-07")).toBe(1);
+    });
+  });
+});
+
+describe("isInRange", () => {
+  it("always matches when range is 'all'", () => {
+    expect(isInRange("2000-01-01", "all")).toBe(true);
+    expect(isInRange(0, "all")).toBe(true);
+  });
+
+  it("matches a numeric timestamp within the current month/year", () => {
+    expect(isInRange(Date.now(), "month")).toBe(true);
+    expect(isInRange(Date.now(), "year")).toBe(true);
+  });
+
+  it("rejects a malformed date string instead of throwing", () => {
+    expect(isInRange("not-a-date", "year")).toBe(false);
+    expect(isInRange("", "month")).toBe(false);
+  });
+
+  it("excludes a date string from a clearly different month and year", () => {
+    expect(isInRange("2000-06-15", "month")).toBe(false);
+    expect(isInRange("2000-06-15", "year")).toBe(false);
+  });
+
+  it("matches year but not month when only the year is current", () => {
+    const now = new Date();
+    // 1-based month guaranteed different from the current one.
+    const differentMonth = now.getMonth() === 0 ? 12 : now.getMonth();
+    const dateStr = dateKey(now.getFullYear(), differentMonth, 1);
+    expect(isInRange(dateStr, "year")).toBe(true);
+    expect(isInRange(dateStr, "month")).toBe(false);
+  });
+
+  it("matches a due-date string on the 1st of the current month, even west of UTC", () => {
+    // This is exactly the shape of bug that broke Dashboard's task filter:
+    // a bare "YYYY-MM-DD" parsed via `new Date(dateStr)` lands on the
+    // previous local calendar day west of UTC, which could shift the 1st
+    // of the month back into the previous month and drop it out of range.
+    withTz("America/Los_Angeles", () => {
+      const now = new Date();
+      const firstOfMonth = dateKey(now.getFullYear(), now.getMonth() + 1, 1);
+      expect(isInRange(firstOfMonth, "month")).toBe(true);
+      expect(isInRange(firstOfMonth, "year")).toBe(true);
     });
   });
 });
