@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Confidently Routine",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "identifier": "com.millihasap.confidentlyroutine",
   "build": {
     "frontendDist": "../dist",
@@ -27,7 +27,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": "all",
     "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
