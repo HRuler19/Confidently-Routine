@@ -6,6 +6,7 @@ import { notes, addNote, updateNote, deleteNote, type Note } from "../lib/stores
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
 import DatePicker from "../components/DatePicker";
+import { Button, Textarea, Card, StatBadge } from "../components/ui";
 import { showToast } from "../lib/toast";
 import { todayStr } from "../lib/dates";
 import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
@@ -28,8 +29,8 @@ function NoteEditForm(props: {
 
   return (
     <div class="flex w-full flex-col gap-3">
-      <textarea
-        class="min-h-24 w-full resize-y rounded-lg border border-line-input bg-surface p-3 text-sm text-primary focus:border-accent focus:outline-none"
+      <Textarea
+        class="min-h-24 w-full"
         value={content()}
         onInput={(e) => setContent(e.currentTarget.value)}
       />
@@ -38,9 +39,9 @@ function NoteEditForm(props: {
         <Select class="w-40" value={category()} options={noteCategoryOptions()} onChange={setCategory} />
       </div>
       <div class="flex gap-2.5 max-[768px]:flex-col">
-        <button
-          type="button"
-          class="cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover"
+        <Button
+          variant="primary"
+          class="px-5 py-2.5"
           onClick={() => {
             const text = content().trim();
             if (!text) return;
@@ -49,7 +50,7 @@ function NoteEditForm(props: {
         >
           <Check size={15} class="mr-1.5 inline-block align-[-2px]" />
           {t("common.save")}
-        </button>
+        </Button>
         <button
           type="button"
           class="cursor-pointer rounded-lg border border-line bg-surface px-5 py-2.5 text-sm font-medium text-secondary transition-colors hover:bg-hover"
@@ -110,24 +111,24 @@ export default function Notes() {
   return (
     <>
       {/* Add-note card */}
-      <section class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <div class="flex gap-5 max-[768px]:flex-col">
-          <textarea
-            class="min-h-36 flex-1 resize-y rounded-lg border border-line-input bg-surface p-4 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+          <Textarea
+            class="min-h-36 flex-1 p-4"
             placeholder={t("notes.add_placeholder")}
             value={newContent()}
             onInput={(e) => setNewContent(e.currentTarget.value)}
           />
           <div class="flex w-56 flex-col gap-4 max-[768px]:w-full">
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              class="h-11 px-6"
               disabled={newContent().trim() === ""}
-              class="h-11 cursor-pointer rounded-lg bg-accent px-6 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
               onClick={submitNewNote}
             >
               <Plus size={16} class="mr-2 inline-block align-[-3px]" />
               {t("notes.add_button")}
-            </button>
+            </Button>
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-medium text-tertiary">{t("notes.date_label")}</label>
               <DatePicker value={newDate()} onChange={setNewDate} ariaLabel={t("notes.date_label")} />
@@ -138,7 +139,7 @@ export default function Notes() {
             </div>
           </div>
         </div>
-      </section>
+      </Card>
 
       {/* Filters + count */}
       <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
@@ -164,11 +165,7 @@ export default function Notes() {
             ]}
           />
         </div>
-        <div class="flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm">
-          <span class="size-2.5 rounded-full" style={{ "background-color": "var(--stat-total)" }} />
-          <span class="font-semibold text-primary">{visibleNotes().length}</span>
-          <span class="text-tertiary">{t("notes.stat_total")}</span>
-        </div>
+        <StatBadge dot="var(--stat-total)" count={visibleNotes().length} label={t("notes.stat_total")} />
       </div>
 
       {/* Notes list */}
@@ -203,24 +200,24 @@ export default function Notes() {
                         </div>
                       </div>
                       <div class="flex gap-2 max-[768px]:w-full">
-                        <button
-                          type="button"
+                        <Button
+                          variant="outline"
                           title={t("notes.edit_tooltip")}
-                          class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm text-secondary transition-colors hover:border-accent hover:text-accent max-[768px]:h-11 max-[768px]:flex-1"
+                          class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setEditingId(note.id)}
                         >
                           <Pencil size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.edit")}</span>
-                        </button>
-                        <button
-                          type="button"
+                        </Button>
+                        <Button
+                          variant="danger-outline"
                           title={t("notes.delete_tooltip")}
-                          class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger/40 bg-surface px-3 text-sm text-danger transition-colors hover:border-danger hover:bg-danger/10 max-[768px]:h-11 max-[768px]:flex-1"
+                          class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => handleDelete(note)}
                         >
                           <Trash2 size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.delete")}</span>
-                        </button>
+                        </Button>
                       </div>
                     </>
                   }

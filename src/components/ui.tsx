@@ -1,6 +1,6 @@
 // Shared UI primitives. Every page composes these instead of repeating
 // long utility strings, so the design system lives in exactly one place.
-import { splitProps, type ComponentProps, type ParentProps, type JSX } from "solid-js";
+import { splitProps, Show, type ComponentProps, type ParentProps, type JSX } from "solid-js";
 
 // ── Button ──────────────────────────────────────────────────────────────
 type ButtonVariant = "primary" | "outline" | "danger-outline";
@@ -47,9 +47,17 @@ export function Textarea(props: ComponentProps<"textarea">) {
 }
 
 // ── Card (page section) ─────────────────────────────────────────────────
-export function Card(props: ParentProps<{ class?: string }>) {
+export function Card(
+  props: ParentProps<{ class?: string; title?: JSX.Element; controls?: JSX.Element }>,
+) {
   return (
     <section class={`rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color) ${props.class ?? ""}`}>
+      <Show when={props.title || props.controls}>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-lg font-semibold text-primary">{props.title}</h2>
+          {props.controls}
+        </div>
+      </Show>
       {props.children}
     </section>
   );

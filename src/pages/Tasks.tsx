@@ -13,6 +13,7 @@ import {
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
 import DatePicker from "../components/DatePicker";
+import { Button, Input, Card, StatBadge } from "../components/ui";
 import { showToast } from "../lib/toast";
 import { todayStr, formatDisplayDate, nextDueDate, type Recurrence } from "../lib/dates";
 import { Plus, Check, X, Calendar, Pencil, Trash2, Repeat, Search } from "lucide-solid";
@@ -49,12 +50,7 @@ function TaskEditForm(props: {
     <div class="flex flex-col gap-3">
       <div class="flex flex-col gap-1">
         <label class="text-xs font-medium text-tertiary">{t("routines.task_title_label")}</label>
-        <input
-          type="text"
-          class="h-10 rounded-lg border border-line-input bg-surface px-3 text-sm text-primary focus:border-accent focus:outline-none"
-          value={title()}
-          onInput={(e) => setTitle(e.currentTarget.value)}
-        />
+        <Input type="text" value={title()} onInput={(e) => setTitle(e.currentTarget.value)} />
       </div>
       <div class="flex gap-3 max-[576px]:flex-col">
         <div class="flex flex-1 flex-col gap-1">
@@ -82,9 +78,9 @@ function TaskEditForm(props: {
         </div>
       </div>
       <div class="flex gap-2.5 max-[768px]:flex-col">
-        <button
-          type="button"
-          class="cursor-pointer rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover"
+        <Button
+          variant="primary"
+          class="px-5 py-2.5"
           onClick={() => {
             const newTitle = title().trim();
             if (!newTitle) return;
@@ -102,7 +98,7 @@ function TaskEditForm(props: {
         >
           <Check size={15} class="mr-1.5 inline-block align-[-2px]" />
           {t("common.save")}
-        </button>
+        </Button>
         <button
           type="button"
           class="cursor-pointer rounded-lg border border-line bg-surface px-5 py-2.5 text-sm font-medium text-secondary transition-colors hover:bg-hover"
@@ -196,25 +192,25 @@ export default function Tasks() {
   return (
     <>
       {/* Add-task card */}
-      <section class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <div class="flex gap-3 max-[768px]:flex-col">
-          <input
+          <Input
             type="text"
-            class="h-11 flex-1 rounded-lg border border-line-input bg-surface px-4 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+            class="h-11 flex-1 px-4"
             placeholder={t("routines.add_placeholder")}
             value={newTitle()}
             onInput={(e) => setNewTitle(e.currentTarget.value)}
             onKeyDown={(e) => e.key === "Enter" && submitNewTask()}
           />
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            class="h-11 px-6"
             disabled={newTitle().trim() === ""}
-            class="h-11 cursor-pointer rounded-lg bg-accent px-6 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             onClick={submitNewTask}
           >
             <Plus size={16} class="mr-2 inline-block align-[-3px]" />
             {t("routines.add_button")}
-          </button>
+          </Button>
         </div>
 
         <hr class="my-5 border-line" />
@@ -237,7 +233,7 @@ export default function Tasks() {
             <Select value={newRepeat()} options={repeatOptions()} onChange={setNewRepeat} />
           </div>
         </div>
-      </section>
+      </Card>
 
       {/* Filters + stats */}
       <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
@@ -292,11 +288,12 @@ export default function Tasks() {
             ]}
           >
             {(stat) => (
-              <div class="flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm max-[480px]:flex-1 max-[480px]:justify-center max-[480px]:px-1.5 max-[480px]:text-xs">
-                <span class="size-2.5 rounded-full" style={{ "background-color": stat.dot }} />
-                <span class="font-semibold text-primary">{stat.count()}</span>
-                <span class="text-tertiary">{t(stat.key)}</span>
-              </div>
+              <StatBadge
+                dot={stat.dot}
+                count={stat.count()}
+                label={t(stat.key)}
+                class="max-[480px]:flex-1 max-[480px]:justify-center max-[480px]:px-1.5 max-[480px]:text-xs"
+              />
             )}
           </For>
         </div>
@@ -368,22 +365,22 @@ export default function Tasks() {
                       </div>
 
                       <div class="flex gap-2">
-                        <button
-                          type="button"
-                          class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-line bg-surface px-3 text-sm text-secondary transition-colors hover:border-accent hover:text-accent max-[768px]:h-11 max-[768px]:flex-1"
+                        <Button
+                          variant="outline"
+                          class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setEditingId(task.id)}
                         >
                           <Pencil size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.edit")}</span>
-                        </button>
-                        <button
-                          type="button"
-                          class="flex h-9 cursor-pointer items-center justify-center gap-2 rounded-lg border border-danger/40 bg-surface px-3 text-sm text-danger transition-colors hover:border-danger hover:bg-danger/10 max-[768px]:h-11 max-[768px]:flex-1"
+                        </Button>
+                        <Button
+                          variant="danger-outline"
+                          class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => handleDelete(task)}
                         >
                           <Trash2 size={15} />
                           <span class="hidden max-[768px]:inline">{t("common.delete")}</span>
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   }

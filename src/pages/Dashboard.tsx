@@ -3,12 +3,13 @@
 // 12-month trend), per-habit insights (ring + line chart with year/month/
 // week/day granularity), and the sleep overview. All charts re-render
 // reactively on data, language, and theme changes.
-import { createSignal, createMemo, For, Show, type JSX } from "solid-js";
+import { createSignal, createMemo, For, Show } from "solid-js";
 import { tasks, notes, habits, habitEntries, sleepEntries, entryKey } from "../lib/stores";
 import { t, calendarNames } from "../lib/i18n";
 import { theme } from "../lib/theme";
 import Select from "../components/Select";
 import Heatmap from "../components/Heatmap";
+import { Card, StatBadge } from "../components/ui";
 import { BarChart, LineChart, ProgressRing } from "../components/charts";
 import { isEntryDone, entryToValue, computeStreak } from "../lib/streaks";
 import { habitColor } from "../lib/colors";
@@ -49,19 +50,6 @@ function rangeOptions() {
     { value: "year", label: () => t("dashboard.range_this_year") },
     { value: "month", label: () => t("dashboard.range_this_month") },
   ];
-}
-
-/** Section wrapper card. */
-function Card(props: { title: string; controls?: JSX.Element; children: JSX.Element }) {
-  return (
-    <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-lg font-semibold text-primary">{props.title}</h2>
-        {props.controls}
-      </div>
-      {props.children}
-    </div>
-  );
 }
 
 export default function Dashboard() {
@@ -269,11 +257,12 @@ export default function Dashboard() {
                 ]}
               >
                 {(stat) => (
-                  <div class="flex items-center gap-1.5 rounded-lg border border-line bg-surface-alt px-3 py-1.5 text-sm max-[480px]:flex-1 max-[480px]:justify-center max-[480px]:px-1.5 max-[480px]:text-xs">
-                    <span class="size-2.5 rounded-full" style={{ "background-color": stat.dot }} />
-                    <span class="font-semibold text-primary">{stat.value()}</span>
-                    <span class="text-tertiary">{t(stat.key)}</span>
-                  </div>
+                  <StatBadge
+                    dot={stat.dot}
+                    count={stat.value()}
+                    label={t(stat.key)}
+                    class="bg-surface-alt max-[480px]:flex-1 max-[480px]:justify-center max-[480px]:px-1.5 max-[480px]:text-xs"
+                  />
                 )}
               </For>
             </div>
@@ -319,11 +308,12 @@ export default function Dashboard() {
           fallback={<p class="text-sm text-muted">{t("dashboard.no_notes_empty")}</p>}
         >
           <div class="flex flex-wrap items-center gap-8 max-[480px]:flex-col max-[480px]:items-stretch">
-            <div class="flex items-center gap-1.5 self-center rounded-lg border border-line bg-surface-alt px-3 py-1.5 text-sm">
-              <span class="size-2.5 rounded-full" style={{ "background-color": "var(--stat-total)" }} />
-              <span class="font-semibold text-primary">{noteStats().total}</span>
-              <span class="text-tertiary">{t("notes.stat_total")}</span>
-            </div>
+            <StatBadge
+              dot="var(--stat-total)"
+              count={noteStats().total}
+              label={t("notes.stat_total")}
+              class="self-center bg-surface-alt"
+            />
             <div class="min-w-52 flex-1">
               <span class="mb-1 block text-xs text-tertiary">{t("dashboard.by_category_label")}</span>
               <BarChart

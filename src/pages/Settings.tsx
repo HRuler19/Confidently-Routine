@@ -8,6 +8,7 @@ import { t, language, setLanguage, type Language } from "../lib/i18n";
 import { theme, setTheme, type Theme } from "../lib/theme";
 import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
+import { Button, Input, Card } from "../components/ui";
 import { showToast } from "../lib/toast";
 import { Plus, Check, Download, Upload, DatabaseBackup } from "lucide-solid";
 
@@ -81,7 +82,7 @@ export default function Settings() {
   return (
     <section class="flex flex-col gap-5 max-[768px]:pb-5">
       {/* Edit profile */}
-      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <h2 class="mb-6 text-lg font-semibold text-primary">{t("settings.edit_profile_title")}</h2>
 
         <div class="flex flex-wrap gap-10 max-[768px]:flex-col max-[768px]:gap-6">
@@ -165,24 +166,24 @@ export default function Settings() {
               <label class="text-xs font-medium text-tertiary">
                 {t("settings.new_username_label")}
               </label>
-              <input
+              <Input
                 type="text"
                 placeholder={t("settings.new_username_placeholder")}
                 value={newUsername()}
                 onInput={(e) => setNewUsername(e.currentTarget.value)}
-                class="h-11 rounded-xl border border-line-input bg-surface px-3.5 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+                class="h-11 rounded-xl px-3.5"
               />
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-medium text-tertiary">
                 {t("settings.new_password_label")}
               </label>
-              <input
+              <Input
                 type="password"
                 placeholder={t("settings.new_password_placeholder")}
                 value={newPassword()}
                 onInput={(e) => setNewPassword(e.currentTarget.value)}
-                class="h-11 rounded-xl border border-line-input bg-surface px-3.5 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+                class="h-11 rounded-xl px-3.5"
               />
             </div>
             <button
@@ -201,10 +202,10 @@ export default function Settings() {
             </button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Theme & language */}
-      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <h2 class="mb-6 text-lg font-semibold text-primary">
           {t("settings.theme_language_title")}
         </h2>
@@ -230,30 +231,26 @@ export default function Settings() {
             />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Data export / import */}
-      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <h2 class="mb-2 text-lg font-semibold text-primary">{t("settings.data_title")}</h2>
         <p class="mb-6 text-sm text-tertiary">{t("settings.data_hint")}</p>
 
         <div class="flex flex-wrap gap-3">
-          <button
-            type="button"
-            class="flex h-11 cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-5 text-sm font-medium text-secondary transition-colors hover:border-accent hover:text-accent"
-            onClick={exportBackupFile}
-          >
+          <Button variant="outline" class="flex h-11 items-center gap-2 px-5" onClick={exportBackupFile}>
             <Download size={16} />
             {t("settings.export_button")}
-          </button>
-          <button
-            type="button"
-            class="flex h-11 cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-5 text-sm font-medium text-secondary transition-colors hover:border-accent hover:text-accent"
+          </Button>
+          <Button
+            variant="outline"
+            class="flex h-11 items-center gap-2 px-5"
             onClick={() => importInput?.click()}
           >
             <Upload size={16} />
             {t("settings.import_button")}
-          </button>
+          </Button>
           <input
             ref={importInput}
             type="file"
@@ -262,7 +259,7 @@ export default function Settings() {
             onChange={onImportFileChosen}
           />
         </div>
-      </div>
+      </Card>
 
       <ConfirmModal
         open={pendingImportFile() !== null}

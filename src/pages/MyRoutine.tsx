@@ -27,6 +27,7 @@ import { theme } from "../lib/theme";
 import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
 import Heatmap from "../components/Heatmap";
+import { Button, Input, Card } from "../components/ui";
 import { computeStreak } from "../lib/streaks";
 import { habitColor } from "../lib/colors";
 import { Plus, Check, X, Pencil, Eraser, Trash2 } from "lucide-solid";
@@ -222,7 +223,7 @@ export default function MyRoutine() {
   return (
     <section class="flex flex-col gap-5">
       {/* Year/month + add habit */}
-      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <div class="flex flex-wrap gap-6 max-[768px]:flex-col max-[768px]:gap-4">
           <div class="flex min-w-40 flex-1 flex-col gap-1.5">
             <span class="text-xs font-medium text-tertiary">{t("myroutine.year_label")}</span>
@@ -248,28 +249,28 @@ export default function MyRoutine() {
         <hr class="my-5 border-line" />
 
         <div class="flex gap-3 max-[768px]:flex-col">
-          <input
+          <Input
             type="text"
-            class="h-11 flex-1 rounded-lg border border-line-input bg-surface px-4 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+            class="h-11 flex-1 px-4"
             placeholder={t("myroutine.add_habit_placeholder")}
             value={newHabit()}
             onInput={(e) => setNewHabit(e.currentTarget.value)}
             onKeyDown={(e) => e.key === "Enter" && submitNewHabit()}
           />
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            class="h-11 px-6"
             disabled={newHabit().trim() === ""}
-            class="h-11 cursor-pointer rounded-lg bg-accent px-6 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
             onClick={submitNewHabit}
           >
             <Plus size={16} class="mr-2 inline-block align-[-3px]" />
             {t("myroutine.add_habit_button")}
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Habit grid */}
-      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
+      <Card>
         <Show when={habits().length === 0}>
           <p class="mb-4 text-sm text-muted">{t("myroutine.empty_hint")}</p>
         </Show>
@@ -392,14 +393,11 @@ export default function MyRoutine() {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Activity heatmap — a GitHub-style year view per habit */}
       <Show when={habits().length > 0}>
-        <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
-          <h3 class="mb-4 text-lg font-semibold text-primary">
-            {t("myroutine.heatmap_title")} · {year()}
-          </h3>
+        <Card title={<>{t("myroutine.heatmap_title")} · {year()}</>}>
           <div class="flex flex-col gap-5">
             <For each={habits()}>
               {(habit, i) => (
@@ -410,12 +408,11 @@ export default function MyRoutine() {
               )}
             </For>
           </div>
-        </div>
+        </Card>
       </Show>
 
       {/* Sleep tracker */}
-      <div class="rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color)">
-        <h3 class="mb-4 text-lg font-semibold text-primary">{t("myroutine.sleep_title")}</h3>
+      <Card title={t("myroutine.sleep_title")}>
         <div ref={(el) => observer.observe(el)} class="w-full">
           <svg
             class="h-55 w-full"
@@ -525,7 +522,7 @@ export default function MyRoutine() {
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Habit entry modal */}
       <Show when={entryCtx()}>
@@ -578,12 +575,12 @@ export default function MyRoutine() {
                 <label class="mb-1 block text-xs font-medium text-tertiary">
                   {t("myroutine.count_label")}
                 </label>
-                <input
+                <Input
                   type="number"
                   min="0"
                   placeholder={t("myroutine.count_placeholder")}
                   disabled={toggle() !== null}
-                  class="h-10 w-full rounded-lg border border-line-input bg-surface px-3 text-sm text-primary focus:border-accent focus:outline-none disabled:opacity-50"
+                  class="w-full disabled:opacity-50"
                   value={count()}
                   onInput={(e) => {
                     setCount(e.currentTarget.value);
@@ -613,14 +610,10 @@ export default function MyRoutine() {
                   <X size={15} class="mr-1.5 inline-block align-[-2px]" />
                   {t("common.cancel")}
                 </button>
-                <button
-                  type="button"
-                  class="flex-1 cursor-pointer rounded-xl bg-accent px-4 py-3 text-sm font-medium text-accent-fill-text transition-colors hover:bg-accent-hover"
-                  onClick={saveEntry}
-                >
+                <Button variant="primary" class="flex-1 rounded-xl px-4 py-3" onClick={saveEntry}>
                   <Check size={15} class="mr-1.5 inline-block align-[-2px]" />
                   {t("common.save")}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
