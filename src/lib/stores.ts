@@ -56,6 +56,7 @@ export interface Note {
 export interface Habit {
   id: number;
   name: string;
+  reminderTime?: string; // HH:MM, 24-hour - undefined means no reminder
 }
 
 /** Habit day cell: done ("plus") | missed ("x") | numeric count — per habit+date. */
@@ -72,6 +73,7 @@ const KEYS = {
   NOTES: "confidently_notes",
   HABITS: "confidently_habits",
   HABIT_ENTRIES: "confidently_habit_entries",
+  REMINDER_LOG: "confidently_reminder_log",
   SLEEP: "confidently_sleep",
 } as const;
 
@@ -172,6 +174,10 @@ export function renameHabit(habitId: number, name: string) {
   writeHabits(habits().map((h) => (h.id == habitId ? { ...h, name } : h)));
 }
 
+export function setHabitReminder(habitId: number, time: string | undefined) {
+  writeHabits(habits().map((h) => (h.id == habitId ? { ...h, reminderTime: time } : h)));
+}
+
 export function deleteHabit(habitId: number) {
   writeHabits(habits().filter((h) => h.id != habitId));
   const entries = { ...habitEntries() };
@@ -180,6 +186,17 @@ export function deleteHabit(habitId: number) {
     if (key.startsWith(prefix)) delete entries[key];
   }
   writeHabitEntries(entries);
+  const log = { ...reminderLog() };
+  delete log[habitId];
+  writeReminderLog(log);
+}
+
+// ── Reminder notification log (habitId -> last date a reminder fired) ──
+const [reminderLog, writeReminderLog] = collection<Record<number, string>>(KEYS.REMINDER_LOG, {});
+export { reminderLog };
+
+export function markReminderNotified(habitId: number, dateStr: string) {
+  writeReminderLog({ ...reminderLog(), [habitId]: dateStr });
 }
 
 // ── Habit entries (keyed `${habitId}_${YYYY-MM-DD}`) ───────────────────

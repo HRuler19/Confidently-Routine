@@ -155,6 +155,25 @@ test("habits: add habit, cycle a cell, and log a count via the modal", async ({ 
   await expect(cell).toHaveText("5");
 });
 
+test("habit reminders: the panel appears and degrades gracefully without Tauri", async ({ page }) => {
+  await login(page);
+  await page.goto("/my-routine");
+
+  // no habits yet -> the Reminders card doesn't render at all
+  await expect(page.getByText("Reminders", { exact: true })).toHaveCount(0);
+
+  await page.fill('input[placeholder="Add new habit"]', "Meditate");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Reminders", { exact: true })).toBeVisible();
+
+  // picking a time asks for notification permission, which the plain
+  // browser build can never grant (no Tauri notification plugin here) -
+  // confirm that failure surfaces as a toast instead of silently no-oping.
+  await page.getByRole("combobox").filter({ hasText: "No reminder" }).click();
+  await page.getByRole("option", { name: "09:00", exact: true }).click();
+  await expect(page.getByText(/enable notifications/i)).toBeVisible();
+});
+
 test("modals: trap focus, wrap Tab, close on Escape, and restore focus to the trigger", async ({ page }) => {
   await login(page);
   await page.goto("/my-routine");

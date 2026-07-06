@@ -16,6 +16,7 @@ import {
   deleteHabit,
   setHabitEntry,
   clearHabitEntry,
+  setHabitReminder,
   sleepEntries,
   setSleepEntry,
   clearSleepEntry,
@@ -24,11 +25,13 @@ import {
 } from "../lib/stores";
 import { t, calendarNames } from "../lib/i18n";
 import { theme } from "../lib/theme";
-import Select from "../components/Select";
+import Select, { type SelectOption } from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
 import Heatmap from "../components/Heatmap";
 import { Button, Input, Card } from "../components/ui";
 import { useDialogA11y } from "../lib/dialogA11y";
+import { requestNotificationPermission } from "../lib/notifications";
+import { showToast } from "../lib/toast";
 import { computeStreak } from "../lib/streaks";
 import { habitColor } from "../lib/colors";
 import { Plus, Check, X, Pencil, Eraser, Trash2 } from "lucide-solid";
@@ -47,6 +50,19 @@ function daysInMonth(year: number, month: number) {
 
 function dateKey(year: number, month: number, day: number) {
   return `${year}-${pad(month)}-${pad(day)}`;
+}
+
+/** "off" plus every half hour of the day, as plain 24-hour HH:MM - avoids
+    AM/PM locale formatting entirely so this needs no per-language logic. */
+function reminderTimeOptions(): SelectOption[] {
+  const options: SelectOption[] = [{ value: "off", label: () => t("myroutine.reminder_off") }];
+  for (let h = 0; h < 24; h++) {
+    for (const m of [0, 30]) {
+      const value = `${pad(h)}:${pad(m)}`;
+      options.push({ value, label: value });
+    }
+  }
+  return options;
 }
 
 /** Entry-editing modal state. */
@@ -147,6 +163,21 @@ export default function MyRoutine() {
     if (!name) return;
     addHabit(name);
     setNewHabit("");
+  }
+
+  async function handleSetReminder(habit: Habit, value: string) {
+    if (value === "off") {
+      setHabitReminder(habit.id, undefined);
+      showToast({ message: t("myroutine.reminder_cleared_toast", { name: habit.name }) });
+      return;
+    }
+    const granted = await requestNotificationPermission();
+    if (!granted) {
+      showToast({ message: t("myroutine.reminder_permission_denied") });
+      return;
+    }
+    setHabitReminder(habit.id, value);
+    showToast({ message: t("myroutine.reminder_set_toast", { name: habit.name, time: value }) });
   }
 
   // ── Sleep chart geometry (reactive SVG, same layout as the vanilla one) ──
@@ -395,6 +426,28 @@ export default function MyRoutine() {
           </table>
         </div>
       </Card>
+
+      {/* Reminders — native notification per habit, checked while the app is open */}
+      <Show when={habits().length > 0}>
+        <Card title={t("myroutine.reminders_title")}>
+          <p class="mb-4 text-sm text-tertiary">{t("myroutine.reminders_hint")}</p>
+          <div class="flex flex-col gap-3">
+            <For each={habits()}>
+              {(habit) => (
+                <div class="flex items-center justify-between gap-3">
+                  <span class="min-w-0 truncate text-sm font-medium text-primary">{habit.name}</span>
+                  <Select
+                    class="w-36 shrink-0"
+                    value={habit.reminderTime ?? "off"}
+                    options={reminderTimeOptions()}
+                    onChange={(v) => handleSetReminder(habit, v)}
+                  />
+                </div>
+              )}
+            </For>
+          </div>
+        </Card>
+      </Show>
 
       {/* Activity heatmap — a GitHub-style year view per habit */}
       <Show when={habits().length > 0}>

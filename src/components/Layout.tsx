@@ -1,4 +1,4 @@
-import { createSignal, type ParentProps } from "solid-js";
+import { createSignal, onCleanup, type ParentProps } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -7,11 +7,20 @@ import ConfirmModal from "./ConfirmModal";
 import ToastHost from "./ToastHost";
 import { LogOut } from "lucide-solid";
 import { logout } from "../lib/stores";
+import { checkAndSendHabitReminders } from "../lib/notifications";
 import { t } from "../lib/i18n";
+
+const REMINDER_CHECK_INTERVAL_MS = 60_000;
 
 export default function Layout(props: ParentProps) {
   const [showLogout, setShowLogout] = createSignal(false);
   const navigate = useNavigate();
+
+  // Safely no-ops outside a Tauri desktop/mobile window - only fires while
+  // the app is actually open, not a background wake-up.
+  checkAndSendHabitReminders();
+  const reminderInterval = setInterval(checkAndSendHabitReminders, REMINDER_CHECK_INTERVAL_MS);
+  onCleanup(() => clearInterval(reminderInterval));
 
   return (
     <div class="min-h-screen bg-page">

@@ -205,6 +205,14 @@ export const dictionary: Record<string, any> = {
       heatmap_done: "Done",
       heatmap_missed: "Missed",
       heatmap_no_data: "No data",
+      reminders_title: "Reminders",
+      reminders_hint: "Get a native notification if a habit isn't logged yet by its reminder time - only while the app is open.",
+      reminder_off: "No reminder",
+      reminder_set_toast: "Reminder set for {name} at {time}",
+      reminder_cleared_toast: "Reminder cleared for {name}",
+      reminder_permission_denied: "Enable notifications for this app in your system settings first",
+      reminder_notification_title: "Habit reminder",
+      reminder_notification_body: "Don't forget: {name}",
     },
     calendar: {
       months_long: [
@@ -426,6 +434,14 @@ export const dictionary: Record<string, any> = {
       heatmap_done: "Ýerine ýetirildi",
       heatmap_missed: "Ýerine ýetirilmedi",
       heatmap_no_data: "Maglumat ýok",
+      reminders_title: "Ýatlatmalar",
+      reminders_hint: "Endik ýatlatma wagtyna çenli bellenmedik bolsa, ýerli bildiriş al - diňe programma açyk wagty.",
+      reminder_off: "Ýatlatma ýok",
+      reminder_set_toast: "{name} üçin ýatlatma {time} wagtyna guruldy",
+      reminder_cleared_toast: "{name} üçin ýatlatma aýryldy",
+      reminder_permission_denied: "Ilki bilen ulgam sazlamalaryndan bu programma üçin bildirişleri işjeňleşdiriň",
+      reminder_notification_title: "Endik ýatlatmasy",
+      reminder_notification_body: "Unutma: {name}",
     },
     calendar: {
       months_long: [
@@ -647,6 +663,14 @@ export const dictionary: Record<string, any> = {
       heatmap_done: "Выполнено",
       heatmap_missed: "Пропущено",
       heatmap_no_data: "Нет данных",
+      reminders_title: "Напоминания",
+      reminders_hint: "Получайте уведомление, если привычка не отмечена к назначенному времени - только пока приложение открыто.",
+      reminder_off: "Без напоминания",
+      reminder_set_toast: "Напоминание для «{name}» установлено на {time}",
+      reminder_cleared_toast: "Напоминание для «{name}» отключено",
+      reminder_permission_denied: "Сначала разрешите уведомления для этого приложения в настройках системы",
+      reminder_notification_title: "Напоминание о привычке",
+      reminder_notification_body: "Не забудьте: {name}",
     },
     calendar: {
       months_long: [
@@ -868,6 +892,14 @@ export const dictionary: Record<string, any> = {
       heatmap_done: "Tamamlandı",
       heatmap_missed: "Kaçırıldı",
       heatmap_no_data: "Veri yok",
+      reminders_title: "Hatırlatıcılar",
+      reminders_hint: "Alışkanlık hatırlatma saatine kadar işaretlenmezse bildirim al - yalnızca uygulama açıkken.",
+      reminder_off: "Hatırlatıcı yok",
+      reminder_set_toast: "{name} için hatırlatıcı {time} olarak ayarlandı",
+      reminder_cleared_toast: "{name} için hatırlatıcı kaldırıldı",
+      reminder_permission_denied: "Önce sistem ayarlarından bu uygulama için bildirimleri etkinleştirin",
+      reminder_notification_title: "Alışkanlık hatırlatıcısı",
+      reminder_notification_body: "Unutma: {name}",
     },
     calendar: {
       months_long: [
