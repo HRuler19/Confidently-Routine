@@ -6,7 +6,7 @@
 // common states (empty -> done -> missed -> empty) without any dialog,
 // since that covers the vast majority of check-ins; a long-press (or
 // right-click) opens the full entry modal for logging an exact count.
-import { createSignal, createMemo, For, Show, onCleanup } from "solid-js";
+import { createSignal, createMemo, createUniqueId, For, Show, onCleanup } from "solid-js";
 import {
   habits,
   habitEntries,
@@ -28,6 +28,7 @@ import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
 import Heatmap from "../components/Heatmap";
 import { Button, Input, Card } from "../components/ui";
+import { useDialogA11y } from "../lib/dialogA11y";
 import { computeStreak } from "../lib/streaks";
 import { habitColor } from "../lib/colors";
 import { Plus, Check, X, Pencil, Eraser, Trash2 } from "lucide-solid";
@@ -526,15 +527,25 @@ export default function MyRoutine() {
 
       {/* Habit entry modal */}
       <Show when={entryCtx()}>
-        {(ctx) => (
+        {(ctx) => {
+          let container: HTMLDivElement | undefined;
+          const titleId = createUniqueId();
+          useDialogA11y(() => container, () => setEntryCtx(null));
+          return (
           <div
             class="fixed inset-0 z-3000 flex items-center justify-center bg-black/40 backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) setEntryCtx(null);
             }}
           >
-            <div class="w-[90%] max-w-90 animate-[modalFadeIn_0.3s_ease] rounded-3xl bg-surface p-6 pt-8 text-center shadow-2xl shadow-(color:--shadow-color-strong)">
-              <h2 class="mb-5 text-lg font-semibold text-primary">
+            <div
+              ref={container}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={titleId}
+              class="w-[90%] max-w-90 animate-[modalFadeIn_0.3s_ease] rounded-3xl bg-surface p-6 pt-8 text-center shadow-2xl shadow-(color:--shadow-color-strong)"
+            >
+              <h2 id={titleId} class="mb-5 text-lg font-semibold text-primary">
                 {ctx().habit.name} — {calendarNames().months_short[month() - 1]} {ctx().day}
               </h2>
 
@@ -617,7 +628,8 @@ export default function MyRoutine() {
               </div>
             </div>
           </div>
-        )}
+          );
+        }}
       </Show>
 
       {/* Delete habit modal */}

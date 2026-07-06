@@ -155,6 +155,42 @@ test("habits: add habit, cycle a cell, and log a count via the modal", async ({ 
   await expect(cell).toHaveText("5");
 });
 
+test("modals: trap focus, wrap Tab, close on Escape, and restore focus to the trigger", async ({ page }) => {
+  await login(page);
+  await page.goto("/my-routine");
+
+  await page.fill('input[placeholder="Add new habit"]', "Meditate");
+  await page.keyboard.press("Enter");
+  await expect(page.locator("th", { hasText: "Meditate" })).toBeVisible();
+
+  // Delete-habit confirmation (ConfirmModal): opens with Cancel focused,
+  // Shift+Tab from the first button wraps to the last instead of escaping
+  // the dialog, and Escape closes it and returns focus to the trigger.
+  const deleteTrigger = page.locator('button[title="Delete habit"]');
+  await deleteTrigger.click();
+  const confirmDialog = page.getByRole("dialog");
+  await expect(confirmDialog).toBeVisible();
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused();
+
+  await page.keyboard.press("Shift+Tab");
+  await expect(page.getByRole("button", { name: /Yes, delete/i })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused();
+
+  await page.keyboard.press("Escape");
+  await expect(confirmDialog).toBeHidden();
+  await expect(deleteTrigger).toBeFocused();
+
+  // Habit-entry modal: opens with a focusable element inside it focused, Escape closes it.
+  const cell = page.locator("tbody td").nth(1);
+  await cell.click({ button: "right" });
+  const entryDialog = page.getByRole("dialog");
+  await expect(entryDialog).toBeVisible();
+  await expect(entryDialog.locator(":focus")).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(entryDialog).toBeHidden();
+});
+
 test("dashboard renders analytics and settings switches theme + language", async ({ page }) => {
   await login(page);
 
