@@ -1,7 +1,7 @@
 // Pure habit-streak math, kept separate from the UI so it's easy to unit
 // test: a "done" day is any entry that counts as a success (a check mark,
 // or a count greater than zero).
-import { toDateStr } from "./dates";
+import { toDateStr, daysBetween } from "./dates";
 import type { HabitEntry } from "./stores";
 
 export function isEntryDone(entry: HabitEntry | undefined): boolean {
@@ -16,18 +16,6 @@ export function entryToValue(entry: HabitEntry | undefined): number {
   if (entry.type === "plus") return 1;
   if (entry.type === "count") return Number(entry.value) || 0;
   return 0;
-}
-
-/** Whole calendar days between two YYYY-MM-DD strings. Normalizes to noon
-    rather than midnight before diffing - midnight-to-midnight can be 23h
-    or 25h across a DST transition, which would make consecutive calendar
-    days measure as something other than exactly one day. */
-function daysBetween(a: string, b: string): number {
-  const [ay, am, ad] = a.split("-").map(Number);
-  const [by, bm, bd] = b.split("-").map(Number);
-  const aNoon = new Date(ay, am - 1, ad, 12).getTime();
-  const bNoon = new Date(by, bm - 1, bd, 12).getTime();
-  return Math.round((bNoon - aNoon) / 86_400_000);
 }
 
 export interface StreakInfo {

@@ -23,6 +23,20 @@ export function dateKey(year: number, month: number, day: number): string {
   return `${year}-${pad(month)}-${pad(day)}`;
 }
 
+/** Whole calendar days from `a` to `b` (both YYYY-MM-DD). Parses each
+    date's year/month/day directly rather than through `new Date(dateStr)`
+    - a bare "YYYY-MM-DD" string parses as UTC per spec, which lands on
+    the wrong local calendar day for anyone west of UTC - and normalizes
+    both to noon rather than midnight before diffing, so a DST transition
+    between the two dates (23h/25h instead of 24h) can't shift the count. */
+export function daysBetween(a: string, b: string): number {
+  const [ay, am, ad] = a.split("-").map(Number);
+  const [by, bm, bd] = b.split("-").map(Number);
+  const aNoon = new Date(ay, am - 1, ad, 12).getTime();
+  const bNoon = new Date(by, bm - 1, bd, 12).getTime();
+  return Math.round((bNoon - aNoon) / 86_400_000);
+}
+
 export type Recurrence = "daily" | "weekly" | "monthly";
 
 /** The due date a recurring task's next instance should land on. Monthly
@@ -43,11 +57,7 @@ export function nextDueDate(dateStr: string, recurrence: Recurrence): string {
 
 /** Human-friendly relative due-date label ("Today", "In 3 days", …). */
 export function formatDisplayDate(dateStr: string): string {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const dueDate = new Date(dateStr);
-  dueDate.setHours(0, 0, 0, 0);
-  const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / 86_400_000);
+  const diffDays = daysBetween(todayStr(), dateStr);
 
   if (diffDays === 0) return t("routines.date_today");
   if (diffDays === 1) return t("routines.date_tomorrow");
