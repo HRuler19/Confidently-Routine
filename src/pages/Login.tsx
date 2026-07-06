@@ -76,10 +76,10 @@ export default function Login() {
           {/* Avatar selection */}
           <div class="mx-2.5 mb-5 mt-5 flex gap-5 max-[500px]:flex-wrap max-[500px]:justify-center max-[500px]:gap-4">
             <For each={AVATARS}>
-              {(src) => (
-                <div
-                  role="button"
-                  tabindex="0"
+              {(src, i) => (
+                <button
+                  type="button"
+                  aria-label={t("login.select_avatar", { n: i() + 1 })}
                   class="flex size-12.5 cursor-pointer items-center justify-center overflow-hidden rounded-full border transition-all hover:scale-105 hover:border-accent"
                   classList={{
                     "border-accent scale-105": !isCustomAvatar() && avatar() === src,
@@ -91,12 +91,11 @@ export default function Login() {
                   }}
                 >
                   <img src={src} alt="" class="size-full rounded-full object-cover" />
-                </div>
+                </button>
               )}
             </For>
-            <div
-              role="button"
-              tabindex="0"
+            <button
+              type="button"
               aria-label={t("login.add_new_avatar")}
               class="flex size-12.5 cursor-pointer items-center justify-center rounded-full border transition-all hover:scale-105 hover:border-accent"
               classList={{
@@ -106,7 +105,7 @@ export default function Login() {
               onClick={() => fileInput?.click()}
             >
               <Plus size={20} class="text-accent-alt" />
-            </div>
+            </button>
             <input ref={fileInput} type="file" accept="image/*" class="hidden" onChange={onUpload} />
           </div>
 

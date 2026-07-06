@@ -1,6 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import { user } from "../lib/stores";
-import { language, setLanguage, type Language } from "../lib/i18n";
+import { t, language, setLanguage, type Language } from "../lib/i18n";
 import Select from "./Select";
 
 const LANGUAGES: { value: Language; code: string; name: string }[] = [
@@ -15,15 +15,19 @@ export default function Header() {
 
   return (
     <header class="fixed inset-x-0 top-0 z-1000 flex h-[calc(60px+env(safe-area-inset-top,0px))] items-center justify-between border-b border-line bg-surface px-7.5 pt-[env(safe-area-inset-top,0px)] max-[576px]:px-4">
-      <div class="flex items-center gap-2.5">
+      <button
+        type="button"
+        class="flex cursor-pointer items-center gap-2.5 border-none bg-transparent p-0"
+        aria-label={t("header.brand")}
+        onClick={() => navigate("/")}
+      >
         <img
           src="/images/Logo Confidently Routine.svg"
           alt=""
-          class="h-7.5 w-auto cursor-pointer max-[768px]:h-8"
-          onClick={() => navigate("/")}
+          class="h-7.5 w-auto max-[768px]:h-8"
         />
         <div class="text-xl text-accent max-[768px]:hidden">Confidently Routine</div>
-      </div>
+      </button>
 
       <div class="flex items-center gap-2.5 text-base text-header max-[768px]:gap-3">
         <Select

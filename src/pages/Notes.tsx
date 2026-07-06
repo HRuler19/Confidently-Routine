@@ -232,6 +232,7 @@ export default function Notes() {
                         <Button
                           variant="outline"
                           title={note.pinned ? t("notes.unpin_tooltip") : t("notes.pin_tooltip")}
+                          aria-label={note.pinned ? t("notes.unpin_tooltip") : t("notes.pin_tooltip")}
                           class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => updateNote(note.id, { pinned: !note.pinned })}
                         >
@@ -242,6 +243,7 @@ export default function Notes() {
                         <Button
                           variant="outline"
                           title={t("notes.edit_tooltip")}
+                          aria-label={t("common.edit")}
                           class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setEditingId(note.id)}
                         >
@@ -251,6 +253,7 @@ export default function Notes() {
                         <Button
                           variant="danger-outline"
                           title={t("notes.delete_tooltip")}
+                          aria-label={t("common.delete")}
                           class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => handleDelete(note)}
                         >

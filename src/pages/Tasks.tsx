@@ -367,6 +367,7 @@ export default function Tasks() {
                       <div class="flex gap-2">
                         <Button
                           variant="outline"
+                          aria-label={t("common.edit")}
                           class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => setEditingId(task.id)}
                         >
@@ -375,6 +376,7 @@ export default function Tasks() {
                         </Button>
                         <Button
                           variant="danger-outline"
+                          aria-label={t("common.delete")}
                           class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
                           onClick={() => handleDelete(task)}
                         >

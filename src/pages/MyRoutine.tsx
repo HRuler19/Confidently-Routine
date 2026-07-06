@@ -327,6 +327,7 @@ export default function MyRoutine() {
                               <button
                                 type="button"
                                 title={t("myroutine.rename_tooltip")}
+                                aria-label={t("myroutine.rename_tooltip")}
                                 class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-accent"
                                 onClick={() => setRenamingId(habit.id)}
                               >
@@ -335,6 +336,7 @@ export default function MyRoutine() {
                               <button
                                 type="button"
                                 title={t("myroutine.delete_tooltip")}
+                                aria-label={t("myroutine.delete_tooltip")}
                                 class="cursor-pointer border-none bg-transparent p-1 text-xs text-tertiary hover:text-danger"
                                 onClick={() => setPendingDelete(habit)}
                               >
@@ -605,6 +607,8 @@ export default function MyRoutine() {
               <div class="mb-4 flex justify-center gap-4">
                 <button
                   type="button"
+                  aria-label={t("myroutine.heatmap_done")}
+                  aria-pressed={toggle() === "plus"}
                   class="flex size-12 cursor-pointer items-center justify-center rounded-xl border-2 text-lg transition-colors"
                   classList={{
                     "border-accent bg-accent text-accent-fill-text": toggle() === "plus",
@@ -620,6 +624,8 @@ export default function MyRoutine() {
                 </button>
                 <button
                   type="button"
+                  aria-label={t("myroutine.heatmap_missed")}
+                  aria-pressed={toggle() === "x"}
                   class="flex size-12 cursor-pointer items-center justify-center rounded-xl border-2 text-lg transition-colors"
                   classList={{
                     "border-danger bg-danger text-white": toggle() === "x",

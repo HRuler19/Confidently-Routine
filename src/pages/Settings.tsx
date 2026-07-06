@@ -130,10 +130,10 @@ export default function Settings() {
             </div>
             <div class="flex flex-wrap gap-3 max-[768px]:justify-center">
               <For each={AVATARS}>
-                {(src) => (
-                  <div
-                    role="button"
-                    tabindex="0"
+                {(src, i) => (
+                  <button
+                    type="button"
+                    aria-label={t("settings.avatar_alt", { n: i() + 1 })}
                     class="flex size-13 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 transition-all hover:scale-105"
                     classList={{
                       "border-accent ring-3 ring-accent/25": selectedAvatar() === src,
@@ -142,17 +142,17 @@ export default function Settings() {
                     onClick={() => setSelectedAvatar(src)}
                   >
                     <img src={src} alt="" class="size-full rounded-full object-cover" />
-                  </div>
+                  </button>
                 )}
               </For>
-              <div
-                role="button"
-                tabindex="0"
+              <button
+                type="button"
+                aria-label={t("login.add_new_avatar")}
                 class="flex size-13 cursor-pointer items-center justify-center rounded-full border-2 border-dashed border-line text-accent transition-all hover:scale-105 hover:border-accent"
                 onClick={() => fileInput?.click()}
               >
                 <Plus size={18} />
-              </div>
+              </button>
               <input
                 ref={fileInput}
                 type="file"

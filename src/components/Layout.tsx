@@ -24,10 +24,27 @@ export default function Layout(props: ParentProps) {
 
   return (
     <div class="min-h-screen bg-page">
+      <a
+        href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-3000 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-fill-text"
+        onClick={(e) => {
+          // Chromium (unlike Firefox/Safari) doesn't reliably move focus to
+          // a tabindex="-1" fragment target on its own, so this is focused
+          // explicitly rather than relying on default anchor navigation.
+          e.preventDefault();
+          document.getElementById("main-content")?.focus();
+        }}
+      >
+        {t("common.skip_to_content")}
+      </a>
       <Header />
       <Sidebar onLogout={() => setShowLogout(true)} />
       <MobileNav />
-      <main class="relative ml-62.5 mt-[calc(60px+env(safe-area-inset-top,0px))] min-h-[calc(100vh-60px-env(safe-area-inset-top,0px))] overflow-y-auto bg-page p-7.5 max-[768px]:mb-[calc(94px+env(safe-area-inset-bottom,0px))] max-[768px]:ml-0 max-[768px]:p-5 max-[576px]:p-4">
+      <main
+        id="main-content"
+        tabindex="-1"
+        class="relative ml-62.5 mt-[calc(60px+env(safe-area-inset-top,0px))] min-h-[calc(100vh-60px-env(safe-area-inset-top,0px))] overflow-y-auto bg-page p-7.5 max-[768px]:mb-[calc(94px+env(safe-area-inset-bottom,0px))] max-[768px]:ml-0 max-[768px]:p-5 max-[576px]:p-4"
+      >
         {props.children}
       </main>
 

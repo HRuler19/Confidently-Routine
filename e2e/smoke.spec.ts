@@ -23,6 +23,29 @@ test("login validates and reaches the dashboard", async ({ page }) => {
   await expect(page.locator("header")).toContainText("E2E User");
 });
 
+test("accessibility: avatar picker is keyboard-operable, and the skip link jumps to main content", async ({
+  page,
+}) => {
+  await page.goto("/login");
+
+  // avatar swatches used to be <div role="button"> with no keydown handler,
+  // so Tab could reach them but Enter/Space did nothing - now real <button>s.
+  const secondAvatar = page.getByRole("button", { name: "Select avatar 2" });
+  await secondAvatar.focus();
+  await page.keyboard.press("Enter");
+  await expect(secondAvatar).toHaveClass(/border-accent/);
+
+  await login(page);
+
+  // the skip link is the first focusable element on an authenticated page
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  const skipLink = page.getByRole("link", { name: "Skip to content" });
+  await expect(skipLink).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#main-content")).toBeFocused();
+});
+
 test("task lifecycle: add, complete, filter, delete", async ({ page }) => {
   await login(page);
   await page.goto("/routines");
@@ -352,7 +375,7 @@ test("select: arrow keys move the highlighted option and Enter commits it", asyn
 
 test("logout returns to login and guards routes", async ({ page }) => {
   await login(page);
-  await page.locator("aside a", { hasText: /Logout/i }).click();
+  await page.locator("aside button", { hasText: /Logout/i }).click();
   await page.getByRole("button", { name: /Yes, log out/i }).click();
   await expect(page).toHaveURL(/\/login/);
 
