@@ -4,6 +4,7 @@
 import { createSignal, For, Show } from "solid-js";
 import { user, updateUser } from "../lib/stores";
 import { exportBackupFile, importBackupFromFile } from "../lib/backup";
+import { resizeImageToDataUrl } from "../lib/avatarImage";
 import { t, language, setLanguage, type Language } from "../lib/i18n";
 import { theme, setTheme, type Theme } from "../lib/theme";
 import Select from "../components/Select";
@@ -75,12 +76,16 @@ export default function Settings() {
     });
   }
 
-  function onUpload(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
+  async function onUpload(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ""; // allow re-choosing the same file after an error
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => setSelectedAvatar(ev.target?.result as string);
-    reader.readAsDataURL(file);
+    try {
+      setSelectedAvatar(await resizeImageToDataUrl(file));
+    } catch {
+      showToast({ message: t("login.avatar_upload_error") });
+    }
   }
 
   function save() {

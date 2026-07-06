@@ -44,6 +44,7 @@ export const dictionary: Record<string, any> = {
       remember_me: "Remember me",
       submit: "Submit",
       error_username_required: "Please enter username",
+      avatar_upload_error: "Couldn't use that image - try a photo under 15MB",
     },
     dashboard: {
       title: "Dashboard",
@@ -267,6 +268,7 @@ export const dictionary: Record<string, any> = {
       remember_me: "Meni ýatda sakla",
       submit: "Ugrat",
       error_username_required: "Ulanyjy adyny giriziň",
+      avatar_upload_error: "Bu surat ulanylyp bilinmedi - 15MB-dan kiçi surat synanyşyň",
     },
     dashboard: {
       title: "Panel",
@@ -490,6 +492,7 @@ export const dictionary: Record<string, any> = {
       remember_me: "Запомнить меня",
       submit: "Войти",
       error_username_required: "Введите имя пользователя",
+      avatar_upload_error: "Не удалось использовать это изображение - попробуйте фото меньше 15МБ",
     },
     dashboard: {
       title: "Панель",
@@ -713,6 +716,7 @@ export const dictionary: Record<string, any> = {
       remember_me: "Beni hatırla",
       submit: "Gönder",
       error_username_required: "Lütfen kullanıcı adı girin",
+      avatar_upload_error: "Bu görsel kullanılamadı - 15MB'dan küçük bir fotoğraf deneyin",
     },
     dashboard: {
       title: "Panel",

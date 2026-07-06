@@ -43,6 +43,23 @@ test("accessibility: avatar picker is keyboard-operable, and the skip link jumps
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
+test("avatar upload: resizes a real image and rejects a non-image file", async ({ page }) => {
+  await page.goto("/login");
+
+  const fileInput = page.locator('input[type="file"]');
+  await fileInput.setInputFiles("e2e/fixtures/tiny.png");
+  // resizeImageToDataUrl always re-encodes through canvas as JPEG, so a
+  // successful upload should replace the preview with a data:image/jpeg URL
+  // regardless of what format was uploaded.
+  await expect(page.locator('img[alt="Main avatar"]')).toHaveAttribute(
+    "src",
+    /^data:image\/jpeg;base64,/,
+  );
+
+  await fileInput.setInputFiles("e2e/fixtures/not-an-image.txt");
+  await expect(page.getByText(/couldn't use that image/i)).toBeVisible();
+});
+
 test("task lifecycle: add, complete, filter, delete", async ({ page }) => {
   await login(page);
   await page.goto("/routines");

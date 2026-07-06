@@ -1,6 +1,7 @@
 import { createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { saveUser } from "../lib/stores";
+import { resizeImageToDataUrl } from "../lib/avatarImage";
 import { t } from "../lib/i18n";
 import { Plus, User } from "lucide-solid";
 
@@ -18,6 +19,7 @@ export default function Login() {
   const [avatar, setAvatar] = createSignal(AVATARS[0]);
   const [isCustomAvatar, setIsCustomAvatar] = createSignal(false);
   const [usernameError, setUsernameError] = createSignal("");
+  const [avatarError, setAvatarError] = createSignal("");
   let fileInput: HTMLInputElement | undefined;
 
   function submit(e: Event) {
@@ -34,15 +36,19 @@ export default function Login() {
     navigate("/");
   }
 
-  function onUpload(e: Event) {
-    const file = (e.target as HTMLInputElement).files?.[0];
+  async function onUpload(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ""; // allow re-choosing the same file after an error
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setAvatar(ev.target?.result as string);
+    setAvatarError("");
+    try {
+      const dataUrl = await resizeImageToDataUrl(file);
+      setAvatar(dataUrl);
       setIsCustomAvatar(true);
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      setAvatarError(t("login.avatar_upload_error"));
+    }
   }
 
   return (
@@ -100,6 +106,9 @@ export default function Login() {
             </button>
             <input ref={fileInput} type="file" accept="image/*" class="hidden" onChange={onUpload} />
           </div>
+          <Show when={avatarError()}>
+            <div class="mb-2.5 -mt-2.5 text-[10px] text-danger">{avatarError()}</div>
+          </Show>
 
           {/* Form */}
           <form class="flex w-full flex-col items-center" novalidate onSubmit={submit}>
