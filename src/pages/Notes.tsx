@@ -9,7 +9,8 @@ import DatePicker from "../components/DatePicker";
 import { Button, Textarea, Card, StatBadge } from "../components/ui";
 import { showToast } from "../lib/toast";
 import { todayStr } from "../lib/dates";
-import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
+import { renderMarkdown } from "../lib/markdown";
+import { Plus, Check, X, Calendar, Pencil, Trash2, Pin, PinOff, Search } from "lucide-solid";
 
 const NOTE_CATEGORIES = ["study", "work", "personal", "learning"] as const;
 
@@ -70,6 +71,7 @@ export default function Notes() {
   const [newCategory, setNewCategory] = createSignal("study");
   const [sortFilter, setSortFilter] = createSignal("all");
   const [categoryFilter, setCategoryFilter] = createSignal("all");
+  const [searchQuery, setSearchQuery] = createSignal("");
   const [editingId, setEditingId] = createSignal<number | null>(null);
 
   function handleDelete(note: Note) {
@@ -86,11 +88,18 @@ export default function Notes() {
     if (categoryFilter() !== "all") {
       filtered = filtered.filter((n) => n.category === categoryFilter());
     }
+    const query = searchQuery().trim().toLowerCase();
+    if (query) filtered = filtered.filter((n) => n.content.toLowerCase().includes(query));
     if (sortFilter() === "recent") {
       filtered.sort((a, b) => b.createdAt - a.createdAt);
     } else if (sortFilter() === "oldest") {
       filtered.sort((a, b) => a.createdAt - b.createdAt);
     }
+    // Stable sort keeps the ordering above intact within each group -
+    // pinned notes always float to the top regardless of sort mode.
+    // (Number(undefined) is NaN, not 0, so the booleans must be coerced
+    // first or an unpinned note's NaN silently no-ops the comparison.)
+    filtered.sort((a, b) => Number(!!b.pinned) - Number(!!a.pinned));
     return filtered;
   });
 
@@ -113,12 +122,15 @@ export default function Notes() {
       {/* Add-note card */}
       <Card>
         <div class="flex gap-5 max-[768px]:flex-col">
-          <Textarea
-            class="min-h-36 flex-1 p-4"
-            placeholder={t("notes.add_placeholder")}
-            value={newContent()}
-            onInput={(e) => setNewContent(e.currentTarget.value)}
-          />
+          <div class="flex flex-1 flex-col gap-1.5">
+            <Textarea
+              class="min-h-36 w-full p-4"
+              placeholder={t("notes.add_placeholder")}
+              value={newContent()}
+              onInput={(e) => setNewContent(e.currentTarget.value)}
+            />
+            <span class="text-xs text-tertiary">{t("notes.markdown_hint")}</span>
+          </div>
           <div class="flex w-56 flex-col gap-4 max-[768px]:w-full">
             <Button
               variant="primary"
@@ -144,6 +156,16 @@ export default function Notes() {
       {/* Filters + count */}
       <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-3">
+          <div class="relative">
+            <Search size={14} class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
+            <input
+              type="text"
+              class="h-9 w-48 rounded-lg border border-line-input bg-surface pl-8 pr-3 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+              placeholder={t("notes.search_placeholder")}
+              value={searchQuery()}
+              onInput={(e) => setSearchQuery(e.currentTarget.value)}
+            />
+          </div>
           <span class="text-sm font-medium text-secondary">{t("notes.filters_label")}</span>
           <Select
             class="w-36"
@@ -180,15 +202,19 @@ export default function Notes() {
         >
           <For each={visibleNotes()}>
             {(note) => (
-              <div class="flex items-start gap-4 rounded-xl border border-line bg-surface p-4 shadow-sm shadow-(color:--shadow-color) transition-shadow hover:shadow-md max-[768px]:flex-col">
+              <div
+                class="flex items-start gap-4 rounded-xl border border-line bg-surface p-4 shadow-sm shadow-(color:--shadow-color) transition-shadow hover:shadow-md max-[768px]:flex-col"
+                classList={{ "border-accent": !!note.pinned }}
+              >
                 <Show
                   when={editingId() === note.id}
                   fallback={
                     <>
                       <div class="flex min-w-0 flex-1 items-center justify-between gap-4 max-[768px]:w-full max-[768px]:flex-col max-[768px]:items-start max-[768px]:gap-2.5">
-                        <div class="whitespace-pre-line text-sm leading-relaxed text-primary">
-                          {note.content}
-                        </div>
+                        <div
+                          class="min-w-0 text-sm leading-relaxed text-primary [&_a]:text-accent [&_a]:underline [&_code]:rounded [&_code]:bg-hover [&_code]:px-1 [&_code]:py-0.5 [&_h3]:mb-1 [&_h3]:text-base [&_h3]:font-semibold [&_h4]:mb-1 [&_h4]:text-sm [&_h4]:font-semibold [&_h5]:mb-1 [&_h5]:text-sm [&_h5]:font-semibold [&_li]:ml-4 [&_p+p]:mt-2 [&_p]:m-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:pl-4"
+                          innerHTML={renderMarkdown(note.content)}
+                        />
                         <div class="flex shrink-0 items-center gap-4 max-[768px]:w-full max-[768px]:flex-wrap">
                           <span class="rounded-full border border-accent px-3.5 py-1 text-xs font-medium text-accent">
                             {t(`notes.category_${note.category}`)}
@@ -197,9 +223,22 @@ export default function Notes() {
                             <Calendar size={14} />
                             {note.date}
                           </span>
+                          <Show when={note.pinned}>
+                            <Pin size={14} class="text-accent" />
+                          </Show>
                         </div>
                       </div>
                       <div class="flex gap-2 max-[768px]:w-full">
+                        <Button
+                          variant="outline"
+                          title={note.pinned ? t("notes.unpin_tooltip") : t("notes.pin_tooltip")}
+                          class="flex h-9 items-center justify-center gap-2 px-3 max-[768px]:h-11 max-[768px]:flex-1"
+                          onClick={() => updateNote(note.id, { pinned: !note.pinned })}
+                        >
+                          <Show when={note.pinned} fallback={<Pin size={15} />}>
+                            <PinOff size={15} />
+                          </Show>
+                        </Button>
                         <Button
                           variant="outline"
                           title={t("notes.edit_tooltip")}

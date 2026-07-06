@@ -50,6 +50,7 @@ export interface Note {
   category: string; // "study" | "work" | "personal" | "learning"
   date: string; // YYYY-MM-DD
   createdAt: number;
+  pinned?: boolean;
 }
 
 export interface Habit {

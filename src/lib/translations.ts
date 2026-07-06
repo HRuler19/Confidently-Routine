@@ -141,6 +141,10 @@ export const dictionary: Record<string, any> = {
       empty_state: "No notes found. Add your first note above!",
       edit_tooltip: "Edit",
       delete_tooltip: "Delete",
+      pin_tooltip: "Pin",
+      unpin_tooltip: "Unpin",
+      search_placeholder: "Search notes...",
+      markdown_hint: "Supports **bold**, *italic*, `code`, # headings, - lists, and [links](url)",
     },
     settings: {
       edit_profile_title: "Edit profile",
@@ -351,6 +355,10 @@ export const dictionary: Record<string, any> = {
       empty_state: "Bellik tapylmady. Ilkinji bellikiňizi ýokardan goşuň!",
       edit_tooltip: "Üýtget",
       delete_tooltip: "Poz",
+      pin_tooltip: "Berkit",
+      unpin_tooltip: "Berkitmäni aýyr",
+      search_placeholder: "Bellik gözle...",
+      markdown_hint: "**Galyň**, *ýapyk*, `kod`, # sözbaşy, - sanaw we [salgy](url) goldanýar",
     },
     settings: {
       edit_profile_title: "Profili üýtget",
@@ -561,6 +569,10 @@ export const dictionary: Record<string, any> = {
       empty_state: "Заметок не найдено. Добавьте первую заметку выше!",
       edit_tooltip: "Изменить",
       delete_tooltip: "Удалить",
+      pin_tooltip: "Закрепить",
+      unpin_tooltip: "Открепить",
+      search_placeholder: "Поиск заметок...",
+      markdown_hint: "Поддерживает **жирный**, *курсив*, `код`, # заголовки, - списки и [ссылки](url)",
     },
     settings: {
       edit_profile_title: "Редактировать профиль",
@@ -771,6 +783,10 @@ export const dictionary: Record<string, any> = {
       empty_state: "Not bulunamadı. İlk notunu yukarıdan ekle!",
       edit_tooltip: "Düzenle",
       delete_tooltip: "Sil",
+      pin_tooltip: "Sabitle",
+      unpin_tooltip: "Sabitlemeyi kaldır",
+      search_placeholder: "Not ara...",
+      markdown_hint: "**Kalın**, *italik*, `kod`, # başlık, - liste ve [bağlantı](url) destekler",
     },
     settings: {
       edit_profile_title: "Profili düzenle",

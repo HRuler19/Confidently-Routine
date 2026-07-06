@@ -101,6 +101,34 @@ test("notes: add and edit", async ({ page }) => {
   await expect(page.getByText("Edited e2e note")).toBeVisible();
 });
 
+test("notes: renders markdown, pinning floats a note to the top, and search filters", async ({ page }) => {
+  await login(page);
+  await page.goto("/notes");
+
+  await page.fill("textarea", "Grocery list for the week");
+  await page.locator("section button", { hasText: "Add Note" }).click();
+  await page.fill("textarea", "**bold** and *italic* text");
+  await page.locator("section button", { hasText: "Add Note" }).click();
+
+  await expect(page.locator("strong", { hasText: "bold" })).toBeVisible();
+  await expect(page.locator("em", { hasText: "italic" })).toBeVisible();
+
+  // newest-first by default, so the bold note (added second) leads
+  const noteContents = page.locator('div[class*="leading-relaxed"]');
+  await expect(noteContents.first()).toContainText("bold");
+
+  // pinning the older note should float it above the newer, unpinned one
+  const groceryCard = page.locator("div.items-start.rounded-xl", { hasText: "Grocery list for the week" });
+  await groceryCard.getByRole("button", { name: "Pin" }).click();
+  await expect(noteContents.first()).toContainText("Grocery list for the week");
+  await expect(page.locator("svg.lucide-pin").first()).toBeVisible();
+
+  // search narrows the list by content
+  await page.fill('input[placeholder="Search notes..."]', "grocery");
+  await expect(page.getByText("Grocery list for the week")).toBeVisible();
+  await expect(page.locator("strong", { hasText: "bold" })).toHaveCount(0);
+});
+
 test("habits: add habit, cycle a cell, and log a count via the modal", async ({ page }) => {
   await login(page);
   await page.goto("/my-routine");
