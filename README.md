@@ -10,7 +10,7 @@ A privacy-first productivity suite for habits, daily tasks, and notes — built 
 
 <br />
 
-[![Version](https://img.shields.io/badge/version-2.0.0-0e5e0a?style=for-the-badge)](https://github.com/HRuler19/Confidently-Routine/releases/latest)
+[![Version](https://img.shields.io/github/v/release/HRuler19/Confidently-Routine?style=for-the-badge&color=0e5e0a&label=version)](https://github.com/HRuler19/Confidently-Routine/releases/latest)
 [![Platforms](https://img.shields.io/badge/platforms-Windows_·_macOS_·_Android_·_iOS_·_Web-3c8116?style=for-the-badge)](#-download--install)
 [![SolidJS](https://img.shields.io/badge/SolidJS-2C4F7C?style=for-the-badge&logo=solid&logoColor=white)](#-tech-stack)
 [![Tauri v2](https://img.shields.io/badge/Tauri_v2-24C8D8?style=for-the-badge&logo=tauri&logoColor=white)](#-tech-stack)
@@ -50,19 +50,25 @@ A privacy-first productivity suite for habits, daily tasks, and notes — built 
 
 ## ⬇ Download & Install
 
-> Grab the latest build for your device from the **[v2.0.0 release](https://github.com/HRuler19/Confidently-Routine/releases/tag/v2.0.0)**, or use a direct link below.
+<!-- Windows/Android buttons use /releases/latest/download/<exact-filename>, which
+     always serves whatever asset by that name sits in the newest release - but the
+     filename itself embeds the version (tauri-action names it from productName +
+     package version), so bump the version number in these two links whenever a new
+     tag is released, or the button 404s against the new release. -->
+
+> Grab the latest build for your device from the **[latest release](https://github.com/HRuler19/Confidently-Routine/releases/latest)**, or use a direct link below — the buttons always resolve to the newest Windows/Android build, no need to hunt for a version number.
 
 <div align="center">
 
 ### 🪟 Windows
 
-[![Download Windows Installer](https://img.shields.io/badge/⬇_Download-Windows_Installer_~5MB-0078D6?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v2.0.0/Confidently-Routine-Setup-2.0.0.exe)
+[![Download Windows Installer](https://img.shields.io/badge/⬇_Download-Windows_Installer_~5MB-0078D6?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently-Routine-Setup-2.0.0.exe)
 
 ### 🤖 Android
 
-[![Download Android APK](https://img.shields.io/badge/⬇_Download-Android_APK_(signed)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v2.0.0/Confidently-Routine-2.0.0.apk)
+[![Download Android APK](https://img.shields.io/badge/⬇_Download-Android_APK_(signed)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently-Routine-2.0.0.apk)
 
-### 🍎 macOS <sub>(v1 builds — v2 coming from the next Mac build)</sub>
+### 🍎 macOS <sub>(v1 builds — v2 ships with the next tagged release, built by CI)</sub>
 
 [![Download macOS (Apple Silicon)](https://img.shields.io/badge/⬇_Download-macOS_Apple_Silicon_(.dmg)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v1.0.0/Confidently-Routine-1.0.0-arm64.dmg)
 &nbsp;
@@ -80,7 +86,7 @@ A privacy-first productivity suite for habits, daily tasks, and notes — built 
 |---|---|---|
 | **Windows** | `Confidently-Routine-Setup-2.0.0.exe` | Run the ~5 MB installer — it adds Start-menu and desktop shortcuts. Installs per-user, no admin rights needed. |
 | **Android** | `Confidently-Routine-2.0.0.apk` | Enable **Settings → Apps → Install unknown apps** for your browser/file manager, then open the `.apk` to sideload. Signed release build (arm64 + x86_64). |
-| **macOS (Apple Silicon)** | `Confidently-Routine-1.0.0-arm64.dmg` | Open the `.dmg`, drag the app into **Applications**. For M1/M2/M3/M4 Macs. *(v1 build — the v2 Tauri build ships after the next Mac session.)* |
+| **macOS (Apple Silicon)** | `Confidently-Routine-1.0.0-arm64.dmg` | Open the `.dmg`, drag the app into **Applications**. For M1/M2/M3/M4 Macs. *(v1 build — the v2 Tauri build ships with the next tagged release, built automatically by CI.)* |
 | **macOS (Intel)** | `Confidently-Routine-1.0.0-x64.dmg` | Same as above, for Intel-based Macs. |
 | **iOS** | — | Apple doesn't allow installing an unsigned `.ipa` on a device without a paid Developer Program account, so there's no direct download yet. Build and run it yourself from Xcode — see [Building from source](#-building-from-source). |
 | **Browser** | — | `bun install && bun run build`, then host the generated `dist/` folder on any static server. |
