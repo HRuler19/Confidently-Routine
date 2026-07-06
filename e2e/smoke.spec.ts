@@ -4,20 +4,17 @@ import { test, expect, type Page } from "@playwright/test";
 async function login(page: Page, username = "E2E User") {
   await page.goto("/login");
   await page.fill("#username", username);
-  await page.fill("#password", "secret123");
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL(/\/$/);
 }
 
 test("login validates and reaches the dashboard", async ({ page }) => {
   await page.goto("/login");
-  // short password should be rejected
-  await page.fill("#username", "E2E User");
-  await page.fill("#password", "123");
+  // empty username should be rejected
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL(/\/login/);
 
-  await page.fill("#password", "secret123");
+  await page.fill("#username", "E2E User");
   await page.click('button[type="submit"]');
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator("header")).toContainText("E2E User");

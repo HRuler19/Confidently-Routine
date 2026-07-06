@@ -1,5 +1,5 @@
 // Settings — port of the vanilla settings module: profile editing
-// (avatar picker + optional custom upload, username/password) and the
+// (avatar picker + optional custom upload, username) and the
 // theme + language selectors, all persisting through the same stores.
 import { createSignal, For, Show } from "solid-js";
 import { user, updateUser } from "../lib/stores";
@@ -30,7 +30,6 @@ const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
 export default function Settings() {
   const [selectedAvatar, setSelectedAvatar] = createSignal(user()?.avatar ?? AVATARS[0]);
   const [newUsername, setNewUsername] = createSignal("");
-  const [newPassword, setNewPassword] = createSignal("");
   const [justSaved, setJustSaved] = createSignal(false);
   const [pendingImportFile, setPendingImportFile] = createSignal<File | null>(null);
   const [canUpdate, setCanUpdate] = createSignal(false);
@@ -93,12 +92,10 @@ export default function Settings() {
       updates.avatar = selectedAvatar();
     }
     if (newUsername().trim()) updates.username = newUsername().trim();
-    if (newPassword().trim()) updates.password = newPassword().trim();
 
     if (Object.keys(updates).length > 0) {
       updateUser(updates);
       setNewUsername("");
-      setNewPassword("");
       setJustSaved(true);
       setTimeout(() => setJustSaved(false), 2000);
     }
@@ -163,7 +160,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* Username / password form */}
+          {/* Username form */}
           <div class="flex min-w-64 flex-1 flex-col gap-3">
             <div class="flex flex-col gap-1">
               <label class="text-xs font-medium text-tertiary">
@@ -178,17 +175,6 @@ export default function Settings() {
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-xs font-medium text-tertiary">
-                {t("settings.current_password_label")}
-              </label>
-              <input
-                type="password"
-                readonly
-                value="********"
-                class="h-11 rounded-xl border border-line-input bg-surface-alt px-3.5 text-sm text-secondary focus:outline-none"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-tertiary">
                 {t("settings.new_username_label")}
               </label>
               <Input
@@ -196,18 +182,6 @@ export default function Settings() {
                 placeholder={t("settings.new_username_placeholder")}
                 value={newUsername()}
                 onInput={(e) => setNewUsername(e.currentTarget.value)}
-                class="h-11 rounded-xl px-3.5"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-tertiary">
-                {t("settings.new_password_label")}
-              </label>
-              <Input
-                type="password"
-                placeholder={t("settings.new_password_placeholder")}
-                value={newPassword()}
-                onInput={(e) => setNewPassword(e.currentTarget.value)}
                 class="h-11 rounded-xl px-3.5"
               />
             </div>

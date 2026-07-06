@@ -28,7 +28,6 @@ function writeJSON(key: string, value: unknown, session = false): void {
 // ── Types (shapes match the data the vanilla app persisted) ───────────
 export interface User {
   username: string;
-  password?: string;
   avatar: string;
   lastLogin?: string;
 }
@@ -235,7 +234,7 @@ export function clearSleepEntry(dateStr: string) {
 }
 
 // ── Backup / restore ────────────────────────────────────────────────────
-// Deliberately excludes the user account (username/password/avatar) - a
+// Deliberately excludes the user account (username/avatar) - a
 // restore should bring back your tasks and habits, not silently change
 // who you're logged in as or clobber a different profile's credentials.
 const BACKUP_VERSION = 1;

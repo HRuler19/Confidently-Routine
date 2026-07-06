@@ -2,7 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { saveUser } from "../lib/stores";
 import { t } from "../lib/i18n";
-import { Plus, User, Lock, Eye, EyeOff } from "lucide-solid";
+import { Plus, User } from "lucide-solid";
 
 const AVATARS = [
   "/images/Boy image 1.svg",
@@ -14,26 +14,18 @@ const AVATARS = [
 export default function Login() {
   const navigate = useNavigate();
   const [username, setUsername] = createSignal("");
-  const [password, setPassword] = createSignal("");
-  const [showPassword, setShowPassword] = createSignal(false);
   const [remember, setRemember] = createSignal(false);
   const [avatar, setAvatar] = createSignal(AVATARS[0]);
   const [isCustomAvatar, setIsCustomAvatar] = createSignal(false);
   const [usernameError, setUsernameError] = createSignal("");
-  const [passwordError, setPasswordError] = createSignal("");
   let fileInput: HTMLInputElement | undefined;
 
   function submit(e: Event) {
     e.preventDefault();
     setUsernameError("");
-    setPasswordError("");
 
     const name = username().trim();
-    const pass = password().trim();
-
     if (!name) return setUsernameError(t("login.error_username_required"));
-    if (!pass) return setPasswordError(t("login.error_password_required"));
-    if (pass.length < 6) return setPasswordError(t("login.error_password_length"));
 
     saveUser(
       { username: name, avatar: avatar(), lastLogin: new Date().toISOString() },
@@ -128,36 +120,6 @@ export default function Login() {
               </div>
               <Show when={usernameError()}>
                 <div class="mt-1 text-[10px] text-danger">{usernameError()}</div>
-              </Show>
-            </div>
-
-            <div class="mb-1.25 w-full max-w-87.5">
-              <label for="password" class="mb-1.25 block text-xs text-primary">
-                {t("login.password_label")}
-              </label>
-              <div class="flex h-10 w-full items-center rounded-[5px] border border-line-input bg-surface px-2.5 focus-within:border-accent">
-                <span class="mr-2.5 flex items-center justify-center text-base text-accent-alt">
-                  <Lock size={16} />
-                </span>
-                <input
-                  type={showPassword() ? "text" : "password"}
-                  id="password"
-                  class="min-w-0 flex-1 border-none bg-transparent p-0 text-sm text-secondary outline-none placeholder:text-placeholder"
-                  placeholder={t("login.password_placeholder")}
-                  value={password()}
-                  onInput={(e) => setPassword(e.currentTarget.value)}
-                />
-                <button
-                  type="button"
-                  class="ml-2.5 flex cursor-pointer items-center justify-center border-none bg-transparent p-0 text-xs text-accent-alt"
-                  aria-label={t("login.toggle_password")}
-                  onClick={() => setShowPassword(!showPassword())}
-                >
-                  {showPassword() ? <Eye size={14} /> : <EyeOff size={14} />}
-                </button>
-              </div>
-              <Show when={passwordError()}>
-                <div class="mt-1 text-[10px] text-danger">{passwordError()}</div>
               </Show>
             </div>
 
