@@ -50,3 +50,22 @@ jobs:
           name: playwright-traces
           path: test-results/
           retention-days: 7
+
+  rust:
+    name: Rust cargo check
+    # windows-latest so it exercises the same toolchain the release workflow
+    # actually ships from - a plain compile check, no Tauri build/bundle,
+    # just to catch a broken src-tauri change before a version tag does.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: cargo check
+        working-directory: src-tauri
+        run: cargo check --all-targets
