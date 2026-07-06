@@ -250,6 +250,51 @@ test("date picker: opens, navigates months, selects a day, and localizes", async
   await expect(trPanel.getByRole("button", { name: "Bugün" })).toBeVisible();
 });
 
+test("date picker: arrow keys move focus between days and Enter selects", async ({ page }) => {
+  await login(page);
+  await page.goto("/routines");
+
+  const trigger = page.getByRole("combobox", { name: "Due Date" });
+  await trigger.click();
+  const panel = page.getByRole("dialog");
+  await expect(panel).toBeVisible();
+
+  // the panel opens with today's day focused; ArrowRight moves to tomorrow
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("Enter");
+  await expect(panel).toBeHidden();
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  await expect(trigger).toContainText(`${tomorrow.getDate()} `);
+
+  // Escape closes the panel and returns focus to the trigger
+  await trigger.click();
+  await expect(panel).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("select: arrow keys move the highlighted option and Enter commits it", async ({ page }) => {
+  await login(page);
+  await page.goto("/routines");
+
+  const categoryTrigger = page.getByRole("combobox").filter({ hasText: "Personal" });
+  await categoryTrigger.focus();
+  await page.keyboard.press("ArrowDown"); // opens with the current selection highlighted
+  await expect(page.getByRole("listbox")).toBeVisible();
+  await page.keyboard.press("ArrowDown"); // Personal -> Work
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("listbox")).toHaveCount(0);
+
+  // confirm the keyboard-driven change actually stuck, via the added task's category tag
+  await page.fill('input[placeholder="Add new task"]', "Keyboard nav check");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Keyboard nav check", { exact: true })).toBeVisible();
+  await expect(page.locator("span.rounded-full", { hasText: "Work" })).toBeVisible();
+});
+
 test("logout returns to login and guards routes", async ({ page }) => {
   await login(page);
   await page.locator("aside a", { hasText: /Logout/i }).click();
