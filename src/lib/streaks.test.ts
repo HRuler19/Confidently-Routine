@@ -91,4 +91,28 @@ describe("computeStreak", () => {
     };
     expect(computeStreak(e, HABIT, TODAY).current).toBe(1);
   });
+
+  it("doesn't break a streak across a DST transition", () => {
+    // Midnight-to-midnight across a "spring forward" is only 23 hours (and
+    // 25 across "fall back"), so naive ms-difference math would see these
+    // consecutive calendar days as more/less than a day apart and reset
+    // the run. Run this under a DST-observing zone regardless of the host
+    // machine's own timezone.
+    const originalTz = process.env.TZ;
+    process.env.TZ = "America/New_York";
+    try {
+      // 2026-03-08 is the day before the US DST transition (2026-03-09).
+      const e = entries({
+        "2026-03-07": { type: "plus" },
+        "2026-03-08": { type: "plus" },
+        "2026-03-09": { type: "plus" },
+        "2026-03-10": { type: "plus" },
+      });
+      const result = computeStreak(e, HABIT, new Date("2026-03-10T12:00:00"));
+      expect(result.best).toBe(4);
+      expect(result.current).toBe(4);
+    } finally {
+      process.env.TZ = originalTz;
+    }
+  });
 });

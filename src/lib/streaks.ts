@@ -18,6 +18,18 @@ export function entryToValue(entry: HabitEntry | undefined): number {
   return 0;
 }
 
+/** Whole calendar days between two YYYY-MM-DD strings. Normalizes to noon
+    rather than midnight before diffing - midnight-to-midnight can be 23h
+    or 25h across a DST transition, which would make consecutive calendar
+    days measure as something other than exactly one day. */
+function daysBetween(a: string, b: string): number {
+  const [ay, am, ad] = a.split("-").map(Number);
+  const [by, bm, bd] = b.split("-").map(Number);
+  const aNoon = new Date(ay, am - 1, ad, 12).getTime();
+  const bNoon = new Date(by, bm - 1, bd, 12).getTime();
+  return Math.round((bNoon - aNoon) / 86_400_000);
+}
+
 export interface StreakInfo {
   /** Consecutive done-days ending today, or yesterday if today isn't
       logged yet (a still-pending today doesn't zero out the streak). */
@@ -45,12 +57,11 @@ export function computeStreak(
 
   let best = 0;
   let run = 0;
-  let prevTime: number | null = null;
+  let prevDateStr: string | null = null;
   for (const dateStr of [...doneDates].sort()) {
-    const time = new Date(`${dateStr}T00:00:00`).getTime();
-    run = prevTime !== null && time - prevTime === 86_400_000 ? run + 1 : 1;
+    run = prevDateStr !== null && daysBetween(prevDateStr, dateStr) === 1 ? run + 1 : 1;
     best = Math.max(best, run);
-    prevTime = time;
+    prevDateStr = dateStr;
   }
 
   const cursor = new Date(today);
