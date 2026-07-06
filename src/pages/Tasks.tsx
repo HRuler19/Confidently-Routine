@@ -14,11 +14,12 @@ import { t } from "../lib/i18n";
 import Select from "../components/Select";
 import DatePicker from "../components/DatePicker";
 import { showToast } from "../lib/toast";
-import { todayStr, formatDisplayDate } from "../lib/dates";
-import { Plus, Check, X, Calendar, Pencil, Trash2 } from "lucide-solid";
+import { todayStr, formatDisplayDate, nextDueDate, type Recurrence } from "../lib/dates";
+import { Plus, Check, X, Calendar, Pencil, Trash2, Repeat, Search } from "lucide-solid";
 
 const CATEGORY_VALUES = ["personal", "work", "shopping", "other"] as const;
 const PRIORITY_VALUES = ["low", "medium", "high", "hard"] as const;
+const REPEAT_VALUES = ["none", "daily", "weekly", "monthly"] as const;
 
 function categoryOptions() {
   return CATEGORY_VALUES.map((c) => ({ value: c, label: () => t(`routines.category_${c}`) }));
@@ -26,6 +27,10 @@ function categoryOptions() {
 
 function priorityOptions() {
   return PRIORITY_VALUES.map((p) => ({ value: p, label: () => t(`routines.priority_${p}`) }));
+}
+
+function repeatOptions() {
+  return REPEAT_VALUES.map((r) => ({ value: r, label: () => t(`routines.repeat_${r}`) }));
 }
 
 /** Inline edit form shown in place of a task row. */
@@ -38,6 +43,7 @@ function TaskEditForm(props: {
   const [category, setCategory] = createSignal(props.task.category.toLowerCase());
   const [priority, setPriority] = createSignal(props.task.priority);
   const [dueDate, setDueDate] = createSignal(props.task.dueDate);
+  const [repeat, setRepeat] = createSignal<(typeof REPEAT_VALUES)[number]>(props.task.recurrence ?? "none");
 
   return (
     <div class="flex flex-col gap-3">
@@ -60,14 +66,20 @@ function TaskEditForm(props: {
           <Select value={priority()} options={priorityOptions()} onChange={setPriority} />
         </div>
       </div>
-      <div class="flex flex-col gap-1">
-        <label class="text-xs font-medium text-tertiary">{t("routines.due_date_label")}</label>
-        <DatePicker
-          class="w-fit max-[576px]:w-full"
-          value={dueDate()}
-          onChange={setDueDate}
-          ariaLabel={t("routines.due_date_label")}
-        />
+      <div class="flex gap-3 max-[576px]:flex-col">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-medium text-tertiary">{t("routines.due_date_label")}</label>
+          <DatePicker
+            class="w-fit max-[576px]:w-full"
+            value={dueDate()}
+            onChange={setDueDate}
+            ariaLabel={t("routines.due_date_label")}
+          />
+        </div>
+        <div class="flex flex-1 flex-col gap-1">
+          <label class="text-xs font-medium text-tertiary">{t("routines.repeat_label")}</label>
+          <Select value={repeat()} options={repeatOptions()} onChange={setRepeat} />
+        </div>
       </div>
       <div class="flex gap-2.5 max-[768px]:flex-col">
         <button
@@ -77,12 +89,14 @@ function TaskEditForm(props: {
             const newTitle = title().trim();
             if (!newTitle) return;
             const cat = category();
+            const rep = repeat();
             props.onSave({
               title: newTitle,
               category: cat.charAt(0).toUpperCase() + cat.slice(1),
               priority: priority(),
               dueDate: dueDate(),
               displayDate: formatDisplayDate(dueDate()),
+              recurrence: rep === "none" ? undefined : (rep as Recurrence),
             });
           }}
         >
@@ -107,9 +121,11 @@ export default function Tasks() {
   const [newCategory, setNewCategory] = createSignal("personal");
   const [newPriority, setNewPriority] = createSignal("medium");
   const [newDate, setNewDate] = createSignal(todayStr());
+  const [newRepeat, setNewRepeat] = createSignal<(typeof REPEAT_VALUES)[number]>("none");
   const [statusFilter, setStatusFilter] = createSignal("all");
   const [categoryFilter, setCategoryFilter] = createSignal("all");
   const [priorityFilter, setPriorityFilter] = createSignal("all");
+  const [searchQuery, setSearchQuery] = createSignal("");
   const [editingId, setEditingId] = createSignal<number | null>(null);
 
   function handleDelete(task: Task) {
@@ -118,6 +134,24 @@ export default function Tasks() {
       message: t("routines.deleted_toast", { title: task.title }),
       actionLabel: t("common.undo"),
       onAction: () => addTask(task),
+    });
+  }
+
+  /** Completing a recurring task spawns its next instance instead of just
+      vanishing - the finished one stays in history like any other task. */
+  function handleToggleComplete(task: Task, completed: boolean) {
+    updateTask(task.id, { completed });
+    if (!completed || !task.recurrence) return;
+    const dueDate = nextDueDate(task.dueDate, task.recurrence);
+    addTask({
+      id: Date.now(),
+      title: task.title,
+      category: task.category,
+      priority: task.priority,
+      recurrence: task.recurrence,
+      dueDate,
+      displayDate: formatDisplayDate(dueDate),
+      completed: false,
     });
   }
 
@@ -131,6 +165,8 @@ export default function Tasks() {
         return false;
       }
       if (priorityFilter() !== "all" && task.priority !== priorityFilter()) return false;
+      const query = searchQuery().trim().toLowerCase();
+      if (query && !task.title.toLowerCase().includes(query)) return false;
       return true;
     }),
   );
@@ -141,6 +177,7 @@ export default function Tasks() {
     const title = newTitle().trim();
     if (!title) return;
     const cat = newCategory();
+    const rep = newRepeat();
     addTask({
       id: Date.now(),
       title,
@@ -149,9 +186,11 @@ export default function Tasks() {
       dueDate: newDate() || todayStr(),
       displayDate: formatDisplayDate(newDate() || todayStr()),
       completed: false,
+      recurrence: rep === "none" ? undefined : (rep as Recurrence),
     });
     setNewTitle("");
     setNewDate(todayStr());
+    setNewRepeat("none");
   }
 
   return (
@@ -193,12 +232,26 @@ export default function Tasks() {
             <span class="text-xs font-medium text-tertiary">{t("routines.due_date_label")}</span>
             <DatePicker value={newDate()} onChange={setNewDate} ariaLabel={t("routines.due_date_label")} />
           </div>
+          <div class="flex min-w-40 flex-1 flex-col gap-1.5">
+            <span class="text-xs font-medium text-tertiary">{t("routines.repeat_label")}</span>
+            <Select value={newRepeat()} options={repeatOptions()} onChange={setNewRepeat} />
+          </div>
         </div>
       </section>
 
       {/* Filters + stats */}
       <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-3">
+          <div class="relative">
+            <Search size={14} class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tertiary" />
+            <input
+              type="text"
+              class="h-9 w-48 rounded-lg border border-line-input bg-surface pl-8 pr-3 text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none"
+              placeholder={t("routines.search_placeholder")}
+              value={searchQuery()}
+              onInput={(e) => setSearchQuery(e.currentTarget.value)}
+            />
+          </div>
           <span class="text-sm font-medium text-secondary">{t("routines.filters_label")}</span>
           <Select
             class="w-36"
@@ -274,9 +327,7 @@ export default function Tasks() {
                           type="checkbox"
                           class="task-check"
                           checked={task.completed}
-                          onChange={(e) =>
-                            updateTask(task.id, { completed: e.currentTarget.checked })
-                          }
+                          onChange={(e) => handleToggleComplete(task, e.currentTarget.checked)}
                         />
                         <h3
                           class="truncate text-base font-medium text-primary"
@@ -306,6 +357,14 @@ export default function Tasks() {
                           <Calendar size={14} />
                           {formatDisplayDate(task.dueDate)}
                         </span>
+                        <Show when={task.recurrence}>
+                          <span
+                            class="flex items-center text-tertiary"
+                            title={t(`routines.repeat_${task.recurrence}`)}
+                          >
+                            <Repeat size={14} />
+                          </span>
+                        </Show>
                       </div>
 
                       <div class="flex gap-2">

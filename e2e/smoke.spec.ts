@@ -51,6 +51,42 @@ test("task lifecycle: add, complete, filter, delete", async ({ page }) => {
   await expect(page.getByText("Buy groceries", { exact: true })).toBeVisible();
 });
 
+test("task search filters the list by title", async ({ page }) => {
+  await login(page);
+  await page.goto("/routines");
+
+  await page.fill('input[placeholder="Add new task"]', "Buy groceries");
+  await page.keyboard.press("Enter");
+  await page.fill('input[placeholder="Add new task"]', "Call dentist");
+  await page.keyboard.press("Enter");
+
+  await page.fill('input[placeholder="Search tasks..."]', "groc");
+  await expect(page.getByText("Buy groceries", { exact: true })).toBeVisible();
+  await expect(page.getByText("Call dentist", { exact: true })).toHaveCount(0);
+
+  await page.fill('input[placeholder="Search tasks..."]', "");
+  await expect(page.getByText("Call dentist", { exact: true })).toBeVisible();
+});
+
+test("recurring task spawns its next instance when completed", async ({ page }) => {
+  await login(page);
+  await page.goto("/routines");
+
+  await page.fill('input[placeholder="Add new task"]', "Water plants");
+  await page.getByRole("combobox").filter({ hasText: "Doesn't repeat" }).click();
+  await page.getByRole("option", { name: "Daily" }).click();
+  await page.getByRole("button", { name: /Add Task/i }).click();
+
+  await expect(page.getByText("Water plants", { exact: true })).toHaveCount(1);
+  await expect(page.locator("svg.lucide-repeat")).toBeVisible();
+
+  // completing it spawns tomorrow's instance instead of just disappearing
+  await page.locator(".task-check").first().check();
+  await expect(page.getByText("Water plants", { exact: true })).toHaveCount(2);
+  await expect(page.getByText("Today", { exact: true })).toBeVisible();
+  await expect(page.getByText("Tomorrow", { exact: true })).toBeVisible();
+});
+
 test("notes: add and edit", async ({ page }) => {
   await login(page);
   await page.goto("/notes");

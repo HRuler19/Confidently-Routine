@@ -23,6 +23,24 @@ export function dateKey(year: number, month: number, day: number): string {
   return `${year}-${pad(month)}-${pad(day)}`;
 }
 
+export type Recurrence = "daily" | "weekly" | "monthly";
+
+/** The due date a recurring task's next instance should land on. Monthly
+    clamps to the target month's actual length (Jan 31 -> Feb 28) instead
+    of overflowing into the month after, like most calendar apps. */
+export function nextDueDate(dateStr: string, recurrence: Recurrence): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+
+  if (recurrence === "daily") return toDateStr(new Date(year, month - 1, day + 1));
+  if (recurrence === "weekly") return toDateStr(new Date(year, month - 1, day + 7));
+
+  const nextMonthFirst = new Date(year, month, 1);
+  const nextYear = nextMonthFirst.getFullYear();
+  const nextMonth = nextMonthFirst.getMonth() + 1;
+  const clampedDay = Math.min(day, daysInMonth(nextYear, nextMonth));
+  return dateKey(nextYear, nextMonth, clampedDay);
+}
+
 /** Human-friendly relative due-date label ("Today", "In 3 days", …). */
 export function formatDisplayDate(dateStr: string): string {
   const today = new Date();

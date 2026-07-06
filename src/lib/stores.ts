@@ -4,6 +4,8 @@
 // a Solid signal whose mutations write through to storage.
 import { createSignal } from "solid-js";
 
+import type { Recurrence } from "./dates";
+
 // ── Shared JSON helpers ────────────────────────────────────────────────
 function readJSON<T>(key: string, fallback: T, session = false): T {
   try {
@@ -39,6 +41,7 @@ export interface Task {
   dueDate: string; // YYYY-MM-DD
   displayDate?: string;
   completed: boolean;
+  recurrence?: Recurrence;
 }
 
 export interface Note {

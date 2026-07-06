@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { formatDisplayDate, dateKey, daysInMonth, pad, toDateStr } from "./dates";
+import { formatDisplayDate, dateKey, daysInMonth, pad, toDateStr, nextDueDate } from "./dates";
 import { setLanguage } from "./i18n";
 
 function offsetDate(days: number): string {
@@ -43,5 +43,27 @@ describe("calendar math", () => {
     expect(daysInMonth(2026, 7)).toBe(31);
     expect(daysInMonth(2026, 2)).toBe(28);
     expect(daysInMonth(2028, 2)).toBe(29);
+  });
+});
+
+describe("nextDueDate", () => {
+  it("advances daily and weekly recurrences", () => {
+    expect(nextDueDate("2026-07-06", "daily")).toBe("2026-07-07");
+    expect(nextDueDate("2026-07-06", "weekly")).toBe("2026-07-13");
+  });
+
+  it("wraps daily/weekly across month and year boundaries", () => {
+    expect(nextDueDate("2026-07-31", "daily")).toBe("2026-08-01");
+    expect(nextDueDate("2026-12-28", "weekly")).toBe("2027-01-04");
+  });
+
+  it("advances monthly to the same day next month", () => {
+    expect(nextDueDate("2026-07-06", "monthly")).toBe("2026-08-06");
+    expect(nextDueDate("2026-12-15", "monthly")).toBe("2027-01-15");
+  });
+
+  it("clamps monthly recurrence to the target month's length", () => {
+    expect(nextDueDate("2026-01-31", "monthly")).toBe("2026-02-28");
+    expect(nextDueDate("2028-01-31", "monthly")).toBe("2028-02-29");
   });
 });
