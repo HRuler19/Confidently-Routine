@@ -10,7 +10,8 @@ import Select from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
 import { Button, Input, Card } from "../components/ui";
 import { showToast } from "../lib/toast";
-import { Plus, Check, Download, Upload, DatabaseBackup } from "lucide-solid";
+import { checkForUpdate, installPendingUpdate, isUpdateCapable } from "../lib/updater";
+import { Plus, Check, Download, Upload, DatabaseBackup, RefreshCw } from "lucide-solid";
 
 const AVATARS = [
   "/images/Boy image 1.svg",
@@ -32,8 +33,32 @@ export default function Settings() {
   const [newPassword, setNewPassword] = createSignal("");
   const [justSaved, setJustSaved] = createSignal(false);
   const [pendingImportFile, setPendingImportFile] = createSignal<File | null>(null);
+  const [canUpdate, setCanUpdate] = createSignal(false);
+  const [updateState, setUpdateState] = createSignal<"idle" | "checking" | "available" | "up_to_date" | "error">(
+    "idle",
+  );
+  const [updateVersion, setUpdateVersion] = createSignal("");
   let fileInput: HTMLInputElement | undefined;
   let importInput: HTMLInputElement | undefined;
+
+  isUpdateCapable().then(setCanUpdate);
+
+  async function handleCheckUpdate() {
+    setUpdateState("checking");
+    try {
+      const result = await checkForUpdate();
+      if (result.available) {
+        setUpdateVersion(result.version ?? "");
+        setUpdateState("available");
+      } else {
+        setUpdateState("up_to_date");
+        setTimeout(() => setUpdateState("idle"), 3000);
+      }
+    } catch {
+      setUpdateState("error");
+      setTimeout(() => setUpdateState("idle"), 3000);
+    }
+  }
 
   function onImportFileChosen(e: Event) {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -260,6 +285,37 @@ export default function Settings() {
           />
         </div>
       </Card>
+
+      {/* Updates - desktop Tauri builds only, Android/iOS use their store's own flow */}
+      <Show when={canUpdate()}>
+        <Card>
+          <h2 class="mb-2 text-lg font-semibold text-primary">{t("settings.updates_title")}</h2>
+          <p class="mb-6 text-sm text-tertiary">{t("settings.updates_hint")}</p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <Button
+              variant="outline"
+              class="flex h-11 items-center gap-2 px-5"
+              disabled={updateState() === "checking"}
+              onClick={handleCheckUpdate}
+            >
+              <RefreshCw size={16} classList={{ "animate-spin": updateState() === "checking" }} />
+              {t("settings.check_updates_button")}
+            </Button>
+            <Show when={updateState() === "up_to_date"}>
+              <span class="text-sm text-tertiary">{t("settings.up_to_date")}</span>
+            </Show>
+            <Show when={updateState() === "error"}>
+              <span class="text-sm text-danger">{t("settings.update_check_error")}</span>
+            </Show>
+            <Show when={updateState() === "available"}>
+              <Button variant="primary" class="h-11 px-5" onClick={() => installPendingUpdate()}>
+                {t("settings.install_update_button", { version: updateVersion() })}
+              </Button>
+            </Show>
+          </div>
+        </Card>
+      </Show>
 
       <ConfirmModal
         open={pendingImportFile() !== null}

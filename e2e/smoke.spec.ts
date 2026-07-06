@@ -169,6 +169,8 @@ test("dashboard renders analytics and settings switches theme + language", async
 
   // settings: dark theme
   await page.goto("/settings");
+  // the updater section is Tauri-desktop-only and must stay hidden in the browser build
+  await expect(page.getByText("Check for updates")).toHaveCount(0);
   await page.getByRole("combobox").filter({ hasText: "Light mode" }).click();
   await page.getByRole("option", { name: "Dark mode" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");

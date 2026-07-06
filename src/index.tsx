@@ -2,6 +2,9 @@
 import { render } from "solid-js/web";
 import App from "./App";
 import "./styles/app.css";
+import { checkForUpdate, installPendingUpdate } from "./lib/updater";
+import { showToast } from "./lib/toast";
+import { t } from "./lib/i18n";
 
 render(() => <App />, document.getElementById("root")!);
 
@@ -16,3 +19,15 @@ if (!("__TAURI_INTERNALS__" in window)) {
       // or a browser without service worker support.
     });
 }
+
+// Silent startup check - no-ops everywhere except a Tauri desktop build,
+// so this is safe to always call regardless of platform.
+checkForUpdate().then((result) => {
+  if (!result.available) return;
+  showToast({
+    message: t("settings.update_available_toast", { version: result.version ?? "" }),
+    actionLabel: t("settings.install_update_button", { version: result.version ?? "" }),
+    onAction: () => installPendingUpdate(),
+    duration: 12000,
+  });
+});

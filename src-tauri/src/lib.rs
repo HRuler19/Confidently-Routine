@@ -9,6 +9,12 @@ pub fn run() {
             .build(),
         )?;
       }
+      #[cfg(desktop)]
+      {
+        app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
+        app.handle().plugin(tauri_plugin_process::init())?;
+      }
+      app.handle().plugin(tauri_plugin_os::init())?;
       Ok(())
     })
     .run(tauri::generate_context!())
