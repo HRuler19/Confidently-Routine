@@ -25,6 +25,7 @@ import {
 } from "../lib/stores";
 import { t, calendarNames } from "../lib/i18n";
 import { theme } from "../lib/theme";
+import { selectableYears } from "../lib/dates";
 import Select, { type SelectOption } from "../components/Select";
 import ConfirmModal from "../components/ConfirmModal";
 import Heatmap from "../components/Heatmap";
@@ -38,7 +39,7 @@ import { Plus, Check, X, Pencil, Eraser, Trash2 } from "lucide-solid";
 
 const LONG_PRESS_MS = 450;
 
-const YEARS = ["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"];
+const YEARS = selectableYears();
 
 function pad(n: number) {
   return String(n).padStart(2, "0");

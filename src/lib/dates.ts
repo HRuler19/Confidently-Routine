@@ -19,6 +19,17 @@ export function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
 
+/** Years offered in the year pickers - from the app's first year through a few
+    past the current one, computed from today rather than hard-coded, so the
+    list never runs out (in 2031 it reaches 2036, and so on). */
+export function selectableYears(): string[] {
+  const START = 2023;
+  const end = new Date().getFullYear() + 5;
+  const years: string[] = [];
+  for (let y = START; y <= end; y++) years.push(String(y));
+  return years;
+}
+
 export function dateKey(year: number, month: number, day: number): string {
   return `${year}-${pad(month)}-${pad(day)}`;
 }

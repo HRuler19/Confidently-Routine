@@ -20,11 +20,16 @@ export default function Heatmap(props: { habitId: number; year: number; color: s
 
   return (
     <div class="overflow-x-auto pb-1">
+      {/* Fluid grid: the 7×weekCount cells share the full card width via 1fr
+          columns and stay square with aspect-square, so the graph scales up on
+          wide screens instead of sitting tiny in a corner. A min-width keeps
+          the cells from collapsing on narrow screens, where the wrapper scrolls
+          horizontally instead. */}
       <div
-        class="grid w-fit gap-[3px]"
+        class="grid w-full min-w-130 gap-[2.5px]"
         style={{
-          "grid-template-columns": `repeat(${data().weekCount}, 11px)`,
-          "grid-template-rows": "12px repeat(7, 11px)",
+          "grid-template-columns": `repeat(${data().weekCount}, minmax(0, 1fr))`,
+          "grid-template-rows": "auto repeat(7, auto)",
         }}
       >
         <For each={data().monthLabels}>
@@ -41,7 +46,7 @@ export default function Heatmap(props: { habitId: number; year: number; color: s
           {(cell) => (
             <div
               title={cellTitle(cell.date, cell.level, cell.missed)}
-              class="size-[11px] rounded-[2px]"
+              class="aspect-square rounded-xs"
               classList={{ "outline outline-1 -outline-offset-1 outline-danger/50": cell.missed }}
               style={{
                 "grid-column": cell.col,

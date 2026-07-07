@@ -5,7 +5,7 @@
 // reactively on data, language, and theme changes.
 import { createSignal, createMemo, For, Show } from "solid-js";
 import { tasks, notes, habits, habitEntries, sleepEntries, entryKey } from "../lib/stores";
-import { isInRange, type DateRange } from "../lib/dates";
+import { isInRange, selectableYears, type DateRange } from "../lib/dates";
 import { t, calendarNames } from "../lib/i18n";
 import { theme } from "../lib/theme";
 import Select from "../components/Select";
@@ -15,7 +15,7 @@ import { BarChart, LineChart, ProgressRing } from "../components/charts";
 import { isEntryDone, entryToValue, computeStreak } from "../lib/streaks";
 import { habitColor } from "../lib/colors";
 
-const YEARS = ["2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030"];
+const YEARS = selectableYears();
 
 function pad(n: number) {
   return String(n).padStart(2, "0");
