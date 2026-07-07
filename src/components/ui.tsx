@@ -6,11 +6,12 @@ import { splitProps, Show, type ComponentProps, type ParentProps, type JSX } fro
 type ButtonVariant = "primary" | "outline" | "danger-outline";
 
 const BUTTON_BASE =
-  "cursor-pointer rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+  "cursor-pointer rounded-lg text-sm font-medium transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-accent-fill-text hover:bg-accent-hover",
-  outline: "border border-line bg-surface text-secondary hover:border-accent hover:text-accent",
+  primary:
+    "bg-accent text-accent-fill-text shadow-sm shadow-accent/25 hover:bg-accent-hover hover:shadow-md hover:shadow-accent/30",
+  outline: "border border-line bg-surface text-secondary hover:border-accent hover:text-accent hover:bg-accent/5",
   "danger-outline":
     "border border-danger/40 bg-surface text-danger hover:border-danger hover:bg-danger/10",
 };
@@ -34,7 +35,7 @@ export function Button(props: ButtonProps) {
 
 // ── Inputs ──────────────────────────────────────────────────────────────
 const FIELD_BASE =
-  "rounded-lg border border-line-input bg-surface text-sm text-primary placeholder:text-placeholder focus:border-accent focus:outline-none";
+  "rounded-lg border border-line-input bg-surface text-sm text-primary placeholder:text-placeholder transition-all duration-200 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25";
 
 export function Input(props: ComponentProps<"input">) {
   const [local, rest] = splitProps(props, ["class"]);
@@ -51,7 +52,9 @@ export function Card(
   props: ParentProps<{ class?: string; title?: JSX.Element; controls?: JSX.Element }>,
 ) {
   return (
-    <section class={`rounded-xl bg-surface p-6 shadow-sm shadow-(color:--shadow-color) ${props.class ?? ""}`}>
+    <section
+      class={`card-elevated rounded-2xl border border-line/70 bg-surface p-6 ${props.class ?? ""}`}
+    >
       <Show when={props.title || props.controls}>
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 class="text-lg font-semibold text-primary">{props.title}</h2>

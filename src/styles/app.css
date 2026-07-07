@@ -40,6 +40,10 @@
   --accent-pink: #db2777;
   --shadow-color: rgba(0, 0, 0, 0.05);
   --shadow-color-strong: rgba(0, 0, 0, 0.1);
+  /* Layered soft elevation for cards (light) - two stacked shadows read as
+     real depth instead of a single flat drop. */
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 6px 16px -4px rgba(16, 24, 40, 0.08);
+  --shadow-card-hover: 0 2px 4px rgba(16, 24, 40, 0.06), 0 14px 32px -6px rgba(16, 24, 40, 0.14);
   /* Task category / priority / stat-dot colors (light) */
   --cat-personal: #35a800;
   --cat-work: #0066ff;
@@ -82,6 +86,9 @@
   --accent-pink: #f778ba;
   --shadow-color: rgba(0, 0, 0, 0.5);
   --shadow-color-strong: rgba(0, 0, 0, 0.6);
+  /* Deeper stacked shadows read against the near-black page (dark). */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 20px -4px rgba(0, 0, 0, 0.55);
+  --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.5), 0 16px 36px -6px rgba(0, 0, 0, 0.65);
   /* Task category / priority / stat-dot colors, tuned for dark surfaces */
   --cat-personal: #2d9b27;
   --cat-work: #58a6ff;
@@ -217,6 +224,59 @@ input[type="number"]::-webkit-inner-spin-button {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ── Polish: elevation, entrance motion, chart fills ─────────────────────
+   A small shared vocabulary the components reuse so the "feel" (depth,
+   easing, timing) stays consistent across every page. */
+
+/* Layered card elevation, theme-aware via the runtime shadow tokens. */
+.card-elevated {
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.3s ease;
+}
+
+/* NB: cards deliberately have NO entrance animation. They host overflowing
+   popups (Select / DatePicker dropdowns), and any animation that briefly sets
+   opacity < 1 or applies a transform turns each card into its own stacking
+   context - which traps a dropdown's z-index inside its card so a later
+   sibling card paints over it. Chart-internal animations below are safe: they
+   live on SVG shapes that never contain a popup. */
+
+/* Bars grow up from their baseline; ring sweeps from empty to its value. */
+@keyframes barRise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.bar-rise {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: barRise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes ringFill {
+  from {
+    stroke-dashoffset: var(--ring-circ);
+  }
+}
+
+.ring-fill {
+  animation: ringFill 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Respect users who ask for less motion - keep the final state, drop the
+   animation. */
+@media (prefers-reduced-motion: reduce) {
+  .bar-rise,
+  .ring-fill {
+    animation: none;
   }
 }
 

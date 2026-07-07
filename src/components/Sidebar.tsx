@@ -25,13 +25,21 @@ export default function Sidebar(props: { onLogout: () => void }) {
             aria-current={location.pathname === item.path ? "page" : undefined}
           >
             <div
-              class="mx-2.5 mb-1 flex cursor-pointer items-center gap-3 rounded-lg px-5 py-3 transition-all hover:bg-hover"
-              classList={{ "bg-hover": location.pathname === item.path }}
+              class="mx-2.5 mb-1 flex cursor-pointer items-center gap-3 rounded-lg px-5 py-3 transition-all duration-200 hover:bg-hover"
+              classList={{ "bg-accent/10 ring-1 ring-accent/15": location.pathname === item.path }}
             >
               <div class="flex min-w-6 justify-center">
                 <Dynamic component={item.icon} size={20} class="text-accent" />
               </div>
-              <div class="text-base font-medium text-primary">{t(item.labelKey)}</div>
+              <div
+                class="text-base font-medium"
+                classList={{
+                  "text-accent": location.pathname === item.path,
+                  "text-primary": location.pathname !== item.path,
+                }}
+              >
+                {t(item.labelKey)}
+              </div>
             </div>
           </A>
         )}

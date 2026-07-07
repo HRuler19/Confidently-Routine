@@ -197,9 +197,9 @@ test("habits: add habit, cycle a cell, and log a count via the modal", async ({ 
 
   const cell = page.locator("tbody td").nth(1);
 
-  // tap once -> done (plus), tap again -> missed (x), tap again -> empty
+  // tap once -> done (check), tap again -> missed (x), tap again -> empty
   await cell.click();
-  await expect(cell.locator("svg.lucide-plus")).toBeVisible();
+  await expect(cell.locator("svg.lucide-check")).toBeVisible();
   await cell.click();
   await expect(cell.locator("svg.lucide-x")).toBeVisible();
   await cell.click();

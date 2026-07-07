@@ -406,7 +406,7 @@ export default function MyRoutine() {
                                 when={e().type === "count"}
                                 fallback={
                                   e().type === "plus" ? (
-                                    <Plus size={16} class="inline-block text-accent" />
+                                    <Check size={16} class="inline-block text-accent" />
                                   ) : (
                                     <X size={16} class="inline-block text-danger" />
                                   )
@@ -620,7 +620,7 @@ export default function MyRoutine() {
                     if (!active) setCount("");
                   }}
                 >
-                  <Plus size={18} />
+                  <Check size={18} />
                 </button>
                 <button
                   type="button"
