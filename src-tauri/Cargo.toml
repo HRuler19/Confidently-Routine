@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "2.0.1"
+version = "2.0.2"
 description = "Confidently Routine - habit, task and notes tracker"
 authors = ["Cholukov Hangeldi"]
 license = "MIT"
@@ -34,3 +34,13 @@ tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
+
+# Size-optimised release profile (Tauri's recommended settings). Shrinks the
+# native library that ships in every bundle - most visibly the Android APK,
+# whose universal build otherwise carries a full copy of this binary per ABI.
+[profile.release]
+opt-level = "s"    # optimise for size rather than raw speed
+lto = true         # cross-crate link-time optimisation drops dead code
+codegen-units = 1  # one unit lets LTO strip the most
+strip = true       # remove debug symbols from the final binary
+panic = "abort"    # no unwinding tables - smaller, and fine for an app binary
