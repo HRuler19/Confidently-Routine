@@ -50,29 +50,29 @@ A privacy-first productivity suite for habits, daily tasks, and notes — built 
 
 ## ⬇ Download & Install
 
-<!-- Windows/Android buttons use /releases/latest/download/<exact-filename>, which
-     always serves whatever asset by that name sits in the newest release - but the
-     filename itself embeds the version (tauri-action names it from productName +
-     package version), so bump the version number in these two links whenever a new
-     tag is released, or the button 404s against the new release. -->
+<!-- All three buttons use /releases/latest/download/<exact-filename>, which always
+     serves whatever asset by that name sits in the newest release. tauri-action
+     names the Windows/macOS files from productName + version (and GitHub replaces
+     spaces in uploaded filenames with dots), and the Android APK is uploaded by hand
+     under a fixed Confidently-Routine-<version>.apk pattern - so bump the version
+     number in all three links whenever a new tag is released, or the buttons 404
+     against the new release. -->
 
-> Grab the latest build for your device from the **[latest release](https://github.com/HRuler19/Confidently-Routine/releases/latest)**, or use a direct link below — the buttons always resolve to the newest Windows/Android build, no need to hunt for a version number.
+> Grab the latest build for your device from the **[latest release](https://github.com/HRuler19/Confidently-Routine/releases/latest)**, or use a direct link below — the buttons always resolve to the newest build, no need to hunt for a version number.
 
 <div align="center">
 
 ### 🪟 Windows
 
-[![Download Windows Installer](https://img.shields.io/badge/⬇_Download-Windows_Installer_~5MB-0078D6?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently-Routine-Setup-2.0.0.exe)
+[![Download Windows Installer](https://img.shields.io/badge/⬇_Download-Windows_Installer_~5MB-0078D6?style=for-the-badge&logo=windows11&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently.Routine_2.0.1_x64-setup.exe)
 
 ### 🤖 Android
 
-[![Download Android APK](https://img.shields.io/badge/⬇_Download-Android_APK_(signed)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently-Routine-2.0.0.apk)
+[![Download Android APK](https://img.shields.io/badge/⬇_Download-Android_APK_(signed)-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently-Routine-2.0.1.apk)
 
-### 🍎 macOS <sub>(v1 builds — v2 ships with the next tagged release, built by CI)</sub>
+### 🍎 macOS
 
-[![Download macOS (Apple Silicon)](https://img.shields.io/badge/⬇_Download-macOS_Apple_Silicon_(.dmg)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v1.0.0/Confidently-Routine-1.0.0-arm64.dmg)
-&nbsp;
-[![Download macOS (Intel)](https://img.shields.io/badge/⬇_Download-macOS_Intel_(.dmg)-5E5E5E?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/download/v1.0.0/Confidently-Routine-1.0.0-x64.dmg)
+[![Download macOS (Universal)](https://img.shields.io/badge/⬇_Download-macOS_Universal_(.dmg)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/HRuler19/Confidently-Routine/releases/latest/download/Confidently.Routine_2.0.1_universal.dmg)
 
 ### 📱 iOS
 
@@ -84,10 +84,9 @@ A privacy-first productivity suite for habits, daily tasks, and notes — built 
 
 | Platform | File | How to install |
 |---|---|---|
-| **Windows** | `Confidently-Routine-Setup-2.0.0.exe` | Run the ~5 MB installer — it adds Start-menu and desktop shortcuts. Installs per-user, no admin rights needed. |
-| **Android** | `Confidently-Routine-2.0.0.apk` | Enable **Settings → Apps → Install unknown apps** for your browser/file manager, then open the `.apk` to sideload. Signed release build (arm64 + x86_64). |
-| **macOS (Apple Silicon)** | `Confidently-Routine-1.0.0-arm64.dmg` | Open the `.dmg`, drag the app into **Applications**. For M1/M2/M3/M4 Macs. *(v1 build — the v2 Tauri build ships with the next tagged release, built automatically by CI.)* |
-| **macOS (Intel)** | `Confidently-Routine-1.0.0-x64.dmg` | Same as above, for Intel-based Macs. |
+| **Windows** | `Confidently.Routine_2.0.1_x64-setup.exe` | Run the ~5 MB installer — it adds Start-menu and desktop shortcuts. Installs per-user, no admin rights needed. |
+| **Android** | `Confidently-Routine-2.0.1.apk` | Enable **Settings → Apps → Install unknown apps** for your browser/file manager, then open the `.apk` to sideload. Signed release build (arm64 + x86_64). |
+| **macOS** | `Confidently.Routine_2.0.1_universal.dmg` | Open the `.dmg`, drag the app into **Applications**. Single universal binary — works on both Apple Silicon and Intel Macs, built automatically by CI on every tagged release. |
 | **iOS** | — | Apple doesn't allow installing an unsigned `.ipa` on a device without a paid Developer Program account, so there's no direct download yet. Build and run it yourself from Xcode — see [Building from source](#-building-from-source). |
 | **Browser** | — | `bun install && bun run build`, then host the generated `dist/` folder on any static server. |
 
