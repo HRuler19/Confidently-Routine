@@ -62,22 +62,44 @@ function getDb(): Promise<SqlDatabase> {
   return dbPromise;
 }
 
+// Serialise every mutation through one promise chain. Each write stores the
+// full current state of a key and writes are issued in the right order from
+// synchronous UI actions - but tauri-plugin-sql runs on a connection pool, so
+// without this two rapid writes to the same key (e.g. completing a recurring
+// task, which rewrites the task list and then appends the next occurrence)
+// could commit out of order and persist a stale array, losing data on the next
+// launch. Chaining guarantees they land in issue order, keeping last-write-wins
+// correct. Errors are swallowed per-link so one failure can't stall the queue.
+let writeChain: Promise<void> = Promise.resolve();
+
+function enqueueWrite(op: (db: SqlDatabase) => Promise<unknown>): Promise<void> {
+  writeChain = writeChain.then(async () => {
+    try {
+      const db = await getDb();
+      await op(db);
+    } catch (e) {
+      console.error("SQLite write failed:", e);
+    }
+  });
+  return writeChain;
+}
+
 const sqliteBackend: StorageBackend = {
   async getItem(key) {
     const db = await getDb();
     const rows = await db.select<{ value: string }[]>("SELECT value FROM kv WHERE key = $1", [key]);
     return rows.length > 0 ? rows[0].value : null;
   },
-  async setItem(key, value) {
-    const db = await getDb();
-    await db.execute(
-      "INSERT INTO kv (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = $2",
-      [key, value],
+  setItem(key, value) {
+    return enqueueWrite((db) =>
+      db.execute("INSERT INTO kv (key, value) VALUES ($1, $2) ON CONFLICT(key) DO UPDATE SET value = $2", [
+        key,
+        value,
+      ]),
     );
   },
-  async removeItem(key) {
-    const db = await getDb();
-    await db.execute("DELETE FROM kv WHERE key = $1", [key]);
+  removeItem(key) {
+    return enqueueWrite((db) => db.execute("DELETE FROM kv WHERE key = $1", [key]));
   },
 };
 
