@@ -2,11 +2,20 @@
 import { render } from "solid-js/web";
 import App from "./App";
 import "./styles/app.css";
+import { hydrateStores } from "./lib/stores";
 import { checkForUpdate, installPendingUpdate } from "./lib/updater";
 import { showToast } from "./lib/toast";
 import { t } from "./lib/i18n";
 
-render(() => <App />, document.getElementById("root")!);
+// Wait for the data collections to load from the storage backend before the
+// first paint - on the SQLite (Tauri) build that read is async, and rendering
+// beforehand would flash empty pages. In the browser build hydrateStores()
+// resolves immediately (collections seed themselves synchronously), so this
+// costs a single microtask. `finally` guarantees the app still renders even if
+// hydration somehow fails, degrading to empty data rather than a blank screen.
+hydrateStores()
+  .catch((e) => console.error("Store hydration failed:", e))
+  .finally(() => render(() => <App />, document.getElementById("root")!));
 
 // Only the plain browser build should register a service worker - the
 // desktop/mobile apps already serve their assets locally through Tauri,

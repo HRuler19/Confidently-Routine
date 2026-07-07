@@ -1,12 +1,17 @@
-// Reactive persistence layer. Uses the exact same localStorage keys and
-// object shapes as the vanilla app's core/storage/* stores, so existing
-// user data keeps working after the SolidJS rewrite. Every collection is
-// a Solid signal whose mutations write through to storage.
+// Reactive persistence layer. Uses the exact same storage keys and object
+// shapes as the vanilla app's core/storage/* stores, so existing user data
+// keeps working after the SolidJS rewrite. Every collection is a Solid signal
+// whose mutations write through to the storage backend (localStorage in the
+// browser, SQLite in the Tauri desktop/mobile apps - see ./storage).
 import { createSignal } from "solid-js";
 
 import type { Recurrence } from "./dates";
+import { backend } from "./storage";
 
-// ── Shared JSON helpers ────────────────────────────────────────────────
+// ── Shared JSON helpers (user/session auth only) ───────────────────────
+// Auth stays on web storage even under SQLite: it's tiny, and the
+// remember-me flow depends on sessionStorage's "clears when the app closes"
+// semantics, which a database has no equivalent for.
 function readJSON<T>(key: string, fallback: T, session = false): T {
   try {
     const raw = (session ? sessionStorage : localStorage).getItem(key);
@@ -121,13 +126,67 @@ export function logout() {
 }
 
 // ── Generic reactive collection helper ─────────────────────────────────
+// Each collection lives in a signal (the synchronous source of truth the UI
+// reads) and writes through to the storage backend on every mutation.
+//
+// On a synchronous backend (localStorage) the signal is seeded at module load,
+// so nothing changes for the browser build. On SQLite there's no synchronous
+// read, so the signal starts at its fallback and is filled by hydrateStores()
+// before the app renders; the write-through stays fire-and-forget, mirroring
+// the old localStorage behaviour of surfacing failures only via console.
+const hydrators: Array<() => Promise<void>> = [];
+
+function parseOr<T>(raw: string | null, fallback: T): T {
+  if (raw == null) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 function collection<T>(key: string, fallback: T) {
-  const [get, set] = createSignal<T>(readJSON<T>(key, fallback));
+  const seed = backend.getItemSync ? parseOr(backend.getItemSync(key), fallback) : fallback;
+  const [get, set] = createSignal<T>(seed);
   const update = (next: T) => {
-    writeJSON(key, next);
     set(() => next);
+    backend.setItem(key, JSON.stringify(next)).catch((e) => console.error(`Storage error (${key}):`, e));
   };
+  hydrators.push(async () => {
+    if (backend.getItemSync) return; // already seeded synchronously at module load
+    const raw = await backend.getItem(key);
+    set(() => parseOr(raw, fallback));
+  });
   return [get, update] as const;
+}
+
+const DATA_KEYS = [
+  KEYS.TASKS,
+  KEYS.NOTES,
+  KEYS.HABITS,
+  KEYS.HABIT_ENTRIES,
+  KEYS.REMINDER_LOG,
+  KEYS.SLEEP,
+] as const;
+
+/** Loads every data collection from the storage backend into its signal.
+    On a synchronous backend this is a no-op (collections seeded themselves at
+    module load); on SQLite it runs the async reads - and, on first launch,
+    first copies any data left in localStorage by an older localStorage-only
+    version of the app so upgrading users don't lose their tasks/habits/notes.
+    index.tsx awaits this before rendering, so the UI never paints empty. */
+export async function hydrateStores(): Promise<void> {
+  if (backend.getItemSync) return; // browser: collections are already populated
+  for (const key of DATA_KEYS) {
+    try {
+      if ((await backend.getItem(key)) != null) continue; // already migrated
+      const legacy = localStorage.getItem(key);
+      if (legacy != null) await backend.setItem(key, legacy);
+    } catch (e) {
+      console.error(`Migration error (${key}):`, e);
+    }
+  }
+  await Promise.all(hydrators.map((h) => h()));
 }
 
 // ── Tasks ──────────────────────────────────────────────────────────────

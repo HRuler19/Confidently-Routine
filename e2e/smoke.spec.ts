@@ -131,6 +131,20 @@ test("recurring task spawns its next instance when completed", async ({ page }) 
   await expect(page.getByText("Water plants", { exact: true })).toHaveCount(2);
 });
 
+test("data persists across a full page reload", async ({ page }) => {
+  // Exercises the write-through -> reload -> hydrate cycle directly: a task
+  // added, then a hard reload (which re-runs the app bootstrap and rehydrates
+  // every collection from the storage backend) must still show the task.
+  await login(page);
+  await page.goto("/routines");
+  await page.fill('input[placeholder="Add new task"]', "Persist across reload");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Persist across reload", { exact: true })).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByText("Persist across reload", { exact: true })).toBeVisible();
+});
+
 test("notes: add and edit", async ({ page }) => {
   await login(page);
   await page.goto("/notes");

@@ -27,6 +27,7 @@ tauri-plugin-os = "2"
 tauri-plugin-notification = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 
 # The updater plugin only supports desktop - there's no equivalent
 # self-update flow on Android/iOS, where the store handles updates instead.

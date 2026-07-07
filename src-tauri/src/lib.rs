@@ -18,6 +18,7 @@ pub fn run() {
       app.handle().plugin(tauri_plugin_notification::init())?;
       app.handle().plugin(tauri_plugin_dialog::init())?;
       app.handle().plugin(tauri_plugin_fs::init())?;
+      app.handle().plugin(tauri_plugin_sql::Builder::default().build())?;
       Ok(())
     })
     .run(tauri::generate_context!())
