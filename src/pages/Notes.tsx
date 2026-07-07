@@ -6,6 +6,7 @@ import { notes, addNote, updateNote, deleteNote, type Note } from "../lib/stores
 import { t } from "../lib/i18n";
 import Select from "../components/Select";
 import DatePicker from "../components/DatePicker";
+import MarkdownToolbar from "../components/MarkdownToolbar";
 import { Button, Textarea, Card, StatBadge } from "../components/ui";
 import { showToast } from "../lib/toast";
 import { todayStr } from "../lib/dates";
@@ -27,14 +28,19 @@ function NoteEditForm(props: {
   const [content, setContent] = createSignal(props.note.content);
   const [category, setCategory] = createSignal(props.note.category);
   const [date, setDate] = createSignal(props.note.date || todayStr());
+  let taRef: HTMLTextAreaElement | undefined;
 
   return (
     <div class="flex w-full flex-col gap-3">
-      <Textarea
-        class="min-h-24 w-full"
-        value={content()}
-        onInput={(e) => setContent(e.currentTarget.value)}
-      />
+      <div class="flex flex-col gap-1.5">
+        <MarkdownToolbar getTextarea={() => taRef} onChange={setContent} />
+        <Textarea
+          ref={(el) => (taRef = el)}
+          class="min-h-24 w-full"
+          value={content()}
+          onInput={(e) => setContent(e.currentTarget.value)}
+        />
+      </div>
       <div class="flex flex-wrap gap-3">
         <DatePicker class="w-fit" value={date()} onChange={setDate} ariaLabel={t("notes.date_label")} />
         <Select class="w-40" value={category()} options={noteCategoryOptions()} onChange={setCategory} />
@@ -73,6 +79,7 @@ export default function Notes() {
   const [categoryFilter, setCategoryFilter] = createSignal("all");
   const [searchQuery, setSearchQuery] = createSignal("");
   const [editingId, setEditingId] = createSignal<number | null>(null);
+  let addTaRef: HTMLTextAreaElement | undefined;
 
   function handleDelete(note: Note) {
     deleteNote(note.id);
@@ -123,7 +130,9 @@ export default function Notes() {
       <Card>
         <div class="flex gap-5 max-[768px]:flex-col">
           <div class="flex flex-1 flex-col gap-1.5">
+            <MarkdownToolbar getTextarea={() => addTaRef} onChange={setNewContent} />
             <Textarea
+              ref={(el) => (addTaRef = el)}
               class="min-h-36 w-full p-4"
               placeholder={t("notes.add_placeholder")}
               value={newContent()}
